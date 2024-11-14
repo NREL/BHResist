@@ -11,7 +11,7 @@ class TestBHR(unittest.TestCase):
             "borehole-type": "UTUBE", # or "COAXIAL"
             "num-u-tubes": 1,
             "hydraulic-configuration": "PARALLEL", # SERIES
-            "shank-spacing"
+            "u-tube-shank-spacing": 0.002,
             "circulating-fluid": {
                 "type": "PROPYLENEGLYCOL", # or "WATER" or "ETHYLALCOHOL" or "METHYLEALCOHOL
                 "concentration": 0.2,
@@ -30,3 +30,6 @@ class TestBHR(unittest.TestCase):
         }
 
         bh = Borehole(inputs)
+
+        # only pass flow rate, so pipe resistance should be computed in the process of of this call
+        bh.calc_bh_effective_resistance_uhf(flow_rate=0.5)
