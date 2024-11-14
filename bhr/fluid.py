@@ -10,8 +10,8 @@ import logging
 def get_fluid(fluid_str: str, fluid_concentration: float = 0):
 
     if fluid_concentration < 0:
-        logging.warning("Attempting to set <0 water-antifreeze mixture concentraiton.")
-        logging.warning("Expect fluid concentraiton 0 <= x <= 0.6")
+        logging.warning("Attempting to set <0 water-antifreeze mixture concentration.")
+        logging.warning("Expect fluid concentration 0 <= x <= 0.6")
         logging.warning("Defaulting to 0.")
         fluid_concentration = 0
 
@@ -21,7 +21,7 @@ def get_fluid(fluid_str: str, fluid_concentration: float = 0):
             return Water()
         else:
             logging.warning(f"Fluid \"{fluid_name}\" - attempting to set non-zero \
-                            water-antifreeze mixture concentraiton \"{fluid_concentration:0.3f}\".")
+                            water-antifreeze mixture concentration \"{fluid_concentration:0.3f}\".")
             logging.warning("Defaulting to pure water.")
             return Water()
 

@@ -5,13 +5,16 @@ from bhr.borehole import Borehole
 
 class TestBHR(unittest.TestCase):
 
-    def test_init_bh_init(self):
+    def test_init_single_u_tube_bh(self):
 
         inputs = {
-            "borehole-type": "SINGLEUTUBE",
-            "fluid": {
-                "fluid-type": "PROPYLENEGLYCOL",
-                "fluid-concentration": 0.2,
+            "borehole-type": "UTUBE", # or "COAXIAL"
+            "num-u-tubes": 1,
+            "hydraulic-configuration": "PARALLEL", # SERIES
+            "shank-spacing"
+            "circulating-fluid": {
+                "type": "PROPYLENEGLYCOL", # or "WATER" or "ETHYLALCOHOL" or "METHYLEALCOHOL
+                "concentration": 0.2,
             },
             "pipe": {
                 "nominal-pipe-diameter-inch": 1.0,
@@ -19,7 +22,7 @@ class TestBHR(unittest.TestCase):
                 "conductivity": 0.4
             },
             "filling": {
-                "grout-type": "GROUT",
+                "type": "GROUT",
                 "conductivity": 1.2,
                 "heat-capacity": 1600000
             },

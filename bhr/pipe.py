@@ -50,24 +50,24 @@ class Pipe:
     def get_inner_dia(outer_dia: float, dimension_ratio: float) -> float:
         return outer_dia * (1 - 2 / dimension_ratio)
 
-    def get_pipe_diameters_imperial(self, nominimal_pipe_size_inches: float, dimension_ratio: float):
-        if nominimal_pipe_size_inches == 0.75:
+    def get_pipe_diameters_imperial(self, nominal_pipe_size_inches: float, dimension_ratio: float):
+        if nominal_pipe_size_inches == 0.75:
             outer_dia = 1.05
-        elif nominimal_pipe_size_inches == 1.0:
+        elif nominal_pipe_size_inches == 1.0:
             outer_dia = 1.315
-        elif nominimal_pipe_size_inches == 1.25:
+        elif nominal_pipe_size_inches == 1.25:
             outer_dia = 1.66
-        elif nominimal_pipe_size_inches == 1.5:
+        elif nominal_pipe_size_inches == 1.5:
             outer_dia = 1.9
-        elif nominimal_pipe_size_inches == 2.0:
+        elif nominal_pipe_size_inches == 2.0:
             outer_dia = 2.375
-        elif nominimal_pipe_size_inches == 3.0:
+        elif nominal_pipe_size_inches == 3.0:
             outer_dia = 3.5
-        elif nominimal_pipe_size_inches == 4.0:
+        elif nominal_pipe_size_inches == 4.0:
             outer_dia = 4.5
-        elif nominimal_pipe_size_inches == 6.0:
+        elif nominal_pipe_size_inches == 6.0:
             outer_dia = 6.625
-        elif nominimal_pipe_size_inches == 8.0:
+        elif nominal_pipe_size_inches == 8.0:
             outer_dia = 8.625
         else:
             raise ValueError("Unsupported pipe size")
@@ -150,7 +150,7 @@ class Pipe:
         """
         Turbulent friction factor
 
-        Petukhov, B. S. (1970). Advances in Heat Transfer, volume 6, chapter Heat transfer and
+        Petukhov, B. S. (1970). Advances in Heat Transfer, volume 6, Heat transfer and
         friction in turbulent pipe flow with variable physical properties, pages 503-564.
         Academic Press, Inc., New York, NY.
 
@@ -160,20 +160,21 @@ class Pipe:
 
         return (0.79 * log(re) - 1.64) ** (-2.0)
 
-    def pressure_loss(self, mdot: float, temp: float) -> float:
+    def pressure_loss(self, m_dot: float, temp: float) -> float:
 
         """
         Pressure loss in straight pipe
 
         :param m_dot: mass flow rate, kg/s
+        :param temp: temperature, C
         :return: pressure loss, Pa
         """
 
-        if mdot <= 0:
+        if m_dot <= 0:
             return 0
 
-        term_1 = self.friction_factor(mdot, temp) * self.length / self.inner_diameter
-        term_2 = (self.fluid.density(temp) * self.mdot_to_velocity(mdot, temp) ** 2) / 2
+        term_1 = self.friction_factor(m_dot, temp) * self.length / self.inner_diameter
+        term_2 = (self.fluid.density(temp) * self.mdot_to_velocity(m_dot, temp) ** 2) / 2
 
         return term_1 * term_2
 
@@ -195,7 +196,7 @@ class Pipe:
         International Chemical Engineering 16(1976), pp. 359-368.
 
         :param re: Reynolds number
-        :param temperature: Temperature, C
+        :param temp: temperature, C
         :return: Nusselt number
         """
 
@@ -222,8 +223,8 @@ class Pipe:
         Gnielinski, V. 1976. 'New equations for heat and mass transfer in turbulent pipe and channel flow.'
         International Chemical Engineering 16(1976), pp. 359-368.
 
-        :param flow_rate: mass flow rate, kg/s
-        :param temperature: temperature, C
+        :param m_dot: mass flow rate, kg/s
+        :param temp: temperature, C
         :return convection resistance, K/(W/m)
         """
 
@@ -244,7 +245,7 @@ class Pipe:
 
         return 1 / (nu * pi * self.fluid.k(temp))
 
-    def calc_resist(self, mdot: float, temp: float):
+    def calc_resist(self, m_dot: float, temp: float):
         """
         Calculates the combined conduction and convection pipe resistance
 
@@ -252,6 +253,10 @@ class Pipe:
         for grouted single U-tube ground heat exchangers.' Applied Energy. 187: 790-806.
 
         Equation 3
+
+        :param m_dot: mass flow rate, kg/s
+        :param temp: temperature, C
+        :return: combined conduction and convection pipe resistance, K/(W/m)
         """
 
-        return self.calc_conv_resist(mdot, temp) + self.calc_cond_resist()
+        return self.calc_conv_resist(m_dot, temp) + self.calc_cond_resist()
