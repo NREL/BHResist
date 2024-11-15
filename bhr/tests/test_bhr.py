@@ -12,7 +12,7 @@ class TestBHR(unittest.TestCase):
             "num-u-tubes": 1,
             "hydraulic-configuration": "PARALLEL", # SERIES
             "u-tube-shank-spacing": 0.002,
-            "circulating-fluid": {
+            "fluid": {
                 "type": "PROPYLENEGLYCOL", # or "WATER" or "ETHYLALCOHOL" or "METHYLEALCOHOL
                 "concentration": 0.2,
             },
@@ -28,6 +28,7 @@ class TestBHR(unittest.TestCase):
             },
             "depth": 100,
         }
+
 
         bh = Borehole(inputs)
 
