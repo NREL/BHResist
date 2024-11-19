@@ -8,9 +8,11 @@ class Borehole:
         self.length = inputs["depth"]
         self.pipe = Pipe({**inputs["pipe"], **inputs["fluid"], "length": self.length * 2})
         self.filling = None
+        self.shank_space = inputs["shank_space"]
+        self.bh_radius = inputs ["borehole-radius"]
 
-        self.theta_1 = self.shank_space / (2 * self.radius)
-        self.theta_2 = self.radius / self.pipe_1.outer_radius
+        self.theta_1 = self.shank_space / (2 * self.bh_radius)
+        self.theta_2 = self.bh_radius / self.pipe.outer_radius
         self.theta_3 = 1 / (2 * self.theta_1 * self.theta_2)
 
     def calc_bh_average_resistance(self, temperature: float,

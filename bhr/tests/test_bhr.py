@@ -11,7 +11,7 @@ class TestBHR(unittest.TestCase):
             "borehole-type": "UTUBE", # or "COAXIAL"
             "num-u-tubes": 1,
             "hydraulic-configuration": "PARALLEL", # SERIES
-            "u-tube-shank-spacing": 0.002,
+            "shank_space": 0.002,
             "fluid": {
                 "type": "PROPYLENEGLYCOL", # or "WATER" or "ETHYLALCOHOL" or "METHYLEALCOHOL
                 "concentration": 0.2,
@@ -26,7 +26,8 @@ class TestBHR(unittest.TestCase):
                 "conductivity": 1.2,
                 "heat-capacity": 1600000
             },
-            "depth": 100,
+            "depth": 100, #ft
+            "borehole-radius": 1, # ft
         }
 
 
