@@ -6,45 +6,43 @@ from bhr.utilities import inch_to_m, smoothing_function
 
 class Pipe:
 
-    def __init__(self, inputs: dict):
+    def __init__(self,
+                 pipe_outer_diameter: float,
+                 pipe_dimension_ratio: float,
+                 pipe_length: float,
+                 pipe_conductivity: float,
+                 fluid_type: str,
+                 fluid_concentration: float = 0):
 
-        self.fluid = get_fluid(inputs.get("fluid-type", "WATER"),
-                               inputs.get("fluid-concentration", 0))
+        self.fluid = get_fluid(fluid_type, fluid_concentration)
 
         # ratio of outer diameter to wall thickness
-        self.dimension_ratio = inputs.get("dimension-ratio", 11)
+        self.dimension_ratio = pipe_dimension_ratio
 
-        # set diameters
-        if "nominal-pipe-diameter-inch" in inputs:
-            self.inner_diameter, self.outer_diameter = \
-                self.get_pipe_diameters_imperial(inputs["nominal-pipe-diameter-inch"],
-                                                 self.dimension_ratio)
-        elif "actual-pipe-outer-diameter-meter" in inputs:
-            self.outer_diameter = inputs["actual-pipe-outer-diameter-meter"]
-            self.inner_diameter = self.get_inner_dia(self.outer_diameter, self.dimension_ratio)
+        # set diameters and thickness
+        self.pipe_outer_diameter = pipe_outer_diameter
+        self.pipe_inner_diameter = self.pipe_outer_diameter * (1 - 2 / self.dimension_ratio)
+        self.thickness = self.pipe_outer_diameter / self.dimension_ratio
 
-        self.length = inputs['length']
+        # set length
+        self.pipe_length = pipe_length
 
-        self.conductivity = inputs.get("conductivity", 0.4)
-
-        # compute other dimensions
-        self.inner_radius = self.inner_diameter / 2
-        self.outer_radius = self.outer_diameter / 2
-        self.wall_thickness = self.outer_radius - self.inner_radius
+        # set physical properties
+        self.conductivity = pipe_conductivity
 
         # compute cross-sectional areas
-        self.area_cr_inner = pi / 4 * self.inner_diameter ** 2
-        self.area_cr_outer = pi / 4 * self.outer_diameter ** 2
+        self.area_cr_inner = pi / 4 * self.pipe_inner_diameter ** 2
+        self.area_cr_outer = pi / 4 * self.pipe_outer_diameter ** 2
         self.area_cr_pipe = self.area_cr_outer - self.area_cr_inner
 
         # compute surface areas
-        self.area_s_inner = pi * self.inner_diameter * self.length
-        self.area_s_outer = pi * self.outer_diameter * self.length
+        self.area_s_inner = pi * self.pipe_inner_diameter * self.pipe_length
+        self.area_s_outer = pi * self.pipe_outer_diameter * self.pipe_length
 
         # compute volumes
-        self.total_vol = self.area_cr_outer * self.length
-        self.fluid_vol = self.area_cr_inner * self.length
-        self.pipe_wall_vol = self.area_cr_pipe * self.length
+        self.total_vol = self.area_cr_outer * self.pipe_length
+        self.fluid_vol = self.area_cr_inner * self.pipe_length
+        self.pipe_wall_vol = self.area_cr_pipe * self.pipe_length
 
     @staticmethod
     def get_inner_dia(outer_dia: float, dimension_ratio: float) -> float:
@@ -94,7 +92,7 @@ class Pipe:
         :return: Reynolds number, dimensionless
         """
 
-        return 4 * m_dot / (self.fluid.mu(temp) * pi * self.inner_diameter)
+        return 4 * m_dot / (self.fluid.mu(temp) * pi * self.pipe_inner_diameter)
 
     def mdot_to_velocity(self, m_dot: float, temp: float) -> float:
         """
@@ -161,7 +159,6 @@ class Pipe:
         return (0.79 * log(re) - 1.64) ** (-2.0)
 
     def pressure_loss(self, m_dot: float, temp: float) -> float:
-
         """
         Pressure loss in straight pipe
 
@@ -173,7 +170,7 @@ class Pipe:
         if m_dot <= 0:
             return 0
 
-        term_1 = self.friction_factor(m_dot, temp) * self.length / self.inner_diameter
+        term_1 = self.friction_factor(m_dot, temp) * self.pipe_length / self.pipe_inner_diameter
         term_2 = (self.fluid.density(temp) * self.mdot_to_velocity(m_dot, temp) ** 2) / 2
 
         return term_1 * term_2
@@ -204,7 +201,7 @@ class Pipe:
         pr = self.fluid.pr(temp)
         return (f / 8) * (re - 1000) * pr / (1 + 12.7 * (f / 8) ** 0.5 * (pr ** (2 / 3) - 1))
 
-    def calc_cond_resist(self):
+    def calc_pipe_cond_resist(self):
         """
         Calculates the pipe radial conduction thermal resistance, in [K/(W/m)].
 
@@ -214,9 +211,9 @@ class Pipe:
         :return: conduction resistance, K/(W/m)
         """
 
-        return log(self.outer_diameter / self.inner_diameter) / (2 * pi * self.conductivity)
+        return log(self.pipe_outer_diameter / self.pipe_inner_diameter) / (2 * pi * self.conductivity)
 
-    def calc_conv_resist(self, m_dot: float, temp: float):
+    def calc_pipe_internal_conv_resist(self, m_dot: float, temp: float):
         """
         Calculates the pipe internal convection thermal resistance, in [k/(W/m)]
 
@@ -245,7 +242,7 @@ class Pipe:
 
         return 1 / (nu * pi * self.fluid.k(temp))
 
-    def calc_resist(self, m_dot: float, temp: float):
+    def calc_pipe_resist(self, m_dot: float, temp: float):
         """
         Calculates the combined conduction and convection pipe resistance
 
@@ -259,4 +256,4 @@ class Pipe:
         :return: combined conduction and convection pipe resistance, K/(W/m)
         """
 
-        return self.calc_conv_resist(m_dot, temp) + self.calc_cond_resist()
+        return self.calc_pipe_internal_conv_resist(m_dot, temp) + self.calc_pipe_cond_resist()
