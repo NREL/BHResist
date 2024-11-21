@@ -11,7 +11,7 @@ class TestSingleUBorehole(TestCase):
             "pipe_outer_diameter": 0.032,
             "pipe_dimension_ratio": 11,
             "length": 100,
-            "shank_spacing": 0.032,
+            "shank_space": 0.032,
             "pipe_conductivity": 0.389,
             "grout_conductivity": 0.6,
             "soil_conductivity": 4.0,

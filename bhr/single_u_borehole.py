@@ -10,13 +10,13 @@ class SingleUBorehole(UTube):
                  pipe_outer_diameter: float,
                  pipe_dimension_ratio: float,
                  length: float,
-                 shank_spacing: float,
+                 shank_space: float,
                  pipe_conductivity: float,
                  grout_conductivity: float,
                  soil_conductivity: float,
                  fluid_type: str,
                  fluid_concentration: float = 0):
-        super().__init__(pipe_outer_diameter, pipe_dimension_ratio, length, shank_spacing, pipe_conductivity,
+        super().__init__(pipe_outer_diameter, pipe_dimension_ratio, length, shank_space, pipe_conductivity,
                          fluid_type, fluid_concentration)
 
         # other static parameters
