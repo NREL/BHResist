@@ -52,8 +52,8 @@ class SingleUBorehole(UTube):
 
         Equation 13
 
-        :param temperature: temperature, Celsius
         :param flow_rate: mass flow rate, kg/s
+        :param temperature: temperature, Celsius
         :param pipe_resist: pipe conduction and convection resistance, K/(W/m). only used for testing
         """
 
@@ -82,12 +82,12 @@ class SingleUBorehole(UTube):
 
         Equation 26
 
-        :param temperature: temperature, Celsius
         :param flow_rate: mass flow rate, kg/s
+        :param temperature: temperature, Celsius
         :param pipe_resist: pipe conduction and convection resistance, K/(W/m). only used for testing
         """
 
-        self.update_beta(temperature, flow_rate, pipe_resist)
+        self.update_beta(flow_rate, temperature, pipe_resist)
 
         term_1_num = (1 + self.theta_1 ** 2) ** self.sigma
         term_1_den = self.theta_3 * (1 - self.theta_1 ** 2) ** self.sigma
@@ -116,15 +116,13 @@ class SingleUBorehole(UTube):
 
         Eq: 3
 
-        :param temperature: temperature, Celsius
         :param flow_rate: mass flow rate, kg/s
+        :param temperature: temperature, Celsius
         :param pipe_resist: pipe conduction and convection resistance, K/(W/m). only used for testing
         """
 
-        self.update_beta(temperature, flow_rate, pipe_resist)
-
-        pipe_resist = self.calc_pipe_resist(flow_rate, temperature)
-        self.resist_bh_grout = self.calc_bh_average_resistance(temperature, flow_rate) - pipe_resist / 2.0
+        self.update_beta(flow_rate, temperature, pipe_resist)
+        self.resist_bh_grout = self.calc_bh_average_resistance(flow_rate, temperature, pipe_resist) - pipe_resist / 2.0
         return self.resist_bh_grout
 
     def calc_bh_effective_resistance_uhf(self,
@@ -139,15 +137,15 @@ class SingleUBorehole(UTube):
 
         Eq: 3-67
 
-        :param temperature: temperature, Celsius
         :param flow_rate: mass flow rate, kg/s
+        :param temperature: temperature, Celsius
         :param pipe_resist: pipe conduction and convection resistance, K/(W/m). only used for testing
         """
 
-        self.update_beta(temperature, flow_rate)
+        self.update_beta(flow_rate, temperature, pipe_resist)
 
-        self.calc_bh_total_internal_resistance(temperature, flow_rate, pipe_resist)
-        self.calc_bh_average_resistance(temperature, flow_rate, pipe_resist)
+        self.calc_bh_total_internal_resistance(flow_rate, temperature, pipe_resist)
+        self.calc_bh_average_resistance(flow_rate, temperature, pipe_resist)
 
         pt_1 = 1 / (3 * self.resist_bh_total_internal)
         pt_2 = (self.length / (self.fluid.cp(temperature) * flow_rate)) ** 2
@@ -160,8 +158,8 @@ class SingleUBorehole(UTube):
                                         flow_rate: float = None,
                                         temperature: float = None,
                                         pipe_resist: float = None) -> tuple:
-        r_a = self.calc_bh_total_internal_resistance(temperature, flow_rate, pipe_resist)
-        r_b = self.calc_bh_average_resistance(temperature, flow_rate, pipe_resist)
+        r_a = self.calc_bh_total_internal_resistance(flow_rate, temperature, pipe_resist)
+        r_b = self.calc_bh_average_resistance(flow_rate, temperature, pipe_resist)
 
         r_12 = (4 * r_a * r_b) / (4 * r_b - r_a)
 
@@ -189,8 +187,8 @@ class SingleUBorehole(UTube):
 
         Eq: 14
 
-        :param temperature: temperature, Celsius
         :param flow_rate: mass flow rate, kg/s
+        :param temperature: temperature, Celsius
         :param pipe_resist: pipe conduction and convection resistance, K/(W/m). only used for testing
         """
 
