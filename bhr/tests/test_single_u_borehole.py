@@ -40,4 +40,4 @@ class TestSingleUBorehole(TestCase):
     def test_calc_bh_resit(self):
         bh = SingleUBorehole(**self.inputs)
         tolerance = 1e-3
-        self.assertAlmostEqual(bh.calc_bh_effective_resistance_uhf(0.5, 20), 0.23068, delta=tolerance)
+        self.assertAlmostEqual(bh.calc_bh_effective_resistance_uhf(0.5, 20), 0.22615, delta=tolerance)

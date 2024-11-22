@@ -105,15 +105,15 @@ class Pipe:
 
         return m_dot / (self.area_cr_inner * self.fluid.density(temp))
 
-    def friction_factor(self, m_dot: float, temp: float) -> float:
+    def friction_factor(self, re: float) -> float:
         """
         Calculates the friction factor in smooth tubes
 
         Petukhov, B.S. 1970. 'Heat transfer and friction in turbulent pipe flow with variable physical properties.'
         In Advances in Heat Transfer, ed. T.F. Irvine and J.P. Hartnett, Vol. 6. New York Academic Press.
-        """
 
-        re = self.mdot_to_re(m_dot, temp)
+        :param re: Reynolds number, dimensionless
+        """
 
         # limits picked be within about 1% of actual values
         low_reynolds = 1500
@@ -170,7 +170,8 @@ class Pipe:
         if m_dot <= 0:
             return 0
 
-        term_1 = self.friction_factor(m_dot, temp) * self.pipe_length / self.pipe_inner_diameter
+        re = self.mdot_to_re(m_dot, temp)
+        term_1 = self.friction_factor(re) * self.pipe_length / self.pipe_inner_diameter
         term_2 = (self.fluid.density(temp) * self.mdot_to_velocity(m_dot, temp) ** 2) / 2
 
         return term_1 * term_2
@@ -197,8 +198,8 @@ class Pipe:
         :return: Nusselt number
         """
 
-        f = self.friction_factor(re, temp)
-        pr = self.fluid.pr(temp)
+        f = self.friction_factor(re)
+        pr = self.fluid.prandtl(temp)
         return (f / 8) * (re - 1000) * pr / (1 + 12.7 * (f / 8) ** 0.5 * (pr ** (2 / 3) - 1))
 
     def calc_pipe_cond_resist(self):

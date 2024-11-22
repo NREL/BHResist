@@ -9,9 +9,9 @@ class TestBHR(unittest.TestCase):
         inputs = {
             "fluid_type": "PROPYLENEGLYCOL",
             "fluid_concentration": 0.2,
-            "boundary_condition": "UHF",
+            "boundary_condition": "uniform_heat_flux",
+            "borehole_type": "single_u_tube",
             "pipes": {
-                "pipe-type": "single-u-tube",
                 "single-u-tube": {
                     "pipe_outer_diameter": 0.042,
                     "pipe_dimension_ratio": 11,
@@ -49,4 +49,4 @@ class TestBHR(unittest.TestCase):
 
         # only pass flow rate, so pipe resistance should be computed in the process of this call
 
-        self.assertEqual(bh.calc_bh_resist(temperature=20, flow_rate=0.5), 0.5)
+        self.assertAlmostEqual(bh.calc_bh_resist(temperature=20, flow_rate=0.5), 0.20304, delta=0.0001)
