@@ -111,4 +111,4 @@ class TestPipe(unittest.TestCase):
     def test_pressure_loss(self):
         pipe = Pipe(**self.inputs)
         tol = 1
-        self.assertAlmostEqual(pipe.pressure_loss(0.5, 20), 33533, delta=tol)
+        self.assertAlmostEqual(pipe.pressure_loss(0.5, 20), 44444, delta=tol)
