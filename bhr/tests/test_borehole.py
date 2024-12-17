@@ -3,7 +3,7 @@ import unittest
 from bhr.borehole import Borehole
 
 
-class TestBHR(unittest.TestCase):
+class TestBorehole(unittest.TestCase):
 
     def test_init_single_u_tube_bh(self):
         inputs = {
@@ -11,32 +11,26 @@ class TestBHR(unittest.TestCase):
             "fluid_concentration": 0.2,
             "boundary_condition": "uniform_heat_flux",
             "borehole_type": "single_u_tube",
-            "pipes": {
-                "single-u-tube": {
-                    "pipe_outer_diameter": 0.042,
-                    "pipe_dimension_ratio": 11,
-                    "pipe_conductivity": 0.4,
-                    "shank_space": 0.02,
-                },
-                "double-u-tube": {
-                    "pipe_outer_diameter": 0.042,
-                    "pipe_dimension_ratio": 11,
-                    "pipe_conductivity": 0.4,
-                    "shank_space": 0.01,
-                    "hydraulic_configuration": "PARALLEL"  # or SERIES
-                },
-                "coaxial": {
-                    "inner_pipe": {
-                        "outer_diameter": 0.042,
-                        "dimension_ratio": 11,
-                        "conductivity": 0.4
-                    },
-                    "outer-pipe": {
-                        "outer_diameter": 0.096,
-                        "dimension_ratio": 11,
-                        "conductivity": 0.4
-                    }
-                }
+            "single-u-tube": {
+                "pipe_outer_diameter": 0.042,
+                "pipe_dimension_ratio": 11,
+                "pipe_conductivity": 0.4,
+                "shank_space": 0.02,
+            },
+            "double-u-tube": {
+                "pipe_outer_diameter": 0.042,
+                "pipe_dimension_ratio": 11,
+                "pipe_conductivity": 0.4,
+                "shank_space": 0.02,
+                "hydraulic_configuration": "PARALLEL"  # or SERIES
+            },
+            "coaxial": {
+                "outer_pipe_outer_diameter": 0.042,
+                "outer_pipe_dimension_ratio": 11,
+                "outer_pipe_conductivity": 0.4,
+                "inner_pipe_outer_diameter": 0.096,
+                "inner_pipe_dimension_ratio": 11,
+                "inner_pipe_conductivity": 0.4
             },
             "grout_conductivity": 1.2,
             "soil_conductivity": 2.5,
