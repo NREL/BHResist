@@ -58,10 +58,29 @@ class DoubleUTube(UTube):
         self.beta = 2 * pi * self.grout_conductivity * self.pipe_resist
 
     def calc_bh_resist(self, flow_rate, temperature):
+                """
+        Calculates tube-to-borehole resistance (aka local borehole resistnance) .
+
+        Claesson, Johan, and Saqib Javed. 2019. “Explicit Multipole Formulas
+        and Thermal Network Models for Calculating Thermal Resistances of 
+        Double U-Pipe Borehole Heat Exchangers.” Science and Technology for
+         the Built Environment 25 (8): 980–92. doi:10.1080/23744731.2019.1620565.
+         
+         eq.___
+         """
         pass
 
     def calc_internal_bh_resist_pipe(self, flow_rate, temperature, pipe_config):
+        """
+        Calculates tube-to-tube resistance (aka internal resistance).
 
+        Claesson, Johan, and Saqib Javed. 2019. “Explicit Multipole Formulas
+        and Thermal Network Models for Calculating Thermal Resistances of 
+        Double U-Pipe Borehole Heat Exchangers.” Science and Technology for
+         the Built Environment 25 (8): 980–92. doi:10.1080/23744731.2019.1620565.
+         
+         eq.___
+         """
         if pipe_config == "DIAGONAL":
             pass
         elif pipe_config == "ADJACENT":
@@ -69,10 +88,32 @@ class DoubleUTube(UTube):
         else:
             assert False
 
+
     def calc_effective_bh_resist_uhf(self, flow_rate, temperature):
+         """
+        Calculates effective borehole resistance for uniform heat flux along the borehole.
+
+        Claesson, Johan, and Saqib Javed. 2019. “Explicit Multipole Formulas
+        and Thermal Network Models for Calculating Thermal Resistances of 
+        Double U-Pipe Borehole Heat Exchangers.” Science and Technology for
+         the Built Environment 25 (8): 980–92. doi:10.1080/23744731.2019.1620565.
+         
+         eq. 44
+         """
         return 0.2
+    
 
     def calc_effective_bh_resist_ubwt(self, flow_rate, temperature):
+        """
+        Calculates effective borehole resistance for uniform borehole wall temperature.
+
+        Claesson, Johan, and Saqib Javed. 2019. “Explicit Multipole Formulas
+        and Thermal Network Models for Calculating Thermal Resistances of 
+        Double U-Pipe Borehole Heat Exchangers.” Science and Technology for
+         the Built Environment 25 (8): 980–92. doi:10.1080/23744731.2019.1620565.
+         
+         eq. 46
+         """
         return 0.2
 
     def calc_effective_bh_resist_ave(self, flow_rate, temperature):
