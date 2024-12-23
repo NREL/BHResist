@@ -20,15 +20,18 @@ class Coaxial:
         self.borehole_diameter = borehole_diameter
         self.grout_conductivity = grout_conductivity
         self.soil_conductivity = soil_conductivity
-        self.hydraulic_diameter = outer_pipe_outer_diameter - inner_pipe_outer_diameter
 
         self.inner_pipe = Pipe(outer_pipe_outer_diameter, outer_pipe_dimension_ratio, length, outer_pipe_conductivity,
                                fluid_type, fluid_concentration)
         self.outer_pipe = Pipe(inner_pipe_outer_diameter, inner_pipe_dimension_ratio, length, inner_pipe_conductivity,
                                fluid_type, fluid_concentration)
-        self.annular_pipe = Pipe(self.hydraulic_diameter, )
 
-    def calc_annular_inner_surface(self):
+        self.annular_hydraulic_diameter = outer_pipe_outer_diameter - inner_pipe_outer_diameter
+
+
+    def convective_heat_transfer_coefficients_concentric_annulus(self, flow_rate):
+
+
         pass
 
     def calc_bh_resist(self):
