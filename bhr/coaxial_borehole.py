@@ -28,10 +28,7 @@ class Coaxial:
 
         self.annular_hydraulic_diameter = outer_pipe_outer_diameter - inner_pipe_outer_diameter
 
-
     def convective_heat_transfer_coefficients_concentric_annulus(self, flow_rate):
-
-
         pass
 
     def calc_bh_resist(self):

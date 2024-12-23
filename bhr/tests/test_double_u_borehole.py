@@ -39,6 +39,6 @@ class TestSingleUBorehole(TestCase):
     #     self.assertAlmostEqual(bh.calc_bh_grout_resistance(pipe_resist=0.05), 0.03373, delta=tolerance)
 
     def test_calc_bh_resit(self):
-            bh = DoubleUTube(**self.inputs)
-            tolerance = 1e-3
-            self.assertAlmostEqual(bh.calc_bh_resist(0.5, 20), 0.22615, delta=tolerance)
+        bh = DoubleUTube(**self.inputs)
+        tolerance = 1e-3
+        self.assertAlmostEqual(bh.calc_bh_resist(0.5, 20), 0.22615, delta=tolerance)

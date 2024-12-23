@@ -1,6 +1,7 @@
+from bhr.double_u_borehole import DoubleUTube
 from bhr.enums import BoundaryCondition, BoreholeType
 from bhr.single_u_borehole import SingleUBorehole
-from bhr.double_u_borehole import DoubleUTube
+
 
 class Borehole:
 
@@ -55,7 +56,6 @@ class Borehole:
             pass
         else:
             raise NotImplementedError(f"bh_type \"{self.bh_type.name}\" not implemented")
-
 
     def init_from_file(self, file_path):
         # setup input dict
