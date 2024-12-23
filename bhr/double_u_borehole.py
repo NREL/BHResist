@@ -2,11 +2,11 @@ from math import pi, log, cosh, sinh
 
 from bhr.u_tube import UTube
 
+from bhr.utilities import coth
+
+#math functions
 ln = log
 
-
-def coth(x):
-    return cosh(x) / sinh(x)
 
 
 class DoubleUTube(UTube):
