@@ -1,20 +1,19 @@
 """ This file is intended to calculate the effective borehole
 resistance with a double u-pipe configuration. """
 
-import math
+from math import pi, log, cosh, sinh 
 #math functions
-pi = math.pi
-ln = math.log
+ln = log
 def coth(x):
-   return math.cosh(x) / math.sinh(x)
+   return cosh(x) / sinh(x)
 
 #Input variables needed. To Change in future to real inputs
-soil_conductivity = 3 # thermal conductivity of the ground W/(m-K)
-grout_conductivity = 1.5 # thermal conductivity of the borehole/grout W/(m-K)
-rb = 57.5 # radius of borehole (mm)
-rp = 16 # radius of pipe (mm)
-length = 200 # depth of borehole (m)
-Rp = 0.05 #total fluid-to-pipe resistance for a single pipe K/(W/m)
+soil_conductivity = 3 # thermal conductivity of the ground W/(m-K) #
+grout_conductivity = 1.5 # thermal conductivity of the borehole/grout W/(m-K) #
+rb = 57.5 # radius of borehole (mm) #
+rp = 16 # radius of pipe (mm) #
+length = 200 # depth of borehole (m) #
+Rp = 0.05 #total fluid-to-pipe thermal resistance for a single pipe K/(W/m)
 Vf = 0.75/3600 #(m^3/s) volumetric flow rate for one pipe, one direction
 cf = 4180 # specific heat of circulating fluid (J/kg)/K
 pf = 997 #(kg/m3) density of circulating fluid
