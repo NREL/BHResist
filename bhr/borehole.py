@@ -1,6 +1,6 @@
 from bhr.enums import BoundaryCondition, BoreholeType
 from bhr.single_u_borehole import SingleUBorehole
-from bhr.double_u_tube import DoubleUTube
+from bhr.double_u_borehole import DoubleUTube
 
 class Borehole:
 

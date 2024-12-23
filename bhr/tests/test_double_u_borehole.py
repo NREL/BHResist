@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from bhr.double_u_tube import DoubleUTube
+from bhr.double_u_borehole import DoubleUTube
 
 
 class TestSingleUBorehole(TestCase):
@@ -10,6 +10,7 @@ class TestSingleUBorehole(TestCase):
             "borehole_diameter": 0.096,
             "pipe_outer_diameter": 0.032,
             "pipe_dimension_ratio": 11,
+            "pipe_config": "ADJACENT",
             "length": 100,
             "shank_space": 0.032,
             "pipe_conductivity": 0.389,
@@ -37,7 +38,7 @@ class TestSingleUBorehole(TestCase):
     #                            delta=tolerance)
     #     self.assertAlmostEqual(bh.calc_bh_grout_resistance(pipe_resist=0.05), 0.03373, delta=tolerance)
 
-    # def test_calc_bh_resit(self):
-    #         bh = SingleUBorehole(**self.inputs)
-    #         tolerance = 1e-3
-    #         self.assertAlmostEqual(bh.calc_bh_effective_resistance_uhf(0.5, 20), 0.22615, delta=tolerance)
+    def test_calc_bh_resit(self):
+            bh = DoubleUTube(**self.inputs)
+            tolerance = 1e-3
+            self.assertAlmostEqual(bh.calc_bh_resist(0.5, 20), 0.22615, delta=tolerance)
