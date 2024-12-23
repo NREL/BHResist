@@ -43,13 +43,13 @@ class DoubleUTube(UTube):
         self.shank_space = shank_space  # (mm) radial distance between centers of symmetrically placed pipes and borehole center rc
         self.sigma = (self.grout_conductivity - self.soil_conductivity) / (
                 self.grout_conductivity + self.soil_conductivity)
+
         # -derived variables-
         self.Ppc = self.pipe_radius ** 2 / (4 * self.shank_space ** 2)  # dimensionless parameter
         self.Pc = self.shank_space ** 2 / (self.borehole_radius ** 8 - self.shank_space ** 8) ** (
                     1 / 4)  # dimensionless parameter
         self.Pb = self.borehole_radius ** 2 / (self.borehole_radius ** 8 - self.shank_space ** 8) ** (
                     1 / 4)  # dimensionless parameter
-        # self.beta = 2 * pi * grout_conductivity * pipe_resist #dimensionless thermal resistance of 1 u-pipe leg
 
         self.sigma = (grout_conductivity - soil_conductivity) / (
                     grout_conductivity + soil_conductivity)  # thermal conductivity ratio, dimensionless
@@ -116,8 +116,8 @@ class DoubleUTube(UTube):
                     self.b1 * self.Ppc * (3 - 8 * self.sigma * self.Pc ** 4) ** 2
                     ) / (1 + self.b1 * self.Ppc * (5 + 64 * self.sigma * self.Pc ** 4 * self.Pb ** 4))
 
-        print("Rb0 = %.3E" % Rb0)
-        print("Rb1 = %.3E" % self.Rb1)
+        #print("Rb0 = %.3E" % Rb0)
+        #print("Rb1 = %.3E" % self.Rb1)
 
         return self.Rb1
 
@@ -148,8 +148,8 @@ class DoubleUTube(UTube):
                         ) / (1 - self.b1 * self.Ppc * (
                         3 - 32 * self.sigma * (self.Pc ** 2 * self.Pb ** 6 + self.Pc ** 6 * self.Pb ** 2)))
 
-            print("Rad0 = %.3E" % Ra0)
-            print("Rad1 = %.3E" % self.Ra1)
+            #print("Rad0 = %.3E" % Ra0)
+            #print("Rad1 = %.3E" % self.Ra1)
 
             return self.Ra1
 
@@ -188,8 +188,7 @@ class DoubleUTube(UTube):
 
         eq. 44
         """
-        Rv = self.length / (self.fluid.density(temperature) * self.fluid.cp(
-            temperature) * self.Vf)  # (K/(w/m)) thermal resistance factor
+        Rv = self.length / ( self.fluid.cp(temperature) * flow_rate)  # (K/(w/m)) thermal resistance factor
 
         self.Rb_eff_UHF = self.Rb1 + Rv ** 2 / (6 * self.Ra1)
         # print("Rb_eff_d_UHF = %.3E" % self.Rb_eff_UHF)
@@ -207,16 +206,17 @@ class DoubleUTube(UTube):
 
          eq. 46
          """
-        Rv = self.length / (self.fluid_density * self.cf * self.Vf)  # (K/(w/m)) thermal resistance factor
+        Rv = self.length / (flow_rate * self.fluid.cp(temperature))  # (K/(w/m)) thermal resistance factor
         n = Rv / (2 * self.Rb1 * self.Ra1) ** (1 / 2)
         self.Rb_eff_UWT = self.Rb1 * n * coth(n)
 
-        print("Ra_eff_UWT = %.3E\n" % self.Rb_eff_UWT)
+        #print("Ra_eff_UWT = %.3E\n" % self.Rb_eff_UWT)
 
         return self.Rb_eff_UWT
 
     def calc_effective_bh_resist_ave(self):
         """ Averages effective borehole resistance results for the two boundry conditions
-        Uniform Heat Flux and Uniform Borehole Wall temperature"""
+        Uniform Heat Flux and Uniform Borehole Wall temperature
+        """
         self.eff_bhr_ave = (self.Rb_eff_UHF + self.Rb_eff_UWT) / 2.0
         return self.eff_bhr_ave
