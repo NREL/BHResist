@@ -12,16 +12,15 @@ ln = log
 class DoubleUTube(UTube):
 
     def __init__(self,
-                 borehole_diameter: float,
-                 pipe_outer_diameter: float,
-                 pipe_dimension_ratio: float,
-                 length: float,
-                 shank_space: float,
-                 #  pipe_resist: float,
-                 pipe_conductivity: float,
+                 borehole_diameter: float, #m
+                 pipe_outer_diameter: float, #m
+                 pipe_dimension_ratio: float, #unitless, ratio of pipe outer diameter / thickness
+                 length: float, #m
+                 shank_space: float, # radial distance between pipe centers, assumes radialy symetrical placement
+                 pipe_conductivity: float, # W/(m-K)
                  pipe_config: str,
-                 grout_conductivity: float,
-                 soil_conductivity: float,
+                 grout_conductivity: float, #  W/(m-K)
+                 soil_conductivity: float, # W/(m-K)
                  fluid_type: str,
                  fluid_concentration: float = 0):
 
@@ -30,17 +29,13 @@ class DoubleUTube(UTube):
 
         # static parameters
         self.grout_conductivity = grout_conductivity
-        self.borehole_radius = borehole_diameter / 2  # radius of borehole (mm) rb
-        self.pipe_radius = pipe_outer_diameter / 2  # pipe outer radius (mm) rp
+        self.borehole_radius = borehole_diameter / 2 * 1000 # radius of borehole (mm) rb
+        self.pipe_radius = pipe_outer_diameter / 2  * 1000 # pipe outer radius (mm) rp
         self.pipe_config = pipe_config
-        self.length = length  # length of borehole (m) H
+        self.length = length / 2  # length of borehole is half the length of one pipe (m)
         self.grout_conductivity = grout_conductivity
-        self.soil_conductivity = soil_conductivity
-        # self.pipe_resist = pipe_resist #total fluid-to-pipe resistance for a single pipe K/(W/m) Rp
-        # self.fluid_density = fluid_density #(kg/m3) density of circulating fluid pf
-        # self.Vf = mass_flow_rate / fluid_density #(m^3/s) volumetric flow rate for one pipe, one direction Vf
-        # self.cf = fluid_specific_heat # specific heat of circulating fluid (J/kg)/K cf
-        self.shank_space = shank_space  # (mm) radial distance between centers of symmetrically placed pipes and borehole center rc
+        self.soil_conductivity = soil_conductivity #W/(m-K)
+        self.shank_space = shank_space * 1000 # (mm) radial distance between centers of symmetrically placed pipes and borehole center rc
         self.sigma = (self.grout_conductivity - self.soil_conductivity) / (
                 self.grout_conductivity + self.soil_conductivity)
 
@@ -121,7 +116,7 @@ class DoubleUTube(UTube):
 
         return self.Rb1
 
-    def calc_internal_bh_resist_pipe(self, flow_rate, temperature):
+    def calc_internal_resist_pipe(self, flow_rate, temperature):
         """
         Calculates tube-to-tube resistance (aka internal resistance).
 

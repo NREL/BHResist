@@ -3,19 +3,19 @@ from unittest import TestCase
 from bhr.double_u_borehole import DoubleUTube
 
 
-class TestSingleUBorehole(TestCase):
+class TestDoubleUBorehole(TestCase):
 
     def setUp(self):
         self.inputs = {
-            "borehole_diameter": 0.096,
-            "pipe_outer_diameter": 0.032,
-            "pipe_dimension_ratio": 11,
-            "pipe_config": "ADJACENT",
-            "length": 100,
-            "shank_space": 0.032,
+            "borehole_diameter": 0.0575,#meters
+            "pipe_outer_diameter": 0.016,#m
+            "pipe_dimension_ratio": 11,# ratio of pipe outer diameter/thickness, unitless
+            "pipe_config": "DIAGONAL",
+            "length": 400,#m length of 1 leg of pipe
+            "shank_space": 0.02263, #m
             "pipe_conductivity": 0.389,
-            "grout_conductivity": 0.6,
-            "soil_conductivity": 4.0,
+            "grout_conductivity": 1.5, #W/(m-K)
+            "soil_conductivity": 3.0, #W/(m-K)
             "fluid_type": "WATER"
         }
 
@@ -23,14 +23,16 @@ class TestSingleUBorehole(TestCase):
         bh = DoubleUTube(**self.inputs)
         self.assertEqual(bh.length, 100)
 
-    # def test_calc_internal_and_grout_resistance(self):
-    #     bh = SingleUBorehole(**self.inputs)
+    def test_calc_internal_and_grout_resistance(self):
+         bh = DoubleUTube(**self.inputs)
 
-    #     tolerance = 1e-3
-    #     self.assertAlmostEqual(bh.theta_1, 0.33333, delta=tolerance)
-    #     self.assertAlmostEqual(bh.theta_2, 3.0, delta=tolerance)
-    #     self.assertAlmostEqual(bh.calc_bh_total_internal_resistance(pipe_resist=0.05), 0.32365, delta=tolerance)
-    #     self.assertAlmostEqual(bh.calc_bh_grout_resistance(pipe_resist=0.05), 0.17701, delta=tolerance)
+         tolerance = 1e-3
+         self.assertAlmostEqual(bh.calc_bh_resist, 0.33333, delta=tolerance)
+         self.assertAlmostEqual(bh.calc_internal_resist_pipe, 3.0, delta=tolerance)
+         self.assertAlmostEqual(bh.calc_effective_bh_resist_uhf, 0.32365, delta=tolerance)
+         self.assertAlmostEqual(bh.calc_effective_bh_resist_ubwt, 0.17701, delta=tolerance)
+         self.assertAlmostEqual(bh.calc_effective_bh_resist_ave, 0.17701, delta=tolerance)
+
 
     #     self.inputs.update({"soil_conductivity": 1.0, "grout_conductivity": 3.6})
     #     bh = SingleUBorehole(**self.inputs)

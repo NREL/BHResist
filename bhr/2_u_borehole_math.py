@@ -40,7 +40,7 @@ sigma = (grout_conductivity - soil_conductivity) / (
 
 print("""
  Rv = %.2E
- Ppc = %.2E 
+ Ppc = %.2E
  Pc = %.2E
  Pb = %.2E
  beta = %.2E
