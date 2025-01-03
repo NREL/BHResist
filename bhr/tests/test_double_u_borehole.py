@@ -21,7 +21,7 @@ class TestDoubleUBorehole(TestCase):
 
     def test_init(self):
         bh = DoubleUTube(**self.inputs)
-        self.assertEqual(bh.length, 100)
+        self.assertEqual(bh.length, 200)
 
     def test_calc_internal_and_grout_resistance(self):
          bh = DoubleUTube(**self.inputs)
@@ -43,4 +43,4 @@ class TestDoubleUBorehole(TestCase):
     def test_calc_bh_resit(self):
         bh = DoubleUTube(**self.inputs)
         tolerance = 1e-3
-        self.assertAlmostEqual(bh.calc_bh_resist(0.5, 20), 0.22615, delta=tolerance)
+        self.assertAlmostEqual(bh.calc_bh_resist(0.2077, 20), 0.03457, delta=tolerance)
