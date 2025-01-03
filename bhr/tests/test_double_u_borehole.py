@@ -27,11 +27,13 @@ class TestDoubleUBorehole(TestCase):
          bh = DoubleUTube(**self.inputs)
 
          tolerance = 1e-3
-         self.assertAlmostEqual(bh.calc_bh_resist, 0.33333, delta=tolerance)
-         self.assertAlmostEqual(bh.calc_internal_resist_pipe, 3.0, delta=tolerance)
-         self.assertAlmostEqual(bh.calc_effective_bh_resist_uhf, 0.32365, delta=tolerance)
-         self.assertAlmostEqual(bh.calc_effective_bh_resist_ubwt, 0.17701, delta=tolerance)
-         self.assertAlmostEqual(bh.calc_effective_bh_resist_ave, 0.17701, delta=tolerance)
+         flow_rate = 0.5
+         temperature = 20
+         self.assertAlmostEqual(bh.calc_bh_resist(flow_rate, temperature), 0.03457, delta=tolerance)
+         self.assertAlmostEqual(bh.calc_internal_resist_pipe(flow_rate, temperature), 0.3309, delta=tolerance)
+         self.assertAlmostEqual(bh.calc_effective_bh_resist_uhf(flow_rate, temperature), 0.039179, delta=tolerance)
+         self.assertAlmostEqual(bh.calc_effective_bh_resist_ubwt(flow_rate, temperature), 0.03906, delta=tolerance)
+         self.assertAlmostEqual(bh.calc_effective_bh_resist_ave(), 0.03912, delta=tolerance)
 
 
     #     self.inputs.update({"soil_conductivity": 1.0, "grout_conductivity": 3.6})

@@ -1,4 +1,4 @@
-from math import exp
+from math import exp, cosh, sinh
 
 
 def inch_to_m(x_inch: float) -> float:
