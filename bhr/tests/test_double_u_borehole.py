@@ -7,11 +7,11 @@ class TestDoubleUBorehole(TestCase):
 
     def setUp(self):
         self.inputs = {
-            "borehole_diameter": 0.0575,#meters
-            "pipe_outer_diameter": 0.016,#m
+            "borehole_diameter": 0.115,#meters
+            "pipe_outer_diameter": 0.032,#m
             "pipe_dimension_ratio": 11,# ratio of pipe outer diameter/thickness, unitless
             "pipe_config": "DIAGONAL",
-            "length": 400,#m length of 1 leg of pipe
+            "length": 200,#m length of 1 leg of pipe
             "shank_space": 0.02263, #m
             "pipe_conductivity": 0.389,
             "grout_conductivity": 1.5, #W/(m-K)
@@ -21,19 +21,23 @@ class TestDoubleUBorehole(TestCase):
 
     def test_init(self):
         bh = DoubleUTube(**self.inputs)
-        self.assertEqual(bh.length, 200)
+        self.assertEqual(bh.bh_length, 200)
 
     def test_calc_internal_and_grout_resistance(self):
-         bh = DoubleUTube(**self.inputs)
+        bh = DoubleUTube(**self.inputs)
 
-         tolerance = 1e-3
-         flow_rate = 0.2077
-         temperature = 20
-         self.assertAlmostEqual(bh.calc_bh_resist(flow_rate, temperature), 7.509E-02, delta=tolerance)
-         self.assertAlmostEqual(bh.calc_internal_resist_pipe(flow_rate, temperature), 0.1604, delta=tolerance)
-         self.assertAlmostEqual(bh.calc_effective_bh_resist_uhf(flow_rate, temperature), 0.1302, delta=tolerance)
-         self.assertAlmostEqual(bh.calc_effective_bh_resist_ubwt(flow_rate, temperature), 0.1235, delta=tolerance)
-         self.assertAlmostEqual(bh.calc_effective_bh_resist_ave(), 0.1269, delta=tolerance)
+        tolerance = 1e-3
+        flow_rate = 0.2077
+        temperature = 20
+        pipe_resist = 0.05
+        #the following tests rely on each previous test
+        self.assertAlmostEqual(bh.update_b1(flow_rate, temperature, pipe_resist), 0.359, delta=tolerance)
+        self.assertAlmostEqual(bh.calc_bh_resist(flow_rate, temperature,pipe_resist), 7.509E-02, delta=tolerance)
+        self.assertAlmostEqual(bh.calc_internal_resist_pipe(flow_rate, temperature,pipe_resist), 0.1604, delta=tolerance)
+        self.assertAlmostEqual(bh.calc_effective_bh_resist_uhf(flow_rate, temperature), 0.1302, delta=tolerance)
+        self.assertAlmostEqual(bh.calc_effective_bh_resist_ubwt(flow_rate, temperature), 0.1235, delta=tolerance)
+        self.assertAlmostEqual(bh.calc_effective_bh_resist_ave(), 0.1269, delta=tolerance)
+
 
 
     #     self.inputs.update({"soil_conductivity": 1.0, "grout_conductivity": 3.6})
@@ -42,7 +46,4 @@ class TestDoubleUBorehole(TestCase):
     #                            delta=tolerance)
     #     self.assertAlmostEqual(bh.calc_bh_grout_resistance(pipe_resist=0.05), 0.03373, delta=tolerance)
 
-    def test_calc_bh_resit(self):
-        bh = DoubleUTube(**self.inputs)
-        tolerance = 1e-3
-        self.assertAlmostEqual(bh.calc_bh_resist(0.2077, 20), 0.03457, delta=tolerance)
+

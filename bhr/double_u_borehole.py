@@ -3,6 +3,7 @@ from math import pi, log, cosh, sinh
 from bhr.u_tube import UTube
 
 from bhr.utilities import coth
+import logging
 
 #math functions
 ln = log
@@ -32,7 +33,7 @@ class DoubleUTube(UTube):
         self.borehole_radius = borehole_diameter / 2 * 1000 # radius of borehole (mm) rb
         self.pipe_radius = pipe_outer_diameter / 2  * 1000 # pipe outer radius (mm) rp
         self.pipe_config = pipe_config
-        self.length = length / 2  # length of borehole is half the length of one pipe (m)
+        self.bh_length = length  # length of borehole is half the length of one pipe (m)
         self.grout_conductivity = grout_conductivity
         self.soil_conductivity = soil_conductivity #W/(m-K)
         self.shank_space = shank_space * 1000 # (mm) radial distance between centers of symmetrically placed pipes and borehole center rc
@@ -57,10 +58,10 @@ class DoubleUTube(UTube):
         self.Rb_eff_UWT = None
         self.eff_bhr_ave = None
 
-    def update_beta(self,
+    def update_b1(self,
                     flow_rate: float = None,
                     temperature: float = None,
-                    pipe_resist=None):
+                    pipe_resist: float = None) -> float:
         """
         Updates Beta coefficient.
 
@@ -85,9 +86,12 @@ class DoubleUTube(UTube):
             self.pipe_resist = self.calc_pipe_resist(flow_rate, temperature)
 
         self.beta = 2 * pi * self.grout_conductivity * self.pipe_resist
+
         self.b1 = (1 - self.beta) / (1 + self.beta)  # dimensionless parameter
 
-    def calc_bh_resist(self, flow_rate, temperature):
+        return self.b1
+
+    def calc_bh_resist(self, flow_rate, temperature,pipe_resist):
         """
         Calculates tube-to-borehole resistance (aka local borehole resistnance) .
 
@@ -99,7 +103,7 @@ class DoubleUTube(UTube):
          eqns.13 & 14
          """
 
-        self.update_beta(flow_rate, temperature)
+        self.update_b1(flow_rate, temperature, pipe_resist)
 
         # --Borehole resistance, 0th order [K/(W/m)]--
         Rb0 = self.pipe_resist / 4 + 1 / (8 * pi * self.grout_conductivity) * (
@@ -111,12 +115,20 @@ class DoubleUTube(UTube):
                     self.b1 * self.Ppc * (3 - 8 * self.sigma * self.Pc ** 4) ** 2
                     ) / (1 + self.b1 * self.Ppc * (5 + 64 * self.sigma * self.Pc ** 4 * self.Pb ** 4))
 
-        #print("Rb0 = %.3E" % Rb0)
-        #print("Rb1 = %.3E" % self.Rb1)
+        #debugging statements
+        print("Lambda_b = %.3E" % self.grout_conductivity)
+        print("Lambda_soil = %.3E" % self.soil_conductivity)
+        print("Length = %.3E" % self.bh_length)
+        print("rb = %.3E" % self.borehole_radius)
+        print("rp = %.3E" % self.pipe_radius)
+        print("rc = %.3E" % self.shank_space)
+        print("Rb0 = %.3E" % Rb0)
+        print("Rb1 = %.3E" % self.Rb1)
+        print("Mass flow rate = %.3E" % flow_rate)
 
         return self.Rb1
 
-    def calc_internal_resist_pipe(self, flow_rate, temperature):
+    def calc_internal_resist_pipe(self, flow_rate, temperature,pipe_resist):
         """
         Calculates tube-to-tube resistance (aka internal resistance).
 
@@ -128,7 +140,7 @@ class DoubleUTube(UTube):
          eqns. 18, 19, 22, 23
          """
 
-        self.update_beta(flow_rate, temperature)
+        self.update_b1(flow_rate, temperature, pipe_resist)
 
         if self.pipe_config == "DIAGONAL":
             # 0th order
@@ -143,8 +155,8 @@ class DoubleUTube(UTube):
                         ) / (1 - self.b1 * self.Ppc * (
                         3 - 32 * self.sigma * (self.Pc ** 2 * self.Pb ** 6 + self.Pc ** 6 * self.Pb ** 2)))
 
-            #print("Rad0 = %.3E" % Ra0)
-            #print("Rad1 = %.3E" % self.Ra1)
+            print("Rad0 = %.3E" % Ra0)
+            print("Rad1 = %.3E" % self.Ra1)
 
             return self.Ra1
 
@@ -167,7 +179,9 @@ class DoubleUTube(UTube):
             self.Ra1 = Ra0 + 2 / (2 * pi * self.grout_conductivity) * self.b1 * self.Ppc / 2 * (
                         V2 ** 2 * M11 - 2 * V1 * V2 * M21 -
                         V1 ** 2 * M22) / (M11 * M22 + M21 ** 2)
-
+            #degbugging print statements
+            print("Rad0 = %.3E" % Ra0)
+            print("Rad1 = %.3E" % self.Ra1)
             return self.Ra1
         else:
             assert False
@@ -183,10 +197,12 @@ class DoubleUTube(UTube):
 
         eq. 44
         """
-        Rv = self.length / ( self.fluid.cp(temperature) * flow_rate)  # (K/(w/m)) thermal resistance factor
+        Rv = self.bh_length / ( self.fluid.cp(temperature) * flow_rate)  # (K/(w/m)) thermal resistance factor
 
         self.Rb_eff_UHF = self.Rb1 + Rv ** 2 / (6 * self.Ra1)
-        # print("Rb_eff_d_UHF = %.3E" % self.Rb_eff_UHF)
+
+        print("Rv = %.3f" % Rv)
+        print("Rb_eff_d_UHF = %.3E" % self.Rb_eff_UHF)
 
         return self.Rb_eff_UHF
 
@@ -201,7 +217,7 @@ class DoubleUTube(UTube):
 
          eq. 46
          """
-        Rv = self.length / (flow_rate * self.fluid.cp(temperature))  # (K/(w/m)) thermal resistance factor
+        Rv = self.bh_length / (flow_rate * self.fluid.cp(temperature))  # (K/(w/m)) thermal resistance factor
         n = Rv / (2 * self.Rb1 * self.Ra1) ** (1 / 2)
         self.Rb_eff_UWT = self.Rb1 * n * coth(n)
 
