@@ -4,36 +4,25 @@ from bhr.double_u_borehole import DoubleUTube
 
 
 class TestDoubleUBorehole(TestCase):
+    def setUp(self):
+        self.inputs = {
+            "borehole_diameter": 0.115,
+            "pipe_outer_diameter": 0.032,
+            "pipe_dimension_ratio": 11,
+            "length": 200,
+            "shank_space": 0.02263,
+            "pipe_conductivity": 0.389,
+            "pipe_config" :"DIAGONAL",
+            "grout_conductivity": 1.5,
+            "soil_conductivity": 3,
+            "fluid_type": "WATER"
+            }
 
     def test_init(self):
-        self.inputs = {
-            "borehole_diameter": 0.115,#meters
-            "pipe_outer_diameter": 0.032,#m
-            "pipe_dimension_ratio": 11,# ratio of pipe outer diameter/thickness, unitless
-            "pipe_config": "DIAGONAL",
-            "length": 200,#m length of 1 leg of pipe
-            "shank_space": 0.02263, #m
-            "pipe_conductivity": 0.389,
-            "grout_conductivity": 1.5, #W/(m-K)
-            "soil_conductivity": 3.0, #W/(m-K)
-            "fluid_type": "WATER"
-        }
         bh = DoubleUTube(**self.inputs)
         self.assertEqual(bh.bh_length, 200)
 
-    def test_calc_internal_and_grout_resistance_D(self):
-        self.inputs = {
-            "borehole_diameter": 0.115,#meters
-            "pipe_outer_diameter": 0.032,#m
-            "pipe_dimension_ratio": 11,# ratio of pipe outer diameter/thickness, unitless
-            "pipe_config": "DIAGONAL",
-            "length": 200,#m length of 1 leg of pipe
-            "shank_space": 0.02263, #m
-            "pipe_conductivity": 0.389,
-            "grout_conductivity": 1.5, #W/(m-K)
-            "soil_conductivity": 3.0, #W/(m-K)
-            "fluid_type": "WATER"
-        }
+    def test_calc_resistances_Diagonal(self):
         bh = DoubleUTube(**self.inputs)
 
         tolerance = 1e-3
@@ -49,20 +38,8 @@ class TestDoubleUBorehole(TestCase):
         self.assertAlmostEqual(bh.calc_effective_bh_resist_ave(), 0.1269, delta=tolerance)
 
 
-
-
-    def test_calc_internal_and_grout_resistance_A(self):
-        self.inputs = {
-            "borehole_diameter": 0.115,#meters
-            "pipe_outer_diameter": 0.032,#m
-            "pipe_dimension_ratio": 11,# ratio of pipe outer diameter/thickness, unitless
-            "pipe_config": "ADJACENT",
-            "length": 200,#m length of 1 leg of pipe
-            "shank_space": 0.02263, #m
-            "pipe_conductivity": 0.389,
-            "grout_conductivity": 1.5, #W/(m-K)
-            "soil_conductivity": 3.0, #W/(m-K)
-            "fluid_type": "WATER"}
+    def test_calc_resistances_Adjacent(self):
+        self.inputs.update({"pipe_config": "ADJACENT"})
 
         bh = DoubleUTube(**self.inputs)
 
@@ -77,10 +54,5 @@ class TestDoubleUBorehole(TestCase):
         self.assertAlmostEqual(bh.calc_effective_bh_resist_uhf(flow_rate, temperature), 0.1089, delta=tolerance)
         self.assertAlmostEqual(bh.calc_effective_bh_resist_ubwt(flow_rate, temperature), 0.1062, delta=tolerance)
         self.assertAlmostEqual(bh.calc_effective_bh_resist_ave(), 0.1075, delta=tolerance)
-    #     self.inputs.update({"soil_conductivity": 1.0, "grout_conductivity": 3.6})
-    #     bh = SingleUBorehole(**self.inputs)
-    #     self.assertAlmostEqual(bh.calc_bh_total_internal_resistance(pipe_resist=0.05), 0.17456,
-    #                            delta=tolerance)
-    #     self.assertAlmostEqual(bh.calc_bh_grout_resistance(pipe_resist=0.05), 0.03373, delta=tolerance)
 
 
