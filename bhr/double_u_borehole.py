@@ -1,9 +1,8 @@
-from math import pi, log, cosh, sinh
+from math import pi, log
 
 from bhr.u_tube import UTube
 
 from bhr.utilities import coth
-import logging
 
 #math functions
 ln = log
@@ -116,15 +115,15 @@ class DoubleUTube(UTube):
                     ) / (1 + self.b1 * self.Ppc * (5 + 64 * self.sigma * self.Pc ** 4 * self.Pb ** 4))
 
         #debugging statements
-        print("Lambda_b = %.3E" % self.grout_conductivity)
-        print("Lambda_soil = %.3E" % self.soil_conductivity)
-        print("Length = %.3E" % self.bh_length)
-        print("rb = %.3E" % self.borehole_radius)
-        print("rp = %.3E" % self.pipe_radius)
-        print("rc = %.3E" % self.shank_space)
-        print("Rb0 = %.3E" % Rb0)
-        print("Rb1 = %.3E" % self.Rb1)
-        print("Mass flow rate = %.3E" % flow_rate)
+        # print("Lambda_b = %.3E" % self.grout_conductivity)
+        # print("Lambda_soil = %.3E" % self.soil_conductivity)
+        # print("Length = %.3E" % self.bh_length)
+        # print("rb = %.3E" % self.borehole_radius)
+        # print("rp = %.3E" % self.pipe_radius)
+        # print("rc = %.3E" % self.shank_space)
+        # print("Rb0 = %.3E" % Rb0)
+        # print("Rb1 = %.3E" % self.Rb1)
+        # print("Mass flow rate = %.3E" % flow_rate)
 
         return self.Rb1
 
@@ -179,9 +178,11 @@ class DoubleUTube(UTube):
             self.Ra1 = Ra0 + 2 / (2 * pi * self.grout_conductivity) * self.b1 * self.Ppc / 2 * (
                         V2 ** 2 * M11 - 2 * V1 * V2 * M21 -
                         V1 ** 2 * M22) / (M11 * M22 + M21 ** 2)
+
             #degbugging print statements
             print("Rad0 = %.3E" % Ra0)
             print("Rad1 = %.3E" % self.Ra1)
+
             return self.Ra1
         else:
             assert False
