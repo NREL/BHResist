@@ -25,5 +25,6 @@ def smoothing_function(x: float, a: float, b: float) -> float:
 
     return 1 / (1 + exp(-(x - a) / b))
 
+
 def coth(x):
     return cosh(x) / sinh(x)

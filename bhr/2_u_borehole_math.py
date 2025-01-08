@@ -36,7 +36,7 @@ Pb = rb ** 2 / (rb ** 8 - rc ** 8) ** (1 / 4)  # dimensionless parameter
 beta = 2 * pi * grout_conductivity * Rp  # dimensionless thermal resistance of 1 u-pipe leg
 b1 = (1 - beta) / (1 + beta)  # dimensionless parameter
 sigma = (grout_conductivity - soil_conductivity) / (
-            grout_conductivity + soil_conductivity)  # thermal conductivity ratio, dimensionless
+        grout_conductivity + soil_conductivity)  # thermal conductivity ratio, dimensionless
 
 print("""
  Rv = %.2E
@@ -67,7 +67,7 @@ Rad0 = 2 * Rp + 2 / (2 * pi * grout_conductivity) * (ln(rc / rp) +
 # 1st order
 Rad1 = Rad0 - 2 / (2 * pi * grout_conductivity) * (b1 * Ppc * (1 + 8 * sigma * Pc ** 2 * Pb ** 2) ** 2
                                                    ) / (
-                   1 - b1 * Ppc * (3 - 32 * sigma * (Pc ** 2 * Pb ** 6 + Pc ** 6 * Pb ** 2)))
+               1 - b1 * Ppc * (3 - 32 * sigma * (Pc ** 2 * Pb ** 6 + Pc ** 6 * Pb ** 2)))
 
 print("Rad0 = %.3E" % Rad0)
 print("Rad1 = %.3E" % Rad1)

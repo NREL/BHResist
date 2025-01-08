@@ -38,7 +38,7 @@ class SingleUBorehole(UTube):
         self.resist_bh_direct_coupling = None
         self.resist_bh_total_internal = None
 
-    def calc_bh_average_resistance(self,
+    def calc_average_bh_resistance(self,
                                    flow_rate: float = None,
                                    temperature: float = None,
                                    pipe_resist: float = None) -> float:
@@ -70,7 +70,7 @@ class SingleUBorehole(UTube):
         self.resist_bh_ave = (1 / (4 * pi * self.grout_conductivity)) * (self.beta + final_term_1 - final_term_2)
         return self.resist_bh_ave
 
-    def calc_bh_total_internal_resistance(self,
+    def calc_total_internal_bh_resistance(self,
                                           flow_rate: float = None,
                                           temperature: float = None,
                                           pipe_resist=None) -> float:
@@ -104,10 +104,10 @@ class SingleUBorehole(UTube):
 
         return self.resist_bh_total_internal
 
-    def calc_bh_grout_resistance(self,
-                                 flow_rate: float = None,
-                                 temperature: float = None,
-                                 pipe_resist: float = None) -> float:
+    def calc_grout_resistance(self,
+                              flow_rate: float = None,
+                              temperature: float = None,
+                              pipe_resist: float = None) -> float:
         """
         Calculates grout resistance. Use for validation.
 
@@ -122,10 +122,10 @@ class SingleUBorehole(UTube):
         """
 
         self.update_beta(flow_rate, temperature, pipe_resist)
-        self.resist_bh_grout = self.calc_bh_average_resistance(flow_rate, temperature, pipe_resist) - pipe_resist / 2.0
+        self.resist_bh_grout = self.calc_average_bh_resistance(flow_rate, temperature, pipe_resist) - pipe_resist / 2.0
         return self.resist_bh_grout
 
-    def calc_bh_effective_resistance_uhf(self,
+    def calc_effective_bh_resistance_uhf(self,
                                          flow_rate: float = None,
                                          temperature: float = None,
                                          pipe_resist: float = None) -> float:
@@ -144,8 +144,8 @@ class SingleUBorehole(UTube):
 
         self.update_beta(flow_rate, temperature, pipe_resist)
 
-        self.calc_bh_total_internal_resistance(flow_rate, temperature, pipe_resist)
-        self.calc_bh_average_resistance(flow_rate, temperature, pipe_resist)
+        self.calc_total_internal_bh_resistance(flow_rate, temperature, pipe_resist)
+        self.calc_average_bh_resistance(flow_rate, temperature, pipe_resist)
 
         pt_1 = 1 / (3 * self.resist_bh_total_internal)
         pt_2 = (self.length / (self.fluid.cp(temperature) * flow_rate)) ** 2
@@ -158,8 +158,8 @@ class SingleUBorehole(UTube):
                                         flow_rate: float = None,
                                         temperature: float = None,
                                         pipe_resist: float = None) -> tuple:
-        r_a = self.calc_bh_total_internal_resistance(flow_rate, temperature, pipe_resist)
-        r_b = self.calc_bh_average_resistance(flow_rate, temperature, pipe_resist)
+        r_a = self.calc_total_internal_bh_resistance(flow_rate, temperature, pipe_resist)
+        r_b = self.calc_average_bh_resistance(flow_rate, temperature, pipe_resist)
 
         r_12 = (4 * r_a * r_b) / (4 * r_b - r_a)
 

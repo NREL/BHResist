@@ -16,7 +16,7 @@ class DoubleUTube(UTube):
                  length: float,  # m
                  shank_space: float,  # radial distance between pipe centers, assumes radially symmetrical placement
                  pipe_conductivity: float,  # W/(m-K)
-                 pipe_config: str,
+                 pipe_inlet_arrangement: str,
                  grout_conductivity: float,  # W/(m-K)
                  soil_conductivity: float,  # W/(m-K)
                  fluid_type: str,
@@ -29,7 +29,7 @@ class DoubleUTube(UTube):
         self.grout_conductivity = grout_conductivity
         self.borehole_radius = borehole_diameter / 2 * 1000  # radius of borehole (mm) rb
         self.pipe_radius = pipe_outer_diameter / 2 * 1000  # pipe outer radius (mm) rp
-        self.pipe_config = pipe_config
+        self.pipe_inlet_arrangement = pipe_inlet_arrangement
         self.bh_length = length  # length of borehole is half the length of one pipe (m)
         self.grout_conductivity = grout_conductivity
         self.soil_conductivity = soil_conductivity  # W/(m-K)
@@ -55,6 +55,7 @@ class DoubleUTube(UTube):
         self.Rb_eff_UWT = None
         self.eff_bhr_ave = None
         self.pipe_resist = None
+        self.b1 = None
 
     def update_b1(self,
                   flow_rate: float = None,
@@ -148,7 +149,7 @@ class DoubleUTube(UTube):
 
         self.update_b1(flow_rate, temperature, pipe_resist)
 
-        if self.pipe_config == "DIAGONAL":
+        if self.pipe_inlet_arrangement == "DIAGONAL":
             # 0th order
             Ra0 = 2 * self.pipe_resist + 2 / (2 * pi * self.grout_conductivity) * (
                     ln(self.shank_space / self.pipe_radius) +
@@ -166,7 +167,7 @@ class DoubleUTube(UTube):
 
             return self.Ra1
 
-        elif self.pipe_config == "ADJACENT":
+        elif self.pipe_inlet_arrangement == "ADJACENT":
             # 0th order
             Ra0 = 2 * self.pipe_resist + 2 / (2 * pi * self.grout_conductivity) * (
                     ln(2 * self.shank_space / self.pipe_radius) +
@@ -186,7 +187,7 @@ class DoubleUTube(UTube):
                     V2 ** 2 * M11 - 2 * V1 * V2 * M21 -
                     V1 ** 2 * M22) / (M11 * M22 + M21 ** 2)
 
-            # degbugging print statements
+            # debugging print statements
             print("Rad0 = %.3E" % Ra0)
             print("Rad1 = %.3E" % self.Ra1)
 
@@ -194,7 +195,7 @@ class DoubleUTube(UTube):
         else:
             assert False
 
-    def calc_effective_bh_resist_uhf(self, flow_rate, temperature):
+    def calc_effective_bh_resistance_uhf(self, flow_rate, temperature):
         """
         Calculates effective borehole resistance for uniform heat flux along the borehole.
 
@@ -219,7 +220,7 @@ class DoubleUTube(UTube):
 
         return self.Rb_eff_UHF
 
-    def calc_effective_bh_resist_ubwt(self, flow_rate, temperature):
+    def calc_effective_bh_resistance_ubwt(self, flow_rate, temperature):
         """
         Calculates effective borehole resistance for uniform borehole wall temperature.
 
@@ -243,7 +244,7 @@ class DoubleUTube(UTube):
 
         return self.Rb_eff_UWT
 
-    def calc_effective_bh_resist_ave(self):
+    def calc_effective_bh_resistance_ave(self):
         """
         Averages effective borehole resistance results for the two boundary conditions
         Uniform Heat Flux and Uniform Borehole Wall temperature

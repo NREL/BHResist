@@ -12,7 +12,7 @@ class TestDoubleUBorehole(TestCase):
             "length": 200,
             "shank_space": 0.02263,
             "pipe_conductivity": 0.389,
-            "pipe_config": "DIAGONAL",
+            "pipe_inlet_arrangement": "DIAGONAL",
             "grout_conductivity": 1.5,
             "soil_conductivity": 3,
             "fluid_type": "WATER"
@@ -34,12 +34,12 @@ class TestDoubleUBorehole(TestCase):
         self.assertAlmostEqual(bh.calc_bh_resist(flow_rate, temperature, pipe_resist), 7.509E-02, delta=tolerance)
         self.assertAlmostEqual(bh.calc_internal_resist_pipe(flow_rate, temperature, pipe_resist), 0.1604,
                                delta=tolerance)
-        self.assertAlmostEqual(bh.calc_effective_bh_resist_uhf(flow_rate, temperature), 0.1302, delta=tolerance)
-        self.assertAlmostEqual(bh.calc_effective_bh_resist_ubwt(flow_rate, temperature), 0.1235, delta=tolerance)
-        self.assertAlmostEqual(bh.calc_effective_bh_resist_ave(), 0.1269, delta=tolerance)
+        self.assertAlmostEqual(bh.calc_effective_bh_resistance_uhf(flow_rate, temperature), 0.1302, delta=tolerance)
+        self.assertAlmostEqual(bh.calc_effective_bh_resistance_ubwt(flow_rate, temperature), 0.1235, delta=tolerance)
+        self.assertAlmostEqual(bh.calc_effective_bh_resistance_ave(), 0.1269, delta=tolerance)
 
     def test_calc_resistances_Adjacent(self):
-        self.inputs.update({"pipe_config": "ADJACENT"})
+        self.inputs.update({"pipe_inlet_arrangement": "ADJACENT"})
 
         bh = DoubleUTube(**self.inputs)
 
@@ -52,6 +52,6 @@ class TestDoubleUBorehole(TestCase):
         self.assertAlmostEqual(bh.calc_bh_resist(flow_rate, temperature, pipe_resist), 7.509E-02, delta=tolerance)
         self.assertAlmostEqual(bh.calc_internal_resist_pipe(flow_rate, temperature, pipe_resist), 0.2617,
                                delta=tolerance)
-        self.assertAlmostEqual(bh.calc_effective_bh_resist_uhf(flow_rate, temperature), 0.1089, delta=tolerance)
-        self.assertAlmostEqual(bh.calc_effective_bh_resist_ubwt(flow_rate, temperature), 0.1062, delta=tolerance)
-        self.assertAlmostEqual(bh.calc_effective_bh_resist_ave(), 0.1075, delta=tolerance)
+        self.assertAlmostEqual(bh.calc_effective_bh_resistance_uhf(flow_rate, temperature), 0.1089, delta=tolerance)
+        self.assertAlmostEqual(bh.calc_effective_bh_resistance_ubwt(flow_rate, temperature), 0.1062, delta=tolerance)
+        self.assertAlmostEqual(bh.calc_effective_bh_resistance_ave(), 0.1075, delta=tolerance)
