@@ -32,11 +32,11 @@ class Borehole:
 
         if self.bh_type == BoreholeType.SINGLE_U_TUBE:
             bh_diameter = inputs['borehole_diameter']
-            pipe_outer_dia = inputs["pipes"]["single-u-tube"]['pipe_outer_diameter']
-            dimension_ratio = inputs["pipes"]["single-u-tube"]['pipe_dimension_ratio']
+            pipe_outer_dia = inputs["single-u-tube"]['pipe_outer_diameter']
+            dimension_ratio = inputs["single-u-tube"]['pipe_dimension_ratio']
             length = inputs['length']
-            shank_space = inputs["pipes"]["single-u-tube"]["shank_space"]
-            pipe_conductivity = inputs["pipes"]["single-u-tube"]["pipe_conductivity"]
+            shank_space = inputs["single-u-tube"]["shank_space"]
+            pipe_conductivity = inputs["single-u-tube"]["pipe_conductivity"]
             grout_conductivity = inputs["grout_conductivity"]
             soil_conductivity = inputs["soil_conductivity"]
             fluid_type = inputs["fluid_type"]
