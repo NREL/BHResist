@@ -1,5 +1,4 @@
 from math import pi, log
-
 from bhr.u_tube import UTube
 from bhr.utilities import coth
 
@@ -35,17 +34,9 @@ class DoubleUTube(UTube):
         self.soil_conductivity = soil_conductivity  # W/(m-K)
         self.shank_space = shank_space * 1000  # (mm) radial distance between centers of symmetrically placed pipes and borehole center rc
         self.sigma = (self.grout_conductivity - self.soil_conductivity) / (
-                self.grout_conductivity + self.soil_conductivity)
+                self.grout_conductivity + self.soil_conductivity) # thermal conductivity ratio, dimensionless
 
         # -derived variables-
-        
-        self.Pc = self.shank_space ** 2 / (self.borehole_radius ** 8 - self.shank_space ** 8) ** (
-                1 / 4)  # dimensionless parameter
-        self.Pb = self.borehole_radius ** 2 / (self.borehole_radius ** 8 - self.shank_space ** 8) ** (
-                1 / 4)  # dimensionless parameter
-
-        self.sigma = (grout_conductivity - soil_conductivity) / (
-                grout_conductivity + soil_conductivity)  # thermal conductivity ratio, dimensionless
 
         # non-static parameters
         self.beta = None
@@ -106,7 +97,12 @@ class DoubleUTube(UTube):
         """
 
         self.update_beta(flow_rate, temperature, pipe_resist)
+
+        #static parameters
         p_pc = self.pipe_radius ** 2 / (4 * self.shank_space ** 2)  # dimensionless parameter
+        p_c = self.shank_space ** 2 / (self.borehole_radius ** 8 - self.shank_space ** 8) ** (
+                1 / 4)  # dimensionless parameter
+
         # --Borehole resistance, 0th order [K/(W/m)]--
         Rb0 = self.pipe_resist / 4 + 1 / (8 * pi * self.grout_conductivity) * (
                 (ln(self.borehole_radius ** 4 / (4 * self.pipe_radius * self.shank_space ** 3))) +
@@ -114,8 +110,8 @@ class DoubleUTube(UTube):
 
         # --Borehole resistance, 1st order [K/(W/m)]--
         self.borhole_resist_local = Rb0 - 1 / (8 * pi * self.grout_conductivity) * (
-                self.b1 * p_pc * (3 - 8 * self.sigma * self.Pc ** 4) ** 2
-        ) / (1 + self.b1 * p_pc * (5 + 64 * self.sigma * self.Pc ** 4 * self.Pb ** 4))
+                self.b1 * p_pc * (3 - 8 * self.sigma * p_c ** 4) ** 2
+        ) / (1 + self.b1 * p_pc * (5 + 64 * self.sigma * p_c ** 4 * p_b ** 4))
 
         # debugging statements
         # print("Lambda_b = %.3E" % self.grout_conductivity)
@@ -146,8 +142,14 @@ class DoubleUTube(UTube):
         :param pipe_resist: pipe conduction and convection resistance, K/(W/m). only used for testing
         """
 
-        self.update_beta(flow_rate, temperature, pipe_resist)
+        self.update_beta_b1(flow_rate, temperature, pipe_resist)
+
+        #static parameters
         p_pc = self.pipe_radius ** 2 / (4 * self.shank_space ** 2)  # dimensionless parameter
+        p_c = self.shank_space ** 2 / (self.borehole_radius ** 8 - self.shank_space ** 8) ** (
+                1 / 4)  # dimensionless parameter
+        p_b = self.borehole_radius ** 2 / (self.borehole_radius ** 8 - self.shank_space ** 8) ** (
+                1 / 4)  # dimensionless parameter
 
         if self.pipe_inlet_arrangement == "DIAGONAL":
             # 0th order
@@ -158,9 +160,9 @@ class DoubleUTube(UTube):
 
             # 1st order
             self.internal_resist = Ra0 - 2 / (2 * pi * self.grout_conductivity) * (
-                    self.b1 * p_pc * (1 + 8 * self.sigma * self.Pc ** 2 * self.Pb ** 2) ** 2
+                    self.b1 * p_pc * (1 + 8 * self.sigma * p_c ** 2 * p_b ** 2) ** 2
             ) / (1 - self.b1 * p_pc * (
-                    3 - 32 * self.sigma * (self.Pc ** 2 * self.Pb ** 6 + self.Pc ** 6 * self.Pb ** 2)))
+                    3 - 32 * self.sigma * (p_c ** 2 * p_b ** 6 + p_c ** 6 * p_b ** 2)))
 
             print("Rad0 = %.3E" % Ra0)
             print("Rad1 = %.3E" % self.internal_resist)
@@ -176,16 +178,16 @@ class DoubleUTube(UTube):
 
             # 1st order
             matrix_element_11 = 1 + 16 * self.b1 * self.sigma * p_pc * (
-                    3 * self.Pc ** 3 * self.Pb ** 5 + self.Pc ** 7 * self.Pb)  # matrix variable
+                    3 * p_c ** 3 * p_b ** 5 + p_c ** 7 * p_b)  # matrix variable
             matrix_element_22 = -1 - 16 * self.b1 * self.sigma * p_pc * (
-                    self.Pc * self.Pb ** 7 + 3 * self.Pc ** 5 * self.Pb ** 3)  # matrix variable
+                    p_c * p_b ** 7 + 3 * p_c ** 5 * p_b ** 3)  # matrix variable
             matrix_element_21 = self.b1 * p_pc  # matrix variable
-            V1 = 1 - 8 * self.sigma * self.Pc ** 3 * self.Pb  # vector variable
-            V2 = 3 + 8 * self.sigma * self.Pc * self.Pb ** 3  # vector variable
+            vector_1 = 1 - 8 * self.sigma * p_c ** 3 * p_b  # vector variable
+            vector_2 = 3 + 8 * self.sigma * p_c * p_b ** 3  # vector variable
 
             self.internal_resist = Ra0 + 2 / (2 * pi * self.grout_conductivity) * self.b1 * p_pc / 2 * (
-                    V2 ** 2 * matrix_element_11 - 2 * V1 * V2 * matrix_element_21 -
-                    V1 ** 2 * matrix_element_22) / (matrix_element_11 * matrix_element_22 + matrix_element_21 ** 2)
+                    vector_2 ** 2 * matrix_element_11 - 2 * vector_1 * vector_2 * matrix_element_21 -
+                    vector_1 ** 2 * matrix_element_22) / (matrix_element_11 * matrix_element_22 + matrix_element_21 ** 2)
 
             # debugging print statements
             print("Rad0 = %.3E" % Ra0)
