@@ -96,11 +96,13 @@ class DoubleUTube(UTube):
         :param pipe_resist: pipe conduction and convection resistance, K/(W/m). only used for testing
         """
 
-        self.update_beta(flow_rate, temperature, pipe_resist)
+        self.update_beta_b1(flow_rate, temperature, pipe_resist)
 
         #static parameters
         p_pc = self.pipe_radius ** 2 / (4 * self.shank_space ** 2)  # dimensionless parameter
         p_c = self.shank_space ** 2 / (self.borehole_radius ** 8 - self.shank_space ** 8) ** (
+                1 / 4)  # dimensionless parameter
+        p_b = self.borehole_radius ** 2 / (self.borehole_radius ** 8 - self.shank_space ** 8) ** (
                 1 / 4)  # dimensionless parameter
 
         # --Borehole resistance, 0th order [K/(W/m)]--
@@ -246,13 +248,4 @@ class DoubleUTube(UTube):
 
         return self.effective_bhr_UWT
 
-    def calc_effective_bh_resistance_ave(self):
-        """
-        Averages effective borehole resistance results for the two boundary conditions
-        Uniform Heat Flux and Uniform Borehole Wall temperature
 
-        No arguments??
-        """
-
-        self.eff_bhr_ave = (self.effective_bhr_UHF + self.effective_bhr_UWT) / 2.0
-        return self.eff_bhr_ave
