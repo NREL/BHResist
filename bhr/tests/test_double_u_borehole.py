@@ -30,7 +30,7 @@ class TestDoubleUBorehole(TestCase):
         temperature = 20
         pipe_resist = 0.05
         # the following tests rely on each previous test
-        self.assertAlmostEqual(bh.update_b1(flow_rate, temperature, pipe_resist), 0.359, delta=tolerance)
+        self.assertAlmostEqual(bh.update_beta(flow_rate, temperature, pipe_resist), 0.359, delta=tolerance)
         self.assertAlmostEqual(bh.calc_bh_resist(flow_rate, temperature, pipe_resist), 7.509E-02, delta=tolerance)
         self.assertAlmostEqual(bh.calc_internal_resist_pipe(flow_rate, temperature, pipe_resist), 0.1604,
                                delta=tolerance)
@@ -48,7 +48,7 @@ class TestDoubleUBorehole(TestCase):
         temperature = 20
         pipe_resist = 0.05
         # the following tests rely on each previous test
-        self.assertAlmostEqual(bh.update_b1(flow_rate, temperature, pipe_resist), 0.359, delta=tolerance)
+        self.assertAlmostEqual(bh.update_beta(flow_rate, temperature, pipe_resist), 0.359, delta=tolerance)
         self.assertAlmostEqual(bh.calc_bh_resist(flow_rate, temperature, pipe_resist), 7.509E-02, delta=tolerance)
         self.assertAlmostEqual(bh.calc_internal_resist_pipe(flow_rate, temperature, pipe_resist), 0.2617,
                                delta=tolerance)
