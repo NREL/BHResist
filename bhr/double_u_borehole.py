@@ -47,6 +47,7 @@ class DoubleUTube(UTube):
         self.pipe_resist = None
         self.b1 = None
 
+
     def update_beta_b1(self,
                   flow_rate: float = None,
                   temperature: float = None,
