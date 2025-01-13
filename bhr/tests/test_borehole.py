@@ -64,7 +64,7 @@ class TestBorehole(unittest.TestCase):
             "borehole_diameter": 0.14
         }
 
-        bh = Borehole()
+        bh = ()
         bh.init_from_dict(inputs)
 
         # only pass flow rate, so pipe resistance should be computed in the process of this call
