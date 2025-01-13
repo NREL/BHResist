@@ -14,14 +14,14 @@ def coth(x):
 # Input variables needed. To Change in future to real inputs
 soil_conductivity = 3  # thermal conductivity of the ground W/(m-K) #
 grout_conductivity = 1.5  # thermal conductivity of the borehole/grout W/(m-K) #
-rb = 57.5  # radius of borehole (mm) #
-rp = 16  # radius of pipe (mm) #
+rb = .0575  # radius of borehole (m) #
+rp = .016  # radius of pipe (m) #
 length = 200  # depth of borehole (m) #
 Rp = 0.05  # total fluid-to-pipe thermal resistance for a single pipe K/(W/m)
 Vf = 0.75 / 3600  # (m^3/s) volumetric flow rate for one pipe, one direction
 cf = 4180  # specific heat of circulating fluid (J/kg)/K
 pf = 997  # (kg/m3) density of circulating fluid
-rc = 22.63  # (mm) radial distance between centers of symmetrically placed pipes and borehole center
+rc = .02263  # (m) radial distance between centers of symmetrically placed pipes and borehole center
 
 print("rc = %.2f mm" % rc)
 

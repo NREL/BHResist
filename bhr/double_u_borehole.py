@@ -26,19 +26,20 @@ class DoubleUTube(UTube):
 
         # static parameters
         self.grout_conductivity = grout_conductivity
-        self.borehole_radius = borehole_diameter / 2 * 1000  # radius of borehole (mm) rb
-        self.pipe_radius = pipe_outer_diameter / 2 * 1000  # pipe outer radius (mm) rp
+        self.borehole_radius = borehole_diameter / 2  # radius of borehole (m) rb
+        self.pipe_radius = pipe_outer_diameter / 2  # pipe outer radius (m) rp
         self.pipe_inlet_arrangement = pipe_inlet_arrangement
         self.bh_length = length  # length of borehole is half the length of one pipe (m)
         self.grout_conductivity = grout_conductivity
         self.soil_conductivity = soil_conductivity  # W/(m-K)
-        self.pipe_centers_radius = shank_space * ( 2**0.5 / 2 ) * 1000  # (mm) radial distance between centers of symmetrically placed pipes and borehole center (rc)
+        self.pipe_centers_radius = shank_space * ( 2**0.5 / 2 )  # (m) radial distance between centers of symmetrically placed pipes and borehole center (rc)
         self.sigma = (self.grout_conductivity - self.soil_conductivity) / (
                 self.grout_conductivity + self.soil_conductivity) # thermal conductivity ratio, dimensionless
 
         # Check if shank spacing realistic
-        assert self.pipe_radius * (
-                2 ** 0.5) <= self.pipe_centers_radius <= self.borehole_radius - self.pipe_radius,"Shank space is not within realistic bounds"
+        assert self.pipe_radius * 2 <= shank_space <= 2 / 2**0.5 * (self.borehole_radius - self.pipe_radius), ('Shank space is not within bounds. '+
+                'MAX is 2 / sqrt(2) * (borehole_radius - pipe_outer_radius). MIN is pipe_outer_radius * 2')
+
 
         # non-static parameters
         self.beta = None
