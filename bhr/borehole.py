@@ -90,14 +90,14 @@ class Borehole:
     def _setup(self):
         pass
 
-    def calc_bh_resist(self, flow_rate, temperature, pipe_resist):
+    def calc_bh_resist(self, flow_rate, temperature):
 
         if self.bh is None:
             pass
             # assert error and message...
 
         if self.boundary_condition == BoundaryCondition.UNIFORM_HEAT_FLUX:
-            return self.bh.calc_effective_bh_resistance_uhf(flow_rate, temperature,pipe_resist)
+            return self.bh.calc_effective_bh_resistance_uhf(flow_rate, temperature)
 
         if self.boundary_condition == BoundaryCondition.UNIFORM_BOREHOLE_WALL_TEMP:
-            return self.bh.calc_effective_bh_resistance_ubwt(flow_rate, temperature, pipe_resist)
+            return self.bh.calc_effective_bh_resistance_ubwt(flow_rate, temperature)

@@ -38,10 +38,7 @@ class SingleUBorehole(UTube):
         self.resist_bh_direct_coupling = None
         self.resist_bh_total_internal = None
 
-    def calc_average_bh_resistance(self,
-                                   flow_rate: float = None,
-                                   temperature: float = None,
-                                   pipe_resist: float = None) -> float:
+    def calc_average_bh_resistance(self) -> float:
         """
         Calculates the average thermal resistance of the borehole using the first-order multipole method.
 
@@ -52,12 +49,7 @@ class SingleUBorehole(UTube):
 
         Equation 13
 
-        :param flow_rate: mass flow rate, kg/s
-        :param temperature: temperature, Celsius
-        :param pipe_resist: pipe conduction and convection resistance, K/(W/m). only used for testing
         """
-
-        self.update_beta(flow_rate, temperature, pipe_resist)
 
         final_term_1 = log(self.theta_2 / (2 * self.theta_1 * (1 - self.theta_1 ** 4) ** self.sigma))
 
@@ -70,10 +62,7 @@ class SingleUBorehole(UTube):
         self.resist_bh_ave = (1 / (4 * pi * self.grout_conductivity)) * (self.beta + final_term_1 - final_term_2)
         return self.resist_bh_ave
 
-    def calc_total_internal_bh_resistance(self,
-                                          flow_rate: float = None,
-                                          temperature: float = None,
-                                          pipe_resist=None) -> float:
+    def calc_total_internal_bh_resistance(self) -> float:
         """
         Calculates the total internal thermal resistance of the borehole using the first-order multipole method.
 
@@ -82,12 +71,7 @@ class SingleUBorehole(UTube):
 
         Equation 26
 
-        :param flow_rate: mass flow rate, kg/s
-        :param temperature: temperature, Celsius
-        :param pipe_resist: pipe conduction and convection resistance, K/(W/m). only used for testing
         """
-
-        self.update_beta(flow_rate, temperature, pipe_resist)
 
         term_1_num = (1 + self.theta_1 ** 2) ** self.sigma
         term_1_den = self.theta_3 * (1 - self.theta_1 ** 2) ** self.sigma
@@ -104,10 +88,7 @@ class SingleUBorehole(UTube):
 
         return self.resist_bh_total_internal
 
-    def calc_grout_resistance(self,
-                              flow_rate: float = None,
-                              temperature: float = None,
-                              pipe_resist: float = None) -> float:
+    def calc_grout_resistance(self) -> float:
         """
         Calculates grout resistance. Use for validation.
 
@@ -118,17 +99,14 @@ class SingleUBorehole(UTube):
 
         :param flow_rate: mass flow rate, kg/s
         :param temperature: temperature, Celsius
-        :param pipe_resist: pipe conduction and convection resistance, K/(W/m). only used for testing
         """
 
-        self.update_beta(flow_rate, temperature, pipe_resist)
-        self.resist_bh_grout = self.calc_average_bh_resistance(flow_rate, temperature, pipe_resist) - pipe_resist / 2.0
+        self.resist_bh_grout = self.calc_average_bh_resistance() - self.pipe_resist / 2.0
         return self.resist_bh_grout
 
     def calc_effective_bh_resistance_uhf(self,
-                                         flow_rate: float = None,
-                                         temperature: float = None,
-                                         pipe_resist: float = None) -> float:
+                                         flow_rate: float,
+                                         temperature: float) -> float:
         """
         Calculates the effective thermal resistance of the borehole assuming a uniform heat flux.
 
@@ -139,13 +117,11 @@ class SingleUBorehole(UTube):
 
         :param flow_rate: mass flow rate, kg/s
         :param temperature: temperature, Celsius
-        :param pipe_resist: pipe conduction and convection resistance, K/(W/m). only used for testing
         """
 
-        self.update_beta(flow_rate, temperature, pipe_resist)
-
-        self.calc_total_internal_bh_resistance(flow_rate, temperature, pipe_resist)
-        self.calc_average_bh_resistance(flow_rate, temperature, pipe_resist)
+        self.update_beta(flow_rate, temperature)
+        self.calc_total_internal_bh_resistance()
+        self.calc_average_bh_resistance()
 
         pt_1 = 1 / (3 * self.resist_bh_total_internal)
         pt_2 = (self.length / (self.fluid.cp(temperature) * flow_rate)) ** 2
@@ -154,12 +130,10 @@ class SingleUBorehole(UTube):
         self.resist_bh_effective = self.resist_bh_ave + resist_short_circuiting
         return self.resist_bh_effective
 
-    def calc_direct_coupling_resistance(self,
-                                        flow_rate: float = None,
-                                        temperature: float = None,
-                                        pipe_resist: float = None) -> tuple:
-        r_a = self.calc_total_internal_bh_resistance(flow_rate, temperature, pipe_resist)
-        r_b = self.calc_average_bh_resistance(flow_rate, temperature, pipe_resist)
+    def calc_direct_coupling_resistance(self) -> tuple:
+
+        r_a = self.calc_total_internal_bh_resistance()
+        r_b = self.calc_average_bh_resistance()
 
         r_12 = (4 * r_a * r_b) / (4 * r_b - r_a)
 
@@ -171,9 +145,8 @@ class SingleUBorehole(UTube):
         return self.resist_bh_direct_coupling, r_b
 
     def update_beta(self,
-                    flow_rate: float = None,
-                    temperature: float = None,
-                    pipe_resist=None):
+                    flow_rate: float,
+                    temperature: float):
         """
         Updates Beta coefficient.
 
@@ -189,12 +162,7 @@ class SingleUBorehole(UTube):
 
         :param flow_rate: mass flow rate, kg/s
         :param temperature: temperature, Celsius
-        :param pipe_resist: pipe conduction and convection resistance, K/(W/m). only used for testing
         """
 
-        if pipe_resist:
-            self.pipe_resist = pipe_resist
-        else:
-            self.pipe_resist = self.calc_pipe_resist(flow_rate, temperature)
-
+        self.pipe_resist = self.calc_pipe_resist(flow_rate, temperature)
         self.beta = 2 * pi * self.grout_conductivity * self.pipe_resist

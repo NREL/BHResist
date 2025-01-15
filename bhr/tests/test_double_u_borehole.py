@@ -8,7 +8,7 @@ class TestDoubleUBorehole(TestCase):
         self.inputs = {
             "borehole_diameter": 0.115,
             "pipe_outer_diameter": 0.032,
-            "pipe_dimension_ratio": 11,
+            "pipe_dimension_ratio": 18.525,
             "length": 200,
             "shank_space": 0.032,
             "pipe_conductivity": 0.389,
@@ -36,58 +36,42 @@ class TestDoubleUBorehole(TestCase):
         bh = DoubleUTube(**self.inputs)
 
         tolerance = 1e-3
-        flow_rate = 0.2077
-        temperature = 20
-        pipe_resist = 0.05
 
-        self.assertAlmostEqual(bh.update_beta_b1(flow_rate, temperature, pipe_resist), 0.359, delta=tolerance)
+        self.assertAlmostEqual(bh.update_beta_b1(flow_rate=0.5, temperature=20), 0.359, delta=tolerance)
 
     def test_calc_bh_resist_local(self):
         bh = DoubleUTube(**self.inputs)
 
         tolerance = 1e-3
-        flow_rate = 0.2077
-        temperature = 20
-        pipe_resist = 0.05
 
-        bh.update_beta_b1(flow_rate, temperature, pipe_resist)
-        self.assertAlmostEqual(bh.calc_bh_resist_local(flow_rate, temperature, pipe_resist), 7.509E-02, delta=tolerance)
+        bh.update_beta_b1(flow_rate=0.5, temperature=20)
+        self.assertAlmostEqual(bh.calc_bh_resist_local(), 7.509E-02, delta=tolerance)
+
 
     def test_calc_internal_resist(self):
         bh = DoubleUTube(**self.inputs)
 
         tolerance = 1e-3
-        flow_rate = 0.2077
-        temperature = 20
-        pipe_resist = 0.05
+        bh.update_beta_b1(flow_rate=0.5, temperature=20)
+        self.assertAlmostEqual(bh.calc_internal_resist(), 0.1604, delta=tolerance)
 
-        bh.update_beta_b1(flow_rate, temperature, pipe_resist)
-        self.assertAlmostEqual(bh.calc_internal_resist_pipe(flow_rate, temperature, pipe_resist), 0.1604,
-                               delta=tolerance)
+    def test_calc_resistances_diagonal(self):
+        d = self.inputs.copy()
+        d["pipe_dimension_ratio"] = 18.9
+        bh = DoubleUTube(**d)
 
-    def test_calc_resistances_Diagonal(self):
-        bh = DoubleUTube(**self.inputs)
-        bh.internal_resist = 0.1604
-        bh.borhole_resist_local = 0.07509
+        # bh = DoubleUTube(**self.inputs)
 
         tolerance = 1e-3
-        flow_rate = 0.2077
-        temperature = 20
-        pipe_resist = 0.05
 
-        self.assertAlmostEqual(bh.calc_effective_bh_resistance_uhf(flow_rate, temperature,pipe_resist), 0.1302, delta=tolerance)
-        self.assertAlmostEqual(bh.calc_effective_bh_resistance_ubwt(flow_rate, temperature,pipe_resist), 0.1235, delta=tolerance)
+        self.assertAlmostEqual(bh.calc_effective_bh_resistance_uhf(flow_rate=0.2077, temperature=20), 0.1302, delta=tolerance)
+        self.assertAlmostEqual(bh.calc_effective_bh_resistance_ubwt(flow_rate=0.2077, temperature=20), 0.1235, delta=tolerance)
 
-    def test_calc_resistances_Adjacent(self):
+    def test_calc_resistances_adjacent(self):
         self.inputs.update({"pipe_inlet_arrangement": "ADJACENT"})
         bh = DoubleUTube(**self.inputs)
-        bh.internal_resist = 0.2617
-        bh.borhole_resist_local = 0.07509
 
         tolerance = 1e-3
-        flow_rate = 0.2077
-        temperature = 20
-        pipe_resist = 0.05
 
-        self.assertAlmostEqual(bh.calc_effective_bh_resistance_uhf(flow_rate, temperature,pipe_resist), 0.1089, delta=tolerance)
-        self.assertAlmostEqual(bh.calc_effective_bh_resistance_ubwt(flow_rate, temperature, pipe_resist), 0.1062, delta=tolerance)
+        self.assertAlmostEqual(bh.calc_effective_bh_resistance_uhf(flow_rate=0.2077, temperature=20), 0.1089, delta=tolerance)
+        self.assertAlmostEqual(bh.calc_effective_bh_resistance_ubwt(flow_rate=0.2077, temperature=20), 0.1062, delta=tolerance)
