@@ -23,11 +23,11 @@ class TestDoubleUBorehole(TestCase):
         self.assertEqual(bh.bh_length, 200)
 
     def test_shank_space_assert(self):
-        #checks to make sure code is raising error when shank space is too large
+        #checks if code is raising error when shank space is too large
         self.inputs.update({"shank_space": 0.115})
         self.assertRaises(AssertionError) #passes when AssertionError is raised
 
-        #checks to make sure code is raising error when shank space is too small
+        #checks if code is raising error when shank space is too small
         self.inputs.update({"shank_space": 0.031})
         self.assertRaises(AssertionError) #passes when AssertionError is raised
 

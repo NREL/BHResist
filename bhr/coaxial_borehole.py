@@ -33,7 +33,7 @@ class Coaxial:
     def convective_heat_transfer_coefficients_concentric_annulus(self, flow_rate, temp):
 
         low_reynolds = 2300 #limit determined from Hellstrom, G. 1991. Ground Heat Storage: Thermal Analyses of Duct Storage Systems. Department of Mathmatical Physics, University of Lund, Sweden.
-        high_reynolds = 4000
+        high_reynolds = 10000 #limit based on dittus-boelter equation
 
         re = Pipe.mdot_to_re(flow_rate, temp)
         pr = self.fluid.prandtl(temp)
