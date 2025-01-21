@@ -1,6 +1,6 @@
 from bhr.pipe import Pipe
 from math import pi, log
-import bhr.fluid import get_fluid
+from bhr.fluid import get_fluid
 
 class Coaxial:
 
@@ -39,17 +39,22 @@ class Coaxial:
         pr = self.fluid.prandtl(temp)
 
         if re < low_reynolds:
+           # use this nusslet number when the flow is laminar
             Nu_ii = 3.66 + 1.2 (self.inner_pipe.pipe_outer_diameter/self.outer_pipe.pipe_inner_diameter) ** -0.8
             Nu_oo = 3.66 + 1.2 (self.inner_pipe.pipe_inner_diameter/self.outer_pipe.pipe_inner_diameter) ** 0.5
+
         elif low_reynolds <= re < high_reynolds:
-            Nu_ii = 1 #ERROR
-            Nu_oo = 1 #ERROR
-        else re >= high_reynolds:
+            #in between - not sure what to do here
+            Nu_ii = 1 #PLACEHOLDER
+            Nu_oo = 1 #PLACEHOLDER
+
+        else:
+            #use this nusslet number when the flow is fully turbulent
             Nu_ii = 0.023 * re ** 0.8 * pr ** 0.35
             Nu_oo = Nu_ii
 
-        h_outside_inner_pipe = Nu_ii * self.fluid.k(temp) / (self.annular_hydraulic_diameter) #hop
-        h_inside_annulus = Nu_oo * self.fluid.k(temp) / (self.annular_hydraulic_diameter) #hoa
+        h_outside_inner_pipe = Nu_ii * self.fluid.k(temp) / (self.annular_hydraulic_diameter)
+        h_inside_annulus = Nu_oo * self.fluid.k(temp) / (self.annular_hydraulic_diameter)
 
         return h_outside_inner_pipe, h_inside_annulus
 
