@@ -41,7 +41,8 @@ class Coaxial:
         :return: Reynolds number
         """
         re = 4 * flow_rate / (self.fluid.mu(temp) * pi * self.annular_hydraulic_diameter)
-
+        # print("mu = ", self.fluid.mu(temp))
+        # print("annular_hydraulic_diameter = ", self.annular_hydraulic_diameter)
         return re
 
     def laminar_nusselt_annulus(self):
@@ -58,7 +59,7 @@ class Coaxial:
 
         return Nu_ii, Nu_oo
 
-    def turbulent_nusselt_annulus(self, flow_rate, temp):
+    def turbulent_nusselt_annulus(self, re, temp):
         """
         Turbulent Nusselt numbers for annulus flow
 
@@ -71,7 +72,7 @@ class Coaxial:
         :param temp: temperature, C
         :return: Nusselt number for inner surface of annulus pipe, Nusselt number for outer annulus pipe surface
         """
-        re = self.re_annulus(flow_rate, temp)
+
         pr = self.fluid.prandtl(temp)
 
         Nu_ii = 0.023 * re ** 0.8 * pr ** 0.35
@@ -99,30 +100,38 @@ class Coaxial:
             nu_ii = self.laminar_nusselt_annulus()[0]
             nu_oo = self.laminar_nusselt_annulus()[1]
             print("flow is laminar, Re = ", re)
+            # print( "Nu_ii = %f, Nu_oo = %f" % (nu_ii, nu_oo))
 
         elif low_reynolds <= re < high_reynolds:
+
             #in between
             nu_ii_low = self.laminar_nusselt_annulus()[0]
-            nu_ii_high = self.turbulent_nusselt_annulus(re, temp)[0]
-            sigma = smoothing_function(re, a=3000, b=450)
+            nu_ii_high = self.turbulent_nusselt_annulus(10000, temp)[0]
+            sigma = smoothing_function(re, a=6150, b=600)
             nu_ii = (1 - sigma) * nu_ii_low + sigma * nu_ii_high
 
             nu_oo_low = self.laminar_nusselt_annulus()[1]
-            nu_oo_high = self.turbulent_nusselt_annulus(re, temp)[1]
-            sigma = smoothing_function(re, a=3000, b=450)
+            nu_oo_high = self.turbulent_nusselt_annulus(10000, temp)[1]
+            sigma = smoothing_function(re, a=6150, b=600)
             nu_oo = (1 - sigma) * nu_oo_low + sigma * nu_oo_high
 
             print("flow is transitional, Re = ", re)
+            # print("Nu_ii_low = ", nu_ii_low)
+            # print("Nu_ii_high = ", nu_ii_high)
+            # print("sigma = ", sigma)
+            # print( "Nu_ii = %f, Nu_oo = %f" % (nu_ii, nu_oo))
 
         else:
             #use this nusslet number when the flow is fully turbulent
-            nu_ii = self.turbulent_nusselt_annulus(flow_rate, temp)[0]
-            nu_oo = self.turbulent_nusselt_annulus(flow_rate, temp)[1]
+            nu_ii = self.turbulent_nusselt_annulus(re, temp)[0]
+            nu_oo = self.turbulent_nusselt_annulus(re, temp)[1]
             print("flow is turbulant, Re = ", re)
+            # print( "Nu_ii = %f, Nu_oo = %f" % (nu_ii, nu_oo))
 
         h_outside_inner_pipe = nu_ii * self.fluid.k(temp) / (self.annular_hydraulic_diameter)
         h_inside_outer_pipe = nu_oo * self.fluid.k(temp) / (self.annular_hydraulic_diameter)
-
+        # print( "h_outside_inner_pipe = ", h_outside_inner_pipe)
+        # print( "h_inside_outer_pipe = ", h_inside_outer_pipe)
         return h_outside_inner_pipe, h_inside_outer_pipe
 
     def calc_bh_resist(self, flow_rate, temp):

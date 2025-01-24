@@ -235,7 +235,7 @@ class Pipe:
             nu = self.laminar_nusselt()
         elif low_reynolds <= re < high_reynolds:
             nu_low = self.laminar_nusselt()
-            nu_high = self.turbulent_nusselt(re, temp)
+            nu_high = self.turbulent_nusselt(re, temp) #I think this 're' arg should be changed to be the high reynolds lower limit of 4000, otherwise the limit moves
             sigma = smoothing_function(re, a=3000, b=150)
             nu = (1 - sigma) * nu_low + sigma * nu_high
         else:
