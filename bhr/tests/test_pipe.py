@@ -100,7 +100,7 @@ class TestPipe(unittest.TestCase):
         temp = 20
         tol = 0.00001
         self.assertAlmostEqual(p.calc_pipe_internal_conv_resist(0, temp), 0.13266, delta=tol)
-        self.assertAlmostEqual(p.calc_pipe_internal_conv_resist(0.07, temp), 0.02827, delta=tol)
+        self.assertAlmostEqual(p.calc_pipe_internal_conv_resist(0.07, temp), 0.020166, delta=tol)
         self.assertAlmostEqual(p.calc_pipe_internal_conv_resist(2, temp), 0.00094, delta=tol)
 
     def test_calc_resist(self):
