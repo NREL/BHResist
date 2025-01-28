@@ -123,10 +123,10 @@ class Pipe:
             return self.laminar_friction_factor(re)
         elif low_reynolds <= re < high_reynolds:
             # pure laminar flow
-            f_low = self.laminar_friction_factor(re)
+            f_low = self.laminar_friction_factor(low_reynolds)
 
             # pure turbulent flow
-            f_high = self.turbulent_friction_factor(re)
+            f_high = self.turbulent_friction_factor(high_reynolds)
             sigma = smoothing_function(re, a=3000, b=450)
             return (1 - sigma) * f_low + sigma * f_high
         else:
