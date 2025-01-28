@@ -82,7 +82,7 @@ class Coaxial:
 
 
 
-    def convective_heat_transfer_coefficients_annulus(self, flow_rate, temp):
+    def convective_resist_annulus(self, flow_rate, temp):
         """
         Convective heat transfer coefficients for annulus flow
 
@@ -128,30 +128,31 @@ class Coaxial:
             print("flow is turbulant, Re = ", re)
             # print( "Nu_ii = %f, Nu_oo = %f" % (nu_ii, nu_oo))
 
-        h_outside_inner_pipe = nu_ii * self.fluid.k(temp) / (self.annular_hydraulic_diameter)
-        h_inside_outer_pipe = nu_oo * self.fluid.k(temp) / (self.annular_hydraulic_diameter)
+        r_conv_outside_inner_pipe = (self.annular_hydraulic_diameter) / (nu_ii * self.fluid.k(temp) * self.inner_pipe.pipe_outer_diameter * pi)
+
+        r_conv_inside_outer_pipe = (self.annular_hydraulic_diameter) / (nu_oo * self.fluid.k(temp) * self.outer_pipe.pipe_inner_diameter * pi)
         # print( "h_outside_inner_pipe = ", h_outside_inner_pipe)
         # print( "h_inside_outer_pipe = ", h_inside_outer_pipe)
-        return h_outside_inner_pipe, h_inside_outer_pipe
+        return r_conv_outside_inner_pipe, r_conv_inside_outer_pipe
 
     def calc_bh_resist(self, flow_rate, temp):
 
         #resistances progressing from inside to outside
         r_conv_inner_pipe = self.inner_pipe.calc_pipe_internal_conv_resist(flow_rate, temp)
         r_cond_inner_pipe = self.inner_pipe.calc_pipe_cond_resist()
-        r_conv_outer_pipe_inner_wall = 1/(self.convective_heat_transfer_coefficients_annulus(flow_rate, temp)[0] * self.inner_pipe.pipe_outer_diameter *pi)
-        r_conv_outer_pipe_outer_wall = 1/(self.convective_heat_transfer_coefficients_annulus(flow_rate, temp)[1] * self.outer_pipe.pipe_inner_diameter *pi)
+        r_conv_outside_inner_pipe = self.convective_resist_annulus(flow_rate, temp)[0]
+        r_conv_inside_outer_pipe = self.convective_resist_annulus(flow_rate, temp)[1]
         r_cond_outer_pipe = self.outer_pipe.calc_pipe_cond_resist()
         r_cond_grout = log( self.borehole_diameter/self.outer_pipe.pipe_outer_diameter) / (2 * pi * self.grout_conductivity)
 
         print( "r_conv_inner_pipe = ", r_conv_inner_pipe)
         print( "r_cond_inner_pipe = ", r_cond_inner_pipe)
-        print( "r_conv_outer_pipe_inner_wall = ", r_conv_outer_pipe_inner_wall)
-        print( "r_conv_outer_pipe_outer_wall = ", r_conv_outer_pipe_outer_wall)
+        print( "r_conv_outer_pipe_inner_wall = ", r_conv_outside_inner_pipe)
+        print( "r_conv_outer_pipe_outer_wall = ", r_conv_inside_outer_pipe)
         print( "r_cond_outer_pipe = ", r_cond_outer_pipe)
         print( "r_cond_grout = ", r_cond_grout)
 
-        bh_resist = sum([r_conv_inner_pipe, r_cond_inner_pipe, r_conv_outer_pipe_inner_wall, r_conv_outer_pipe_outer_wall,
+        bh_resist = sum([r_conv_inner_pipe, r_cond_inner_pipe, r_conv_outside_inner_pipe, r_conv_inside_outer_pipe,
                          r_cond_outer_pipe, r_cond_grout])
 
         return bh_resist

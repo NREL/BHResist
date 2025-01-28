@@ -42,22 +42,22 @@ class TestCoaxialBorehole(TestCase):
          self.assertAlmostEqual(coax.turbulent_nusselt_annulus(re=10000, temp = 20)[0], 72.0409 , delta=1e-3)
          self.assertAlmostEqual(coax.turbulent_nusselt_annulus(re=20000 , temp = 20)[1], 125.4305 , delta=1e-3)
 
-    def test_convective_heat_transfer_coefficients_annulus(self):
+    def test_convective_resist_annulus(self):
          coax = Coaxial(**self.inputs)
 
-         #tests turbulant flow, convective heat transfer coefficient of outside surface of inner pipe
-         self.assertAlmostEqual(coax.convective_heat_transfer_coefficients_annulus(flow_rate = 0.5 , temp = 20)[0], 5260.2484 ,delta=1e-3)
-         #tests laminar flow, convective heat transfer coefficient of outside surface of inner pipe
-         self.assertAlmostEqual(coax.convective_heat_transfer_coefficients_annulus(flow_rate = 0.02 , temp = 20)[0], 159.829 ,delta=1e-3) #ACK this is a very high value
-         #tests transitional flow, convective heat transfer coefficient of outside surface of inner pipe
-         self.assertAlmostEqual(coax.convective_heat_transfer_coefficients_annulus(flow_rate = 0.1 , temp = 20)[0], 1211.5946 ,delta=1e-3)
+         #tests turbulant flow, convective resistance of outside surface of inner pipe
+         self.assertAlmostEqual(coax.convective_resist_annulus(flow_rate = 0.5 , temp = 20)[0], 0.001891 ,delta=1e-3)
+         #tests laminar flow, convective resistance of outside surface of inner pipe
+         self.assertAlmostEqual(coax.convective_resist_annulus(flow_rate = 0.02 , temp = 20)[0], 0.062236 ,delta=1e-3)
+         #tests transitional flow, convective resistance of outside surface of inner pipe
+         self.assertAlmostEqual(coax.convective_resist_annulus(flow_rate = 0.1 , temp = 20)[0], 0.00820999 ,delta=1e-3)
 
-         #tests turbulant flow, convective heat transfer coefficient of inside of outer pipe
-         self.assertAlmostEqual(coax.convective_heat_transfer_coefficients_annulus(flow_rate = 0.5 , temp = 20)[1], 5260.2484 ,delta=1e-3)
-         #tests laminar flow, convective heat transfer coefficient of inside of outer pipe
-         self.assertAlmostEqual(coax.convective_heat_transfer_coefficients_annulus(flow_rate = 0.02 , temp = 20)[1], 135.10714 ,delta=1e-3) #ACK this is a very high value
-         #tests transitional flow, convective heat transfer coefficient of inside of outer pipe
-         self.assertAlmostEqual(coax.convective_heat_transfer_coefficients_annulus(flow_rate = 0.1 , temp = 20)[1], 1200.15925 ,delta=1e-3)
+         #tests turbulant flow, convective resistance of inside of outer pipe
+         self.assertAlmostEqual(coax.convective_resist_annulus(flow_rate = 0.5 , temp = 20)[1], 0.001155 ,delta=1e-3)
+         #tests laminar flow, convective resistance of inside of outer pipe
+         self.assertAlmostEqual(coax.convective_resist_annulus(flow_rate = 0.02 , temp = 20)[1], 0.04499 ,delta=1e-3)
+         #tests transitional flow, convective resistance of inside of outer pipe
+         self.assertAlmostEqual(coax.convective_resist_annulus(flow_rate = 0.1 , temp = 20)[1], 0.005065 ,delta=1e-3)
 
     def test_calc_bh_resist(self):
          coax = Coaxial(**self.inputs)

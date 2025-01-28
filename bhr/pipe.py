@@ -240,7 +240,7 @@ class Pipe:
             nu = (1 - sigma) * nu_low + sigma * nu_high
         else:
             nu = self.turbulent_nusselt(re, temp)
-
+        print(self.fluid.k(temp))
         return 1 / (nu * pi * self.fluid.k(temp))
 
     def calc_pipe_resist(self, m_dot: float, temp: float):
