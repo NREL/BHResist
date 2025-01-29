@@ -131,7 +131,6 @@ class SingleUBorehole(UTube):
         return self.resist_bh_effective
 
     def calc_direct_coupling_resistance(self) -> tuple:
-
         r_a = self.calc_total_internal_bh_resistance()
         r_b = self.calc_average_bh_resistance()
 

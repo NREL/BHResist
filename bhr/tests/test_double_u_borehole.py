@@ -23,14 +23,13 @@ class TestDoubleUBorehole(TestCase):
         self.assertEqual(bh.bh_length, 200)
 
     def test_shank_space_assert(self):
-        #checks if code is raising error when shank space is too large
+        # checks if code is raising error when shank space is too large
         self.inputs.update({"shank_space": 0.115})
-        self.assertRaises(AssertionError) #passes when AssertionError is raised
+        self.assertRaises(AssertionError)  # passes when AssertionError is raised
 
-        #checks if code is raising error when shank space is too small
+        # checks if code is raising error when shank space is too small
         self.inputs.update({"shank_space": 0.031})
-        self.assertRaises(AssertionError) #passes when AssertionError is raised
-
+        self.assertRaises(AssertionError)  # passes when AssertionError is raised
 
     def test_update_beta_b1(self):
         bh = DoubleUTube(**self.inputs)
@@ -46,7 +45,6 @@ class TestDoubleUBorehole(TestCase):
 
         bh.update_beta_b1(flow_rate=0.5, temperature=20)
         self.assertAlmostEqual(bh.calc_bh_resist_local(), 7.509E-02, delta=tolerance)
-
 
     def test_calc_internal_resist(self):
         bh = DoubleUTube(**self.inputs)
@@ -64,8 +62,10 @@ class TestDoubleUBorehole(TestCase):
 
         tolerance = 1e-3
 
-        self.assertAlmostEqual(bh.calc_effective_bh_resistance_uhf(flow_rate=0.2077, temperature=20), 0.1302, delta=tolerance)
-        self.assertAlmostEqual(bh.calc_effective_bh_resistance_ubwt(flow_rate=0.2077, temperature=20), 0.1235, delta=tolerance)
+        self.assertAlmostEqual(bh.calc_effective_bh_resistance_uhf(flow_rate=0.2077, temperature=20), 0.1302,
+                               delta=tolerance)
+        self.assertAlmostEqual(bh.calc_effective_bh_resistance_ubwt(flow_rate=0.2077, temperature=20), 0.1235,
+                               delta=tolerance)
 
     def test_calc_resistances_adjacent(self):
         self.inputs.update({"pipe_inlet_arrangement": "ADJACENT"})
@@ -73,5 +73,7 @@ class TestDoubleUBorehole(TestCase):
 
         tolerance = 1e-3
 
-        self.assertAlmostEqual(bh.calc_effective_bh_resistance_uhf(flow_rate=0.2077, temperature=20), 0.1089, delta=tolerance)
-        self.assertAlmostEqual(bh.calc_effective_bh_resistance_ubwt(flow_rate=0.2077, temperature=20), 0.1062, delta=tolerance)
+        self.assertAlmostEqual(bh.calc_effective_bh_resistance_uhf(flow_rate=0.2077, temperature=20), 0.1089,
+                               delta=tolerance)
+        self.assertAlmostEqual(bh.calc_effective_bh_resistance_ubwt(flow_rate=0.2077, temperature=20), 0.1062,
+                               delta=tolerance)

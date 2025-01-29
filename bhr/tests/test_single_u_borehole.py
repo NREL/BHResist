@@ -9,7 +9,8 @@ class TestSingleUBorehole(TestCase):
         self.inputs = {
             "borehole_diameter": 0.096,
             "pipe_outer_diameter": 0.032,
-            "pipe_dimension_ratio": 18.53,  # This is not a realistic value, set to make pipe conduction + internal fluid resistance = 0.05 to match tests
+            "pipe_dimension_ratio": 18.53,
+            # This is not a realistic value, set to make pipe conduction + internal fluid resistance = 0.05 to match tests
             "length": 100,
             "shank_space": 0.032,
             "pipe_conductivity": 0.389,
@@ -48,4 +49,5 @@ class TestSingleUBorehole(TestCase):
         bh = SingleUBorehole(**self.inputs)
         tolerance = 1e-3
         bh.update_beta(flow_rate=0.5, temperature=20)
-        self.assertAlmostEqual(bh.calc_effective_bh_resistance_uhf(flow_rate=0.5, temperature=20), 0.20435, delta=tolerance)
+        self.assertAlmostEqual(bh.calc_effective_bh_resistance_uhf(flow_rate=0.5, temperature=20), 0.20435,
+                               delta=tolerance)
