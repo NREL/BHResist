@@ -47,10 +47,10 @@ class TestPipe(unittest.TestCase):
 
     def test_calc_friction_factor(self):
         p = Pipe(**self.inputs)
-        tol = 0.00001
+        tol = 1e-4
 
         # laminar tests
-        re = 100  # noqa: E126
+        re = 100
         self.assertEqual(p.friction_factor(re), 64.0 / re)
 
         re = 1000
@@ -61,13 +61,13 @@ class TestPipe(unittest.TestCase):
 
         # transitional tests
         re = 2000
-        self.assertAlmostEqual(p.friction_factor(re), 0.034003503, delta=tol)
+        self.assertAlmostEqual(p.friction_factor(re), 0.03213, delta=tol)
 
         re = 3000
-        self.assertAlmostEqual(p.friction_factor(re), 0.033446219, delta=tol)
+        self.assertAlmostEqual(p.friction_factor(re), 0.03344, delta=tol)
 
         re = 4000
-        self.assertAlmostEqual(p.friction_factor(re), 0.03895358, delta=tol)
+        self.assertAlmostEqual(p.friction_factor(re), 0.04127, delta=tol)
 
         # turbulent tests
         re = 5000
@@ -100,7 +100,7 @@ class TestPipe(unittest.TestCase):
         temp = 20
         tol = 0.00001
         self.assertAlmostEqual(p.calc_pipe_internal_conv_resist(0, temp), 0.13266, delta=tol)
-        self.assertAlmostEqual(p.calc_pipe_internal_conv_resist(0.07, temp), 0.020166, delta=tol)
+        self.assertAlmostEqual(p.calc_pipe_internal_conv_resist(0.07, temp), 0.020784, delta=tol)
         self.assertAlmostEqual(p.calc_pipe_internal_conv_resist(2, temp), 0.00094, delta=tol)
 
     def test_calc_resist(self):

@@ -42,24 +42,22 @@ class Coaxial:
         :param temp: temperature, C
         :return: Reynolds number
         """
-        re = 4 * flow_rate / (self.fluid.mu(temp) * pi * self.annular_hydraulic_diameter)
-        # print("mu = ", self.fluid.mu(temp))
-        # print("annular_hydraulic_diameter = ", self.annular_hydraulic_diameter)
-        return re
+
+        return 4 * flow_rate / (self.fluid.mu(temp) * pi * self.annular_hydraulic_diameter)
 
     def laminar_nusselt_annulus(self):
         """
         Laminar Nusselt numbers for annulus flow
 
         Hellström, G. 1991. Ground Heat Storage: Thermal Analyses of Duct Storage Systems.
-        Department of Mathematical Physics, University of Lund, Sweden., p67-71
+        Department of Mathematical Physics, University of Lund, Sweden., pp 67-71
 
         :return: Nusselt number for inner surface of annulus pipe, Nusselt number for outer annulus pipe surface
         """
-        Nu_ii = 3.66 + 1.2 * (self.inner_pipe.pipe_outer_diameter / self.outer_pipe.pipe_inner_diameter) ** -0.8
-        Nu_oo = 3.66 + 1.2 * (self.inner_pipe.pipe_outer_diameter / self.outer_pipe.pipe_inner_diameter) ** 0.5
+        nu_ii = 3.66 + 1.2 * (self.inner_pipe.pipe_outer_diameter / self.outer_pipe.pipe_inner_diameter) ** -0.8
+        nu_oo = 3.66 + 1.2 * (self.inner_pipe.pipe_outer_diameter / self.outer_pipe.pipe_inner_diameter) ** 0.5
 
-        return Nu_ii, Nu_oo
+        return nu_ii, nu_oo
 
     def turbulent_nusselt_annulus(self, re, temp):
         """
@@ -70,17 +68,17 @@ class Coaxial:
 
         Eqns 4.10 and 4.11 based on the Dittus-Boelter equation
 
-        :param flow_rate: mass flow rate, kg/s
+        :param re: Reynolds number
         :param temp: temperature, C
         :return: Nusselt number for inner surface of annulus pipe, Nusselt number for outer annulus pipe surface
         """
 
         pr = self.fluid.prandtl(temp)
 
-        Nu_ii = 0.023 * re ** 0.8 * pr ** 0.35
-        Nu_oo = Nu_ii
+        nu_ii = 0.023 * re ** 0.8 * pr ** 0.35
+        nu_oo = nu_ii
 
-        return Nu_ii, Nu_oo
+        return nu_ii, nu_oo
 
     def convective_resist_annulus(self, flow_rate, temp):
         """
@@ -88,53 +86,44 @@ class Coaxial:
 
         :param flow_rate: mass flow rate, kg/s
         :param temp: temperature, C
-        :return: annulus pipe convective heat transfer coeffiecients for inner and outer surfaces, W/(m^2K)
+        :return: annulus pipe convective heat transfer coefficients for inner and outer surfaces, W/(m^2K)
         """
-        low_reynolds = 2300  # limit determined from Hellstrom, G. 1991. Ground Heat Storage: Thermal Analyses of Duct Storage Systems. Department of Mathmatical Physics, University of Lund, Sweden.
-        high_reynolds = 10000  # limit based on dittus-boelter equation
+
+        # limit determined from Hellström, G. 1991. Ground Heat Storage: Thermal Analyses of
+        # Duct Storage Systems. Department of Mathematical Physics, University of Lund, Sweden.
+
+        low_reynolds = 2300
+
+        # limit based on Dittus-Boelter equation
+        high_reynolds = 10000
 
         re = self.re_annulus(flow_rate, temp)
 
         if re < low_reynolds:
-            # use this nusslet number when the flow is laminar
-            nu_ii = self.laminar_nusselt_annulus()[0]
-            nu_oo = self.laminar_nusselt_annulus()[1]
+            # use this Nusslet number when the flow is laminar
+            nu_ii, nu_oo = self.laminar_nusselt_annulus()
             print("flow is laminar, Re = ", re)
-            # print( "Nu_ii = %f, Nu_oo = %f" % (nu_ii, nu_oo))
 
         elif low_reynolds <= re < high_reynolds:
 
             # in between
-            nu_ii_low = self.laminar_nusselt_annulus()[0]
-            nu_ii_high = self.turbulent_nusselt_annulus(10000, temp)[0]
-            sigma = smoothing_function(re, a=6150, b=600)
-            nu_ii = (1 - sigma) * nu_ii_low + sigma * nu_ii_high
-
-            nu_oo_low = self.laminar_nusselt_annulus()[1]
-            nu_oo_high = self.turbulent_nusselt_annulus(10000, temp)[1]
-            sigma = smoothing_function(re, a=6150, b=600)
-            nu_oo = (1 - sigma) * nu_oo_low + sigma * nu_oo_high
-
+            nu_ii_low, nu_oo_low = self.laminar_nusselt_annulus()
+            nu_ii_high, nu_oo_high = self.turbulent_nusselt_annulus(high_reynolds, temp)
+            nu_ii = smoothing_function(re, low_reynolds, high_reynolds, nu_ii_low, nu_ii_high)
+            nu_oo = smoothing_function(re, low_reynolds, high_reynolds, nu_oo_low, nu_oo_high)
             print("flow is transitional, Re = ", re)
-            # print("Nu_ii_low = ", nu_ii_low)
-            # print("Nu_ii_high = ", nu_ii_high)
-            # print("sigma = ", sigma)
-            # print( "Nu_ii = %f, Nu_oo = %f" % (nu_ii, nu_oo))
 
         else:
             # use this nusslet number when the flow is fully turbulent
-            nu_ii = self.turbulent_nusselt_annulus(re, temp)[0]
-            nu_oo = self.turbulent_nusselt_annulus(re, temp)[1]
-            print("flow is turbulant, Re = ", re)
-            # print( "Nu_ii = %f, Nu_oo = %f" % (nu_ii, nu_oo))
+            nu_ii, nu_oo = self.turbulent_nusselt_annulus(re, temp)
+            print("flow is turbulent, Re = ", re)
 
-        r_conv_outside_inner_pipe = (self.annular_hydraulic_diameter) / (
-                    nu_ii * self.fluid.k(temp) * self.inner_pipe.pipe_outer_diameter * pi)
+        r_conv_outside_inner_pipe = self.annular_hydraulic_diameter / (
+                nu_ii * self.fluid.k(temp) * self.inner_pipe.pipe_outer_diameter * pi)
 
-        r_conv_inside_outer_pipe = (self.annular_hydraulic_diameter) / (
-                    nu_oo * self.fluid.k(temp) * self.outer_pipe.pipe_inner_diameter * pi)
-        # print( "h_outside_inner_pipe = ", h_outside_inner_pipe)
-        # print( "h_inside_outer_pipe = ", h_inside_outer_pipe)
+        r_conv_inside_outer_pipe = self.annular_hydraulic_diameter / (
+                nu_oo * self.fluid.k(temp) * self.outer_pipe.pipe_inner_diameter * pi)
+
         return r_conv_outside_inner_pipe, r_conv_inside_outer_pipe
 
     def calc_bh_resist(self, flow_rate, temp):
@@ -146,7 +135,7 @@ class Coaxial:
         r_conv_inside_outer_pipe = self.convective_resist_annulus(flow_rate, temp)[1]
         r_cond_outer_pipe = self.outer_pipe.calc_pipe_cond_resist()
         r_cond_grout = log(self.borehole_diameter / self.outer_pipe.pipe_outer_diameter) / (
-                    2 * pi * self.grout_conductivity)
+                2 * pi * self.grout_conductivity)
 
         print("r_conv_inner_pipe = ", r_conv_inner_pipe)
         print("r_cond_inner_pipe = ", r_cond_inner_pipe)

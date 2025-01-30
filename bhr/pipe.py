@@ -116,21 +116,21 @@ class Pipe:
         """
 
         # limits picked be within about 1% of actual values
-        low_reynolds = 1500
-        high_reynolds = 5000
+        low_reynolds = 2000
+        high_reynolds = 4000
 
         if re < low_reynolds:
             return self.laminar_friction_factor(re)
-        elif low_reynolds <= re < high_reynolds:
-            # pure laminar flow
-            f_low = self.laminar_friction_factor(low_reynolds)
-
-            # pure turbulent flow
-            f_high = self.turbulent_friction_factor(high_reynolds)
-            sigma = smoothing_function(re, a=3000, b=450)
-            return (1 - sigma) * f_low + sigma * f_high
-        else:
+        if re > high_reynolds:
             return self.turbulent_friction_factor(re)
+
+        # pure laminar flow
+        f_low = self.laminar_friction_factor(re)
+
+        # pure turbulent flow
+        f_high = self.turbulent_friction_factor(re)
+
+        return smoothing_function(re, low_reynolds, high_reynolds, f_low, f_high)
 
     @staticmethod
     def laminar_friction_factor(re: float):
@@ -236,11 +236,10 @@ class Pipe:
         elif low_reynolds <= re < high_reynolds:
             nu_low = self.laminar_nusselt()
             nu_high = self.turbulent_nusselt(high_reynolds, temp)
-            sigma = smoothing_function(re, a=3000, b=150)
-            nu = (1 - sigma) * nu_low + sigma * nu_high
+            nu = smoothing_function(re, low_reynolds, high_reynolds, nu_low, nu_high)
         else:
             nu = self.turbulent_nusselt(re, temp)
-        print(self.fluid.k(temp))
+
         return 1 / (nu * pi * self.fluid.k(temp))
 
     def calc_pipe_resist(self, m_dot: float, temp: float):

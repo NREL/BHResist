@@ -49,6 +49,7 @@ class SingleUBorehole(UTube):
 
         Equation 13
 
+        :return: average thermal resistance, K/(W/m)
         """
 
         final_term_1 = log(self.theta_2 / (2 * self.theta_1 * (1 - self.theta_1 ** 4) ** self.sigma))
@@ -71,6 +72,7 @@ class SingleUBorehole(UTube):
 
         Equation 26
 
+        :return: total internal thermal resistance, K/(W/m)
         """
 
         term_1_num = (1 + self.theta_1 ** 2) ** self.sigma
@@ -97,8 +99,7 @@ class SingleUBorehole(UTube):
 
         Eq: 3
 
-        :param flow_rate: mass flow rate, kg/s
-        :param temperature: temperature, Celsius
+        :return: grout resistance, K/(W-m)
         """
 
         self.resist_bh_grout = self.calc_average_bh_resistance() - self.pipe_resist / 2.0
@@ -117,6 +118,8 @@ class SingleUBorehole(UTube):
 
         :param flow_rate: mass flow rate, kg/s
         :param temperature: temperature, Celsius
+
+        :return: effective thermal resistance, K/(W/m)
         """
 
         self.update_beta(flow_rate, temperature)
@@ -161,6 +164,8 @@ class SingleUBorehole(UTube):
 
         :param flow_rate: mass flow rate, kg/s
         :param temperature: temperature, Celsius
+
+        :return: none
         """
 
         self.pipe_resist = self.calc_pipe_resist(flow_rate, temperature)
