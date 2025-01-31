@@ -75,7 +75,6 @@ class DoubleUTube(UTube):
         self.beta = 2 * pi * self.grout_conductivity * self.pipe_resist
         self.b1 = (1 - self.beta) / (1 + self.beta)  # dimensionless parameter
 
-        print(self.pipe_resist)
         return self.b1
 
     def calc_bh_resist_local(self):
@@ -193,7 +192,6 @@ class DoubleUTube(UTube):
 
         Rv = self.bh_length / (self.fluid.cp(temperature) * flow_rate)  # (K/(w/m)) thermal resistance factor
 
-        print(internal_resist, borehole_resist_local, Rv)
 
         self.effective_bhr_UHF = borehole_resist_local + Rv ** 2 / (6 * internal_resist)
 

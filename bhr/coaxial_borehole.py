@@ -102,7 +102,6 @@ class Coaxial:
         if re < low_reynolds:
             # use this Nusslet number when the flow is laminar
             nu_ii, nu_oo = self.laminar_nusselt_annulus()
-            print("flow is laminar, Re = ", re)
 
         elif low_reynolds <= re < high_reynolds:
 
@@ -111,12 +110,10 @@ class Coaxial:
             nu_ii_high, nu_oo_high = self.turbulent_nusselt_annulus(high_reynolds, temp)
             nu_ii = smoothing_function(re, low_reynolds, high_reynolds, nu_ii_low, nu_ii_high)
             nu_oo = smoothing_function(re, low_reynolds, high_reynolds, nu_oo_low, nu_oo_high)
-            print("flow is transitional, Re = ", re)
 
         else:
             # use this nusslet number when the flow is fully turbulent
             nu_ii, nu_oo = self.turbulent_nusselt_annulus(re, temp)
-            print("flow is turbulent, Re = ", re)
 
         r_conv_outside_inner_pipe = self.annular_hydraulic_diameter / (
                 nu_ii * self.fluid.k(temp) * self.inner_pipe.pipe_outer_diameter * pi)
@@ -136,13 +133,6 @@ class Coaxial:
         r_cond_outer_pipe = self.outer_pipe.calc_pipe_cond_resist()
         r_cond_grout = log(self.borehole_diameter / self.outer_pipe.pipe_outer_diameter) / (
                 2 * pi * self.grout_conductivity)
-
-        print("r_conv_inner_pipe = ", r_conv_inner_pipe)
-        print("r_cond_inner_pipe = ", r_cond_inner_pipe)
-        print("r_conv_outer_pipe_inner_wall = ", r_conv_outside_inner_pipe)
-        print("r_conv_outer_pipe_outer_wall = ", r_conv_inside_outer_pipe)
-        print("r_cond_outer_pipe = ", r_cond_outer_pipe)
-        print("r_cond_grout = ", r_cond_grout)
 
         bh_resist = sum([r_conv_inner_pipe, r_cond_inner_pipe, r_conv_outside_inner_pipe, r_conv_inside_outer_pipe,
                          r_cond_outer_pipe, r_cond_grout])
