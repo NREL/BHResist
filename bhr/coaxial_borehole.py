@@ -126,7 +126,7 @@ class Coaxial:
 
         return r_conv_outside_inner_pipe, r_conv_inside_outer_pipe
 
-    def calc_bh_resist(self, flow_rate, temp):
+    def calc_effective_bh_resistance_uhf(self, flow_rate, temp):
 
         # resistances progressing from inside to outside
         r_conv_inner_pipe = self.inner_pipe.calc_pipe_internal_conv_resist(flow_rate, temp)

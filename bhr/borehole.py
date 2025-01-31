@@ -1,19 +1,28 @@
 from bhr.double_u_borehole import DoubleUTube
 from bhr.enums import BoundaryCondition, BoreholeType
 from bhr.single_u_borehole import SingleUBorehole
+from bhr.coaxial_borehole import Coaxial
 
-
+# creates a class named Borehole
 class Borehole:
 
+# creates a function named __init__ with the parameter self
     def __init__(self):
+        # initializes the variable bh_type to None
         self.bh_type = None
+        # initializes the variable boundary_condition to None
         self.boundary_condition = None
+        # initializes the variable bh to None
         self.bh = None
 
+# creates a function named init_from_dict with the parameter self and inputs
     def init_from_dict(self, inputs: dict):
 
-        bh_type_str = inputs["borehole_type"].upper()
+        # initializes the variable bh_type_str to the value of the key "borehole_type" in the dictionary inputs
+        bh_type_str = inputs["borehole_type"].upper() #formats the string to uppercase
+        # checks if the value of bh_type_str is equal to the name of the BoreholeType.SINGLE_U_TUBE
         if bh_type_str == BoreholeType.SINGLE_U_TUBE.name:
+            # sets the value of the variable bh_type to BoreholeType.SINGLE_U_TUBE
             self.bh_type = BoreholeType.SINGLE_U_TUBE
         elif bh_type_str == BoreholeType.DOUBLE_U_TUBE.name:
             self.bh_type = BoreholeType.DOUBLE_U_TUBE
@@ -22,6 +31,7 @@ class Borehole:
         else:
             raise LookupError(f"borehole_type \"{bh_type_str}\" not supported")
 
+        # sets bc_str to the value of the key "boundary_condition" in the dictionary inputs and formats it to uppercase
         bc_str = inputs["boundary_condition"].upper()
         if bc_str == BoundaryCondition.UNIFORM_HEAT_FLUX.name:
             self.boundary_condition = BoundaryCondition.UNIFORM_HEAT_FLUX
@@ -38,6 +48,7 @@ class Borehole:
         fluid_concentration = inputs["fluid_concentration"]
 
         if self.bh_type == BoreholeType.SINGLE_U_TUBE:
+            # sets the value of the variable pipe_outer_dia_single to the value of the key "pipe_outer_diameter" in the dictionary inputs
             pipe_outer_dia_single = inputs["single_u_tube"]['pipe_outer_diameter']
             dimension_ratio_single = inputs["single_u_tube"]['pipe_dimension_ratio']
             shank_space_single = inputs["single_u_tube"]["shank_space"]
@@ -75,7 +86,29 @@ class Borehole:
                                   fluid_concentration)
 
         elif self.bh_type == BoreholeType.COAXIAL:
-            pass
+
+            pipe_outer_dia_coax = inputs["coaxial"]['outer_pipe_outer_diameter']
+            outer_pipe_dimension_ratio = inputs["coaxial"]['outer_pipe_dimension_ratio']
+            pipe_conductivity_coax = inputs["coaxial"]["outer_pipe_conductivity"]
+            inner_pipe_outer_diameter = inputs["coaxial"]["inner_pipe_outer_diameter"]
+            inner_pipe_dimension_ratio = inputs["coaxial"]["inner_pipe_dimension_ratio"]
+            inner_pipe_conductivity = inputs ["coaxial"]["inner_pipe_conductivity"]
+
+
+            self.bh = Coaxial(bh_diameter,
+                              pipe_outer_dia_coax,
+                              outer_pipe_dimension_ratio,
+                              pipe_conductivity_coax,
+                              inner_pipe_outer_diameter,
+                              inner_pipe_dimension_ratio,
+                              inner_pipe_conductivity,
+                              length,
+                              grout_conductivity,
+                              soil_conductivity,
+                              fluid_type,
+                              fluid_concentration,
+                              )
+
         else:
             raise NotImplementedError(f"bh_type \"{self.bh_type.name}\" not implemented")
 
