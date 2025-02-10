@@ -2,7 +2,7 @@ from math import pi, log
 
 from bhr.fluid import get_fluid
 from bhr.pipe import Pipe
-from bhr.utilities import smoothing_function
+from bhr.utilities import smoothing_function, coth
 
 
 class Coaxial:
@@ -26,6 +26,7 @@ class Coaxial:
         self.grout_conductivity = grout_conductivity
         self.soil_conductivity = soil_conductivity
         self.fluid = get_fluid(fluid_type, fluid_concentration)
+        self.length = length
 
         self.outer_pipe = Pipe(outer_pipe_outer_diameter, outer_pipe_dimension_ratio, length, outer_pipe_conductivity,
                                fluid_type, fluid_concentration)
@@ -82,11 +83,15 @@ class Coaxial:
 
     def convective_resist_annulus(self, flow_rate, temp):
         """
-        Convective heat transfer coefficients for annulus flow
+        Grundmann, Rachel Marie. "Improved design methods for ground heat exchangers."
+        Master's thesis, Oklahoma State University, 2016.
+
+        Eqns 4.4 - 4.11
 
         :param flow_rate: mass flow rate, kg/s
         :param temp: temperature, C
-        :return: annulus pipe convective heat transfer coefficients for inner and outer surfaces, W/(m^2K)
+        :return: convective resistances along the outer wall of the inner pipe, K/(W/m)
+        :return: convective resistance along the inside wall of the outer pipe K/(W/m)
         """
 
         # limit determined from Hellström, G. 1991. Ground Heat Storage: Thermal Analyses of
@@ -123,8 +128,20 @@ class Coaxial:
 
         return r_conv_outside_inner_pipe, r_conv_inside_outer_pipe
 
-    def calc_effective_bh_resistance_uhf(self, flow_rate, temp):
+    def calc_local_bh_resistance(self, flow_rate, temp):
+        """
+        Grundmann, Rachel Marie. "Improved design methods for ground heat exchangers."
+        Master's thesis, Oklahoma State University, 2016.
 
+        Eqns 4.4 and 4.5
+
+        :param flow_rate: mass flow rate, kg/s
+        :param temp: temperature, C
+        :return: total local borehole resistance K /(W/m)
+        :return: local internal borehole resistance K /(W/m)
+        :return: local borehole resistance K /(W/m)
+
+        """
         # resistances progressing from inside to outside
         r_conv_inner_pipe = self.inner_pipe.calc_pipe_internal_conv_resist(flow_rate, temp)
         r_cond_inner_pipe = self.inner_pipe.calc_pipe_cond_resist()
@@ -134,7 +151,51 @@ class Coaxial:
         r_cond_grout = log(self.borehole_diameter / self.outer_pipe.pipe_outer_diameter) / (
                 2 * pi * self.grout_conductivity)
 
-        bh_resist = sum([r_conv_inner_pipe, r_cond_inner_pipe, r_conv_outside_inner_pipe, r_conv_inside_outer_pipe,
+        r_internal_resist = sum([r_conv_inner_pipe, r_cond_inner_pipe, r_conv_outside_inner_pipe])
+        r_borehole_resist = sum([r_conv_inside_outer_pipe,
                          r_cond_outer_pipe, r_cond_grout])
+        local_bh_resist = r_internal_resist + r_borehole_resist
 
-        return bh_resist
+        return [local_bh_resist, r_internal_resist, r_borehole_resist]
+
+    def calc_effective_bh_resistance_uhf (self, flow_rate, temp):
+        """
+        Grundmann, Rachel Marie. "Improved design methods for ground heat exchangers."
+        Master's thesis, Oklahoma State University, 2016.
+
+        Eqn 4.33
+
+        :param flow_rate: mass flow rate, kg/s
+        :param temp: temperature, C
+        :return: effective borehole resistance for
+                 uniform heat flux boundary condition  [K/(W/m)]
+        """
+
+        r_b = self.calc_local_bh_resistance(flow_rate, temp)[2]
+        r_a = self.calc_local_bh_resistance(flow_rate, temp)[1]
+        Rv = self.length / (flow_rate * self.fluid.cp(temp))  # (K/(w/m)) thermal resistance factor
+        effective_bhr_uhf = r_b + 1/(3* r_a) * (Rv) ** 2
+
+        return effective_bhr_uhf
+
+    def calc_effective_bh_resistance_uwt (self, flow_rate, temp):
+        """
+        Grundmann, Rachel Marie. "Improved design methods for ground heat exchangers."
+        Master's thesis, Oklahoma State University, 2016.
+
+        Eqns 4.28 & 4.29
+
+        :param flow_rate: mass flow rate, kg/s
+        :param temp: temperature, C
+        :return: effective borehole resistance for
+                 uniform borehole wall temperature boundary condition  [K/(W/m)]
+        """
+
+        r_b = self.calc_local_bh_resistance(flow_rate, temp)[2]
+        r_a = self.calc_local_bh_resistance(flow_rate, temp)[1]
+
+        Rv = self.length / (flow_rate * self.fluid.cp(temp))  # (K/(w/m)) thermal resistance factor
+        n = Rv / (2 * r_b) * (1 + 4 * r_b / r_a ) ** (1 / 2)
+        effective_bhr_uwt = r_b * n * coth(n)
+
+        return effective_bhr_uwt

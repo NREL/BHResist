@@ -17,21 +17,7 @@ class TestBorehole(unittest.TestCase):
                 "pipe_conductivity": 0.4,
                 "shank_space": 0.02,
             },
-            # "double_u_tube": {
-            #     "pipe_outer_diameter": 0.042,
-            #     "pipe_dimension_ratio": 11,
-            #     "pipe_conductivity": 0.4,
-            #     "shank_space": 0.02,
-            #     "hydraulic_configuration": "PARALLEL"  # or SERIES
-            # },
-            # "coaxial": {
-            #     "outer_pipe_outer_diameter": 0.042,
-            #     "outer_pipe_dimension_ratio": 11,
-            #     "outer_pipe_conductivity": 0.4,
-            #     "inner_pipe_outer_diameter": 0.096,
-            #     "inner_pipe_dimension_ratio": 11,
-            #     "inner_pipe_conductivity": 0.4
-            # },
+   
             "grout_conductivity": 1.2,
             "soil_conductivity": 2.5,
             "length": 100,
