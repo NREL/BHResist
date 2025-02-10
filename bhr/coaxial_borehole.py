@@ -53,7 +53,8 @@ class Coaxial:
         Hellström, G. 1991. Ground Heat Storage: Thermal Analyses of Duct Storage Systems.
         Department of Mathematical Physics, University of Lund, Sweden., pp 67-71
 
-        :return: Nusselt number for inner surface of annulus pipe, Nusselt number for outer annulus pipe surface
+        :return nu_ii: Laminar Nusselt number for inner surface of annulus pipe
+        :return nu_oo: Laminar Nusselt number for outer annulus pipe surface
         """
         nu_ii = 3.66 + 1.2 * (self.inner_pipe.pipe_outer_diameter / self.outer_pipe.pipe_inner_diameter) ** -0.8
         nu_oo = 3.66 + 1.2 * (self.inner_pipe.pipe_outer_diameter / self.outer_pipe.pipe_inner_diameter) ** 0.5
@@ -71,7 +72,8 @@ class Coaxial:
 
         :param re: Reynolds number
         :param temp: temperature, C
-        :return: Nusselt number for inner surface of annulus pipe, Nusselt number for outer annulus pipe surface
+        :return nu_ii: Turbulant Nusselt number for inner surface of annulus pipe
+        :return nu_oo: Turbulant Nusselt number for outer annulus pipe surface
         """
 
         pr = self.fluid.prandtl(temp)
@@ -90,8 +92,8 @@ class Coaxial:
 
         :param flow_rate: mass flow rate, kg/s
         :param temp: temperature, C
-        :return: convective resistances along the outer wall of the inner pipe, K/(W/m)
-        :return: convective resistance along the inside wall of the outer pipe K/(W/m)
+        :return r_conv_outside_inner_pipe: convective resistances along the outer wall of the inner pipe, K/(W/m)
+        :return r_conv_inside_outer_pipe: convective resistance along the inside wall of the outer pipe K/(W/m)
         """
 
         # limit determined from Hellström, G. 1991. Ground Heat Storage: Thermal Analyses of
@@ -137,9 +139,9 @@ class Coaxial:
 
         :param flow_rate: mass flow rate, kg/s
         :param temp: temperature, C
-        :return: total local borehole resistance K /(W/m)
-        :return: local internal borehole resistance K /(W/m)
-        :return: local borehole resistance K /(W/m)
+        :return local_bh_resist: total local borehole resistance K /(W/m)
+        :return r_internal_resist: local internal borehole resistance K /(W/m)
+        :return r_borehole_resist: local borehole resistance K /(W/m)
 
         """
         # resistances progressing from inside to outside
@@ -167,7 +169,7 @@ class Coaxial:
 
         :param flow_rate: mass flow rate, kg/s
         :param temp: temperature, C
-        :return: effective borehole resistance for
+        :return effective_bhr_uhf: effective borehole resistance for
                  uniform heat flux boundary condition  [K/(W/m)]
         """
 
@@ -187,7 +189,7 @@ class Coaxial:
 
         :param flow_rate: mass flow rate, kg/s
         :param temp: temperature, C
-        :return: effective borehole resistance for
+        :return effective_bhr_uwt: effective borehole resistance for
                  uniform borehole wall temperature boundary condition  [K/(W/m)]
         """
 

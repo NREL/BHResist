@@ -36,29 +36,25 @@ class TestDoubleUBorehole(TestCase):
 
         tolerance = 1e-3
 
-        self.assertAlmostEqual(bh.update_beta_b1(flow_rate=0.5, temperature=20), 0.359, delta=tolerance)
+        self.assertAlmostEqual(bh.update_b1(flow_rate=0.5, temperature=20), 0.359, delta=tolerance)
 
     def test_calc_bh_resist_local(self):
         bh = DoubleUTube(**self.inputs)
 
         tolerance = 1e-3
 
-        bh.update_beta_b1(flow_rate=0.5, temperature=20)
-        self.assertAlmostEqual(bh.calc_bh_resist_local(), 7.509E-02, delta=tolerance)
+        self.assertAlmostEqual(bh.calc_bh_resist_local(flow_rate=0.5,temperature=20), 7.509E-02, delta=tolerance)
 
     def test_calc_internal_resist(self):
         bh = DoubleUTube(**self.inputs)
 
         tolerance = 1e-3
-        bh.update_beta_b1(flow_rate=0.5, temperature=20)
-        self.assertAlmostEqual(bh.calc_internal_resist(), 0.1604, delta=tolerance)
+        self.assertAlmostEqual(bh.calc_internal_resist(flow_rate=0.5, temperature=20), 0.1604, delta=tolerance)
 
     def test_calc_resistances_diagonal(self):
         d = self.inputs.copy()
         d["pipe_dimension_ratio"] = 18.9
         bh = DoubleUTube(**d)
-
-        # bh = DoubleUTube(**self.inputs)
 
         tolerance = 1e-3
 
