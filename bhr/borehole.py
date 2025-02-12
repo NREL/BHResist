@@ -121,7 +121,7 @@ class Borehole:
             # assert error and message...
 
         if self.boundary_condition == BoundaryCondition.UNIFORM_HEAT_FLUX:
-            return self.bh.calc_local_bh_resistance(flow_rate, temperature)
+            return self.bh.calc_effective_bh_resistance_uhf(flow_rate, temperature)
 
         if self.boundary_condition == BoundaryCondition.UNIFORM_BOREHOLE_WALL_TEMP:
-            return self.bh.calc_effective_bh_resistance_ubwt(flow_rate, temperature)
+            return self.bh.calc_effective_bh_resistance_uwt(flow_rate, temperature)

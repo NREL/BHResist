@@ -17,7 +17,7 @@ class TestBorehole(unittest.TestCase):
                 "pipe_conductivity": 0.4,
                 "shank_space": 0.02,
             },
-   
+
             "grout_conductivity": 1.2,
             "soil_conductivity": 2.5,
             "length": 100,
@@ -80,4 +80,4 @@ class TestBorehole(unittest.TestCase):
         bh.init_from_dict(inputs)
 
         # only pass flow rate, so pipe resistance should be computed in the process of this call
-        self.assertAlmostEqual(bh.calc_bh_resist(flow_rate=0.5, temperature=20), 0.23245, delta=0.0001)
+        self.assertAlmostEqual(bh.calc_bh_resist(flow_rate=0.5, temperature=20), 0.18048, delta=0.0001)
