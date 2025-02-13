@@ -173,8 +173,7 @@ class Coaxial:
                  uniform heat flux boundary condition  [K/(W/m)]
         """
 
-        r_b = self.calc_local_bh_resistance(flow_rate, temp)[2]
-        r_a = self.calc_local_bh_resistance(flow_rate, temp)[1]
+        _, r_a, r_b = self.calc_local_bh_resistance(flow_rate, temp)
         Rv = self.length / (flow_rate * self.fluid.cp(temp))  # (K/(w/m)) thermal resistance factor
         effective_bhr_uhf = r_b + 1/(3* r_a) * (Rv) ** 2
 
@@ -193,9 +192,7 @@ class Coaxial:
                  uniform borehole wall temperature boundary condition  [K/(W/m)]
         """
 
-        r_b = self.calc_local_bh_resistance(flow_rate, temp)[2]
-        r_a = self.calc_local_bh_resistance(flow_rate, temp)[1]
-
+        _, r_a, r_b = self.calc_local_bh_resistance(flow_rate, temp)
         Rv = self.length / (flow_rate * self.fluid.cp(temp))  # (K/(w/m)) thermal resistance factor
         n = Rv / (2 * r_b) * (1 + 4 * r_b / r_a ) ** (1 / 2)
         effective_bhr_uwt = r_b * n * coth(n)

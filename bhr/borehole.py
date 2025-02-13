@@ -3,7 +3,7 @@ from bhr.enums import BoundaryCondition, BoreholeType
 from bhr.single_u_borehole import SingleUBorehole
 from bhr.coaxial_borehole import Coaxial
 
-# creates a class named Borehole
+
 class Borehole:
 
     def __init__(self):
@@ -11,8 +11,25 @@ class Borehole:
         self.boundary_condition = None
         self.bh = None
 
-    def init_from_dict(self, inputs: dict):
+    def init_single_u_borehole(self):
+        self.bh_type = BoreholeType.SINGLE_U_TUBE
+        self.bh = SingleUBorehole(
 
+        )
+
+    def init_double_u_borehole(self):
+        self.bh_type = BoreholeType.DOUBLE_U_TUBE
+        self.bh = DoubleUTube(
+
+        )
+
+    def init_coaxial_borehole(self):
+        self.bh_type = BoreholeType.COAXIAL
+        self.bh = Coaxial(
+
+        )
+
+    def init_from_dict(self, inputs: dict):
 
         bh_type_str = inputs["borehole_type"].upper()
         if bh_type_str == BoreholeType.SINGLE_U_TUBE.name:
@@ -103,22 +120,10 @@ class Borehole:
         else:
             raise NotImplementedError(f"bh_type \"{self.bh_type.name}\" not implemented")
 
-    def init_from_file(self, file_path):
-        # setup input dict
-        # call init_from_dict()
-        pass
-
-    def init_from_params(self):
-        pass
-
-    def _setup(self):
-        pass
-
     def calc_bh_resist(self, flow_rate, temperature):
 
         if self.bh is None:
-            pass
-            # assert error and message...
+            raise TypeError("Borehole not initialized")
 
         if self.boundary_condition == BoundaryCondition.UNIFORM_HEAT_FLUX:
             return self.bh.calc_effective_bh_resistance_uhf(flow_rate, temperature)

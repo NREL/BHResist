@@ -1,11 +1,9 @@
-from math import pi, log
-from turtle import update
+from math import pi
+from math import log as ln
 
 from bhr.u_tube import UTube
 from bhr.utilities import coth
 
-# math functions
-ln = log
 
 
 class DoubleUTube(UTube):
