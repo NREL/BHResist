@@ -1,9 +1,8 @@
-from math import pi
 from math import log as ln
+from math import pi
 
 from bhr.u_tube import UTube
 from bhr.utilities import coth
-
 
 
 class DoubleUTube(UTube):
@@ -30,17 +29,19 @@ class DoubleUTube(UTube):
         self.pipe_radius = pipe_outer_diameter / 2  # pipe outer radius (m)
         self.pipe_inlet_arrangement = pipe_inlet_arrangement
         self.bh_length = length  # length of borehole (m)
-        self.grout_conductivity = grout_conductivity #W/(m-K)
+        self.grout_conductivity = grout_conductivity  # W/(m-K)
         self.soil_conductivity = soil_conductivity  # W/(m-K)
-        self.pipe_centers_radius = shank_space * (
-            2 ** 0.5 / 2) # (m) radial distance between centers of symmetrically placed pipes and borehole center (rc)
+
+        # (m) radial distance between centers of symmetrically placed pipes and borehole center (rc)
+        self.pipe_centers_radius = shank_space * (2 ** 0.5 / 2)
+
         self.sigma = (self.grout_conductivity - self.soil_conductivity) / (
                 self.grout_conductivity + self.soil_conductivity)  # thermal conductivity ratio, dimensionless
 
         # Check if shank spacing realistic
         assert self.pipe_radius * 2 <= shank_space <= 2 / 2 ** 0.5 * (self.borehole_radius - self.pipe_radius), (
-                    'Shank space is not within bounds. ' +
-                    'MAX is 2 / sqrt(2) * (borehole_radius - pipe_outer_radius). MIN is pipe_outer_radius * 2')
+                'Shank space is not within bounds. ' +
+                'MAX is 2 / sqrt(2) * (borehole_radius - pipe_outer_radius). MIN is pipe_outer_radius * 2')
 
         # non-static parameters
         self.effective_bhr_UHF = None
@@ -48,8 +49,8 @@ class DoubleUTube(UTube):
         self.pipe_resist = None
 
     def update_b1(self,
-                       flow_rate: float,
-                       temperature: float) -> float:
+                  flow_rate: float,
+                  temperature: float) -> float:
         """
         Updates b1 coefficient.
 
@@ -89,7 +90,7 @@ class DoubleUTube(UTube):
         :return borehole_resist_local: local borehole resistance K/(W/m)
 
         """
-        b1 = self.update_b1(flow_rate,temperature)
+        b1 = self.update_b1(flow_rate, temperature)
         # static parameters
         p_pc = self.pipe_radius ** 2 / (4 * self.pipe_centers_radius ** 2)  # dimensionless parameter
         p_c = self.pipe_centers_radius ** 2 / (self.borehole_radius ** 8 - self.pipe_centers_radius ** 8) ** (
@@ -98,9 +99,8 @@ class DoubleUTube(UTube):
                 1 / 4)  # dimensionless parameter
 
         # --Borehole resistance, 0th order [K/(W/m)]--
-        Rb0 = self.pipe_resist / 4 + 1 / (8 * pi * self.grout_conductivity) * (
-                (ln(self.borehole_radius ** 4 / (4 * self.pipe_radius * self.pipe_centers_radius ** 3))) +
-                self.sigma * ln(
+        Rb0 = self.pipe_resist / 4 + 1 / (8 * pi * self.grout_conductivity) * ((ln(self.borehole_radius ** 4 / (
+                4 * self.pipe_radius * self.pipe_centers_radius ** 3))) + self.sigma * ln(
             self.borehole_radius ** 8 / (self.borehole_radius ** 8 - self.pipe_centers_radius ** 8)))
 
         # --Borehole resistance, 1st order [K/(W/m)]--
@@ -110,7 +110,7 @@ class DoubleUTube(UTube):
 
         return borehole_resist_local
 
-    def calc_internal_resist(self,flow_rate, temperature):
+    def calc_internal_resist(self, flow_rate, temperature):
         """
         Calculates tube-to-tube resistance (aka internal resistance).
 
@@ -123,7 +123,7 @@ class DoubleUTube(UTube):
 
         :return internal_resist: local internal resistance K/(W/m)
         """
-        b1 = self.update_b1(flow_rate,temperature)
+        b1 = self.update_b1(flow_rate, temperature)
 
         # static parameters
         p_pc = self.pipe_radius ** 2 / (4 * self.pipe_centers_radius ** 2)  # dimensionless parameter
@@ -132,15 +132,18 @@ class DoubleUTube(UTube):
         p_b = self.borehole_radius ** 2 / (self.borehole_radius ** 8 - self.pipe_centers_radius ** 8) ** (
                 1 / 4)  # dimensionless parameter
 
+        two_pi_kg = 2 * pi * self.grout_conductivity
+        c_1 = self.pipe_centers_radius / self.pipe_radius
+
         if self.pipe_inlet_arrangement == "DIAGONAL":
             # 0th order
-            Ra0 = 2 * self.pipe_resist + 2 / (2 * pi * self.grout_conductivity) * (
-                    ln(self.pipe_centers_radius / self.pipe_radius) +
-                    self.sigma * ln((self.borehole_radius ** 4 + self.pipe_centers_radius ** 4) / (
-                    self.borehole_radius ** 4 - self.pipe_centers_radius ** 4)))
+            c_2 = self.borehole_radius ** 4 + self.pipe_centers_radius ** 4
+            c_3 = self.borehole_radius ** 4 - self.pipe_centers_radius ** 4
+            Ra0 = 2 * self.pipe_resist + 2 / two_pi_kg * (ln(c_1) + self.sigma * ln(c_2 / c_3))
 
             # 1st order
-            internal_resist = Ra0 - 2 / (2 * pi * self.grout_conductivity) * (
+
+            internal_resist = Ra0 - 2 / two_pi_kg * (
                     b1 * p_pc * (1 + 8 * self.sigma * p_c ** 2 * p_b ** 2) ** 2
             ) / (1 - b1 * p_pc * (
                     3 - 32 * self.sigma * (p_c ** 2 * p_b ** 6 + p_c ** 6 * p_b ** 2)))
@@ -149,10 +152,10 @@ class DoubleUTube(UTube):
 
         elif self.pipe_inlet_arrangement == "ADJACENT":
             # 0th order
-            Ra0 = 2 * self.pipe_resist + 2 / (2 * pi * self.grout_conductivity) * (
-                    ln(2 * self.pipe_centers_radius / self.pipe_radius) +
-                    self.sigma * ln((self.borehole_radius ** 2 + self.pipe_centers_radius ** 2) / (
-                    self.borehole_radius ** 2 - self.pipe_centers_radius ** 2)))
+            d_2 = self.borehole_radius ** 2 + self.pipe_centers_radius ** 2
+            d_3 = self.borehole_radius ** 2 - self.pipe_centers_radius ** 2
+            Ra0 = 2 * self.pipe_resist + 2 / two_pi_kg * (
+                    ln(2 * c_1) + self.sigma * ln(d_2 / d_3))
 
             # 1st order
             matrix_element_11 = 1 + 16 * b1 * self.sigma * p_pc * (
@@ -163,10 +166,10 @@ class DoubleUTube(UTube):
             vector_1 = 1 - 8 * self.sigma * p_c ** 3 * p_b  # vector variable
             vector_2 = 3 + 8 * self.sigma * p_c * p_b ** 3  # vector variable
 
-            internal_resist = Ra0 + 2 / (2 * pi * self.grout_conductivity) * b1 * p_pc / 2 * (
+            internal_resist = Ra0 + 2 / two_pi_kg * b1 * p_pc / 2 * (
                     vector_2 ** 2 * matrix_element_11 - 2 * vector_1 * vector_2 * matrix_element_21 -
                     vector_1 ** 2 * matrix_element_22) / (
-                                          matrix_element_11 * matrix_element_22 + matrix_element_21 ** 2)
+                                      matrix_element_11 * matrix_element_22 + matrix_element_21 ** 2)
 
             return internal_resist
         else:
@@ -195,7 +198,6 @@ class DoubleUTube(UTube):
         borehole_resist_local = self.calc_bh_resist_local(flow_rate, temperature)
 
         Rv = self.bh_length / (self.fluid.cp(temperature) * flow_rate)  # (K/(w/m)) thermal resistance factor
-
 
         effective_bhr_UHF = borehole_resist_local + Rv ** 2 / (6 * internal_resist)
 

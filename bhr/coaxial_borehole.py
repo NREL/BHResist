@@ -155,12 +155,12 @@ class Coaxial:
 
         r_internal_resist = sum([r_conv_inner_pipe, r_cond_inner_pipe, r_conv_outside_inner_pipe])
         r_borehole_resist = sum([r_conv_inside_outer_pipe,
-                         r_cond_outer_pipe, r_cond_grout])
+                                 r_cond_outer_pipe, r_cond_grout])
         local_bh_resist = r_internal_resist + r_borehole_resist
 
         return [local_bh_resist, r_internal_resist, r_borehole_resist]
 
-    def calc_effective_bh_resistance_uhf (self, flow_rate, temp):
+    def calc_effective_bh_resistance_uhf(self, flow_rate, temp):
         """
         Grundmann, Rachel Marie. "Improved design methods for ground heat exchangers."
         Master's thesis, Oklahoma State University, 2016.
@@ -175,11 +175,11 @@ class Coaxial:
 
         _, r_a, r_b = self.calc_local_bh_resistance(flow_rate, temp)
         Rv = self.length / (flow_rate * self.fluid.cp(temp))  # (K/(w/m)) thermal resistance factor
-        effective_bhr_uhf = r_b + 1/(3* r_a) * (Rv) ** 2
+        effective_bhr_uhf = r_b + 1 / (3 * r_a) * (Rv) ** 2
 
         return effective_bhr_uhf
 
-    def calc_effective_bh_resistance_uwt (self, flow_rate, temp):
+    def calc_effective_bh_resistance_uwt(self, flow_rate, temp):
         """
         Grundmann, Rachel Marie. "Improved design methods for ground heat exchangers."
         Master's thesis, Oklahoma State University, 2016.
@@ -194,7 +194,7 @@ class Coaxial:
 
         _, r_a, r_b = self.calc_local_bh_resistance(flow_rate, temp)
         Rv = self.length / (flow_rate * self.fluid.cp(temp))  # (K/(w/m)) thermal resistance factor
-        n = Rv / (2 * r_b) * (1 + 4 * r_b / r_a ) ** (1 / 2)
+        n = Rv / (2 * r_b) * (1 + 4 * r_b / r_a) ** (1 / 2)
         effective_bhr_uwt = r_b * n * coth(n)
 
         return effective_bhr_uwt

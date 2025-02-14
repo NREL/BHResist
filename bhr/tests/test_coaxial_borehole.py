@@ -77,6 +77,5 @@ class TestCoaxialBorehole(TestCase):
 
     def test_calc_effective_bh_resistance_uwt(self):
         coax = Coaxial(**self.inputs)
-        
-        self.assertAlmostEqual(coax.calc_effective_bh_resistance_uwt(flow_rate=0.02, temp=20), 2.31, delta=1e-3)
 
+        self.assertAlmostEqual(coax.calc_effective_bh_resistance_uwt(flow_rate=0.02, temp=20), 2.31, delta=1e-3)

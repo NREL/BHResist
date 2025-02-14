@@ -1,7 +1,7 @@
+from bhr.coaxial_borehole import Coaxial
 from bhr.double_u_borehole import DoubleUTube
 from bhr.enums import BoundaryCondition, BoreholeType
 from bhr.single_u_borehole import SingleUBorehole
-from bhr.coaxial_borehole import Coaxial
 
 
 class Borehole:
@@ -100,8 +100,7 @@ class Borehole:
             pipe_conductivity_coax = inputs["coaxial"]["outer_pipe_conductivity"]
             inner_pipe_outer_diameter = inputs["coaxial"]["inner_pipe_outer_diameter"]
             inner_pipe_dimension_ratio = inputs["coaxial"]["inner_pipe_dimension_ratio"]
-            inner_pipe_conductivity = inputs ["coaxial"]["inner_pipe_conductivity"]
-
+            inner_pipe_conductivity = inputs["coaxial"]["inner_pipe_conductivity"]
 
             self.bh = Coaxial(bh_diameter,
                               pipe_outer_dia_coax,
