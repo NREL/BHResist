@@ -11,26 +11,96 @@ class Borehole:
         self.boundary_condition = None
         self.bh = None
 
-    def init_single_u_borehole(self):
+    def init_single_u_borehole(self,
+                               borehole_diameter: float,
+                               pipe_outer_diameter: float,
+                               pipe_dimension_ratio: float,
+                               length: float,
+                               shank_space: float,
+                               pipe_conductivity: float,
+                               grout_conductivity: float,
+                               soil_conductivity: float,
+                               fluid_type: str,
+                               fluid_concentration: float = 0,
+                               boundary_condition: BoundaryCondition = BoundaryCondition.UNIFORM_HEAT_FLUX):
+
         self.bh_type = BoreholeType.SINGLE_U_TUBE
+        self.boundary_condition = boundary_condition
         self.bh = SingleUBorehole(
-
+            borehole_diameter,
+            pipe_outer_diameter,
+            pipe_dimension_ratio,
+            length,
+            shank_space,
+            pipe_conductivity,
+            grout_conductivity,
+            soil_conductivity,
+            fluid_type,
+            fluid_concentration
         )
 
-    def init_double_u_borehole(self):
+    def init_double_u_borehole(self,
+                               borehole_diameter: float,
+                               pipe_outer_diameter: float,
+                               pipe_dimension_ratio: float,
+                               length: float,
+                               shank_space: float,
+                               pipe_conductivity: float,
+                               pipe_inlet_arrangement: str,
+                               grout_conductivity: float,
+                               soil_conductivity: float,
+                               fluid_type: str,
+                               fluid_concentration: float = 0,
+                               boundary_condition: BoundaryCondition = BoundaryCondition.UNIFORM_HEAT_FLUX):
+
         self.bh_type = BoreholeType.DOUBLE_U_TUBE
+        self.boundary_condition = boundary_condition
         self.bh = DoubleUTube(
-
+            borehole_diameter,
+            pipe_outer_diameter,
+            pipe_dimension_ratio,
+            length,
+            shank_space,
+            pipe_conductivity,
+            pipe_inlet_arrangement,
+            grout_conductivity,
+            soil_conductivity,
+            fluid_type,
+            fluid_concentration
         )
 
-    def init_coaxial_borehole(self):
+    def init_coaxial_borehole(self,
+                              borehole_diameter: float,
+                              outer_pipe_outer_diameter: float,
+                              outer_pipe_dimension_ratio: float,
+                              outer_pipe_conductivity: float,
+                              inner_pipe_outer_diameter: float,
+                              inner_pipe_dimension_ratio: float,
+                              inner_pipe_conductivity: float,
+                              length: float,
+                              grout_conductivity: float,
+                              soil_conductivity: float,
+                              fluid_type: str,
+                              fluid_concentration: float,
+                              boundary_condition: BoundaryCondition = BoundaryCondition.UNIFORM_HEAT_FLUX):
+
         self.bh_type = BoreholeType.COAXIAL
+        self.boundary_condition = boundary_condition
         self.bh = Coaxial(
-
-        )
+            borehole_diameter,
+            outer_pipe_outer_diameter,
+            outer_pipe_dimension_ratio,
+            outer_pipe_conductivity,
+            inner_pipe_outer_diameter,
+            inner_pipe_dimension_ratio,
+            inner_pipe_conductivity,
+            length,
+            grout_conductivity,
+            soil_conductivity,
+            fluid_type,
+            fluid_concentration)
 
     def init_from_dict(self, inputs: dict):
-
         bh_type_str = inputs["borehole_type"].upper()
         if bh_type_str == BoreholeType.SINGLE_U_TUBE.name:
             self.bh_type = BoreholeType.SINGLE_U_TUBE
@@ -113,14 +183,12 @@ class Borehole:
                               grout_conductivity,
                               soil_conductivity,
                               fluid_type,
-                              fluid_concentration,
-                              )
+                              fluid_concentration)
 
         else:
             raise NotImplementedError(f"bh_type \"{self.bh_type.name}\" not implemented")
 
     def calc_bh_resist(self, flow_rate, temperature):
-
         if self.bh is None:
             raise TypeError("Borehole not initialized")
 

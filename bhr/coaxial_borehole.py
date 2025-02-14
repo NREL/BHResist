@@ -19,8 +19,7 @@ class Coaxial:
                  grout_conductivity: float,
                  soil_conductivity: float,
                  fluid_type: str,
-                 fluid_concentration: float,
-                 ):
+                 fluid_concentration: float):
 
         self.borehole_diameter = borehole_diameter
         self.grout_conductivity = grout_conductivity

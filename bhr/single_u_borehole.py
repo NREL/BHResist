@@ -105,9 +105,7 @@ class SingleUBorehole(UTube):
         self.resist_bh_grout = self.calc_average_bh_resistance() - self.pipe_resist / 2.0
         return self.resist_bh_grout
 
-    def calc_effective_bh_resistance_uhf(self,
-                                         flow_rate: float,
-                                         temperature: float) -> float:
+    def calc_effective_bh_resistance_uhf(self, flow_rate: float, temperature: float) -> float:
         """
         Calculates the effective thermal resistance of the borehole assuming a uniform heat flux.
 
@@ -146,9 +144,7 @@ class SingleUBorehole(UTube):
         self.resist_bh_direct_coupling = r_12
         return self.resist_bh_direct_coupling, r_b
 
-    def update_beta(self,
-                    flow_rate: float,
-                    temperature: float):
+    def update_beta(self, flow_rate: float, temperature: float) -> None:
         """
         Updates Beta coefficient.
 
