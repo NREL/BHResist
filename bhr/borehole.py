@@ -2,6 +2,7 @@ from bhr.coaxial_borehole import Coaxial
 from bhr.double_u_borehole import DoubleUTube
 from bhr.enums import BoundaryCondition, BoreholeType
 from bhr.single_u_borehole import SingleUBorehole
+from bhr.utilities import set_boundary_condition_enum
 
 
 class Borehole:
@@ -22,10 +23,10 @@ class Borehole:
                                soil_conductivity: float,
                                fluid_type: str,
                                fluid_concentration: float = 0,
-                               boundary_condition: BoundaryCondition = BoundaryCondition.UNIFORM_HEAT_FLUX):
+                               boundary_condition: str = "UNIFORM_HEAT_FLUX"):
 
         self._bh_type = BoreholeType.SINGLE_U_TUBE
-        self._boundary_condition = boundary_condition
+        self._boundary_condition = set_boundary_condition_enum(boundary_condition)
         self._bh = SingleUBorehole(
             borehole_diameter,
             pipe_outer_diameter,
@@ -51,10 +52,10 @@ class Borehole:
                                soil_conductivity: float,
                                fluid_type: str,
                                fluid_concentration: float = 0,
-                               boundary_condition: BoundaryCondition = BoundaryCondition.UNIFORM_HEAT_FLUX):
+                               boundary_condition: str = "UNIFORM_HEAT_FLUX"):
 
         self._bh_type = BoreholeType.DOUBLE_U_TUBE
-        self._boundary_condition = boundary_condition
+        self._boundary_condition = set_boundary_condition_enum(boundary_condition)
         self._bh = DoubleUTube(
             borehole_diameter,
             pipe_outer_diameter,
@@ -82,10 +83,10 @@ class Borehole:
                               soil_conductivity: float,
                               fluid_type: str,
                               fluid_concentration: float,
-                              boundary_condition: BoundaryCondition = BoundaryCondition.UNIFORM_HEAT_FLUX):
+                              boundary_condition: str = "UNIFORM_HEAT_FLUX"):
 
         self._bh_type = BoreholeType.COAXIAL
-        self._boundary_condition = boundary_condition
+        self._boundary_condition = set_boundary_condition_enum(boundary_condition)
         self._bh = Coaxial(
             borehole_diameter,
             outer_pipe_outer_diameter,
@@ -196,4 +197,4 @@ class Borehole:
             return self._bh.calc_effective_bh_resistance_uhf(flow_rate, temperature)
 
         if self._boundary_condition == BoundaryCondition.UNIFORM_BOREHOLE_WALL_TEMP:
-            return self._bh.calc_effective_bh_resistance_uwt(flow_rate, temperature)
+            return self._bh.calc_effective_bh_resistance_ubwt(flow_rate, temperature)

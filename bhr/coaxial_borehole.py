@@ -71,8 +71,8 @@ class Coaxial:
 
         :param re: Reynolds number
         :param temp: temperature, C
-        :return nu_ii: Turbulant Nusselt number for inner surface of annulus pipe
-        :return nu_oo: Turbulant Nusselt number for outer annulus pipe surface
+        :return nu_ii: Turbulent Nusselt number for inner surface of annulus pipe
+        :return nu_oo: Turbulent Nusselt number for outer annulus pipe surface
         """
 
         pr = self.fluid.prandtl(temp)
@@ -118,7 +118,7 @@ class Coaxial:
             nu_oo = smoothing_function(re, low_reynolds, high_reynolds, nu_oo_low, nu_oo_high)
 
         else:
-            # use this nusslet number when the flow is fully turbulent
+            # use this Nusslet number when the flow is fully turbulent
             nu_ii, nu_oo = self.turbulent_nusselt_annulus(re, temp)
 
         r_conv_outside_inner_pipe = self.annular_hydraulic_diameter / (
@@ -178,7 +178,7 @@ class Coaxial:
 
         return effective_bhr_uhf
 
-    def calc_effective_bh_resistance_uwt(self, flow_rate, temp):
+    def calc_effective_bh_resistance_ubwt(self, flow_rate, temp):
         """
         Grundmann, Rachel Marie. "Improved design methods for ground heat exchangers."
         Master's thesis, Oklahoma State University, 2016.
@@ -187,13 +187,13 @@ class Coaxial:
 
         :param flow_rate: mass flow rate, kg/s
         :param temp: temperature, C
-        :return effective_bhr_uwt: effective borehole resistance for
+        :return effective_bhr_ubwt: effective borehole resistance for
                  uniform borehole wall temperature boundary condition  [K/(W/m)]
         """
 
         _, r_a, r_b = self.calc_local_bh_resistance(flow_rate, temp)
         Rv = self.length / (flow_rate * self.fluid.cp(temp))  # (K/(w/m)) thermal resistance factor
         n = Rv / (2 * r_b) * (1 + 4 * r_b / r_a) ** (1 / 2)
-        effective_bhr_uwt = r_b * n * coth(n)
+        effective_bhr_ubwt = r_b * n * coth(n)
 
-        return effective_bhr_uwt
+        return effective_bhr_ubwt

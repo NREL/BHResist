@@ -49,7 +49,7 @@ class TestCoaxialBorehole(TestCase):
         self.assertAlmostEqual(coax.convective_resist_annulus(flow_rate=0.02, temp=20)[0], 0.062236, delta=1e-3)
         # transitional flow
         self.assertAlmostEqual(coax.convective_resist_annulus(flow_rate=0.1, temp=20)[0], 0.00820999, delta=1e-3)
-        # turbulant flow
+        # turbulent flow
         self.assertAlmostEqual(coax.convective_resist_annulus(flow_rate=0.5, temp=20)[0], 0.001891, delta=1e-3)
 
         # tests convective resistance of inside surface of outer pipe
@@ -57,13 +57,13 @@ class TestCoaxialBorehole(TestCase):
         self.assertAlmostEqual(coax.convective_resist_annulus(flow_rate=0.02, temp=20)[1], 0.04499, delta=1e-3)
         # transitional flow
         self.assertAlmostEqual(coax.convective_resist_annulus(flow_rate=0.1, temp=20)[1], 0.005065, delta=1e-3)
-        # turbulant flow
+        # turbulent flow
         self.assertAlmostEqual(coax.convective_resist_annulus(flow_rate=0.5, temp=20)[1], 0.001155, delta=1e-3)
 
     def test_calc_local_bh_resistance(self):
         coax = Coaxial(**self.inputs)
 
-        # test turbulant flow
+        # test turbulent flow
         self.assertAlmostEqual(coax.calc_local_bh_resistance(flow_rate=0.5, temp=20)[0], 0.23245, delta=1e-3)
         # test intermediate flow
         self.assertAlmostEqual(coax.calc_local_bh_resistance(flow_rate=0.1, temp=20)[0], 0.2533, delta=1e-3)
@@ -75,7 +75,7 @@ class TestCoaxialBorehole(TestCase):
 
         self.assertAlmostEqual(coax.calc_effective_bh_resistance_uhf(flow_rate=0.02, temp=20), 7.07, delta=1e-3)
 
-    def test_calc_effective_bh_resistance_uwt(self):
+    def test_calc_effective_bh_resistance_ubwt(self):
         coax = Coaxial(**self.inputs)
 
-        self.assertAlmostEqual(coax.calc_effective_bh_resistance_uwt(flow_rate=0.02, temp=20), 2.31, delta=1e-3)
+        self.assertAlmostEqual(coax.calc_effective_bh_resistance_ubwt(flow_rate=0.02, temp=20), 2.31, delta=1e-3)

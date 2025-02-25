@@ -1,5 +1,14 @@
 from math import exp, cosh, sinh
 
+from bhr.enums import BoundaryCondition
+
+
+def set_boundary_condition_enum(bh_str: str) -> BoundaryCondition:
+    if bh_str.upper() == BoundaryCondition.UNIFORM_HEAT_FLUX.name:
+        return BoundaryCondition.UNIFORM_HEAT_FLUX
+    elif bh_str.upper() == BoundaryCondition.UNIFORM_BOREHOLE_WALL_TEMP.name:
+        return BoundaryCondition.UNIFORM_BOREHOLE_WALL_TEMP
+
 
 def inch_to_m(x_inch: float) -> float:
     """

@@ -44,8 +44,6 @@ class DoubleUTube(UTube):
                 'MAX is 2 / sqrt(2) * (borehole_radius - pipe_outer_radius). MIN is pipe_outer_radius * 2')
 
         # non-static parameters
-        self.effective_bhr_UHF = None
-        self.effective_bhr_UWT = None
         self.pipe_resist = None
 
     def update_b1(self, flow_rate: float, temperature: float) -> float:
@@ -213,8 +211,8 @@ class DoubleUTube(UTube):
 
         :param flow_rate: mass flow rate, kg/s
         :param temperature: temperature, Celsius
-        :return effective_bhr_uwt: effective borehole resistance for uniform borehole wall temperature
-                                   boundary condition [K/(W/m)]
+        :return effective_bhr_ubwt: effective borehole resistance for uniform borehole wall temperature
+                                    boundary condition [K/(W/m)]
         """
 
         internal_resist = self.calc_internal_resist(flow_rate, temperature)
@@ -222,6 +220,6 @@ class DoubleUTube(UTube):
 
         Rv = self.bh_length / (flow_rate * self.fluid.cp(temperature))  # (K/(w/m)) thermal resistance factor
         n = Rv / (2 * borehole_resist_local * internal_resist) ** (1 / 2)
-        effective_bhr_uwt = borehole_resist_local * n * coth(n)
+        effective_bhr_ubwt = borehole_resist_local * n * coth(n)
 
-        return effective_bhr_uwt
+        return effective_bhr_ubwt

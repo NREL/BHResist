@@ -46,9 +46,16 @@ class TestSingleUBorehole(TestCase):
                                delta=tolerance)
         self.assertAlmostEqual(bh.calc_grout_resistance(), 0.03373, delta=tolerance)
 
-    def test_calc_bh_effective_resistance_uhf(self):
+    def test_calc_effective_bh_resistance_uhf(self):
         bh = SingleUBorehole(**self.inputs)
         tolerance = 1e-3
         bh.update_beta(flow_rate=0.5, temperature=20)
         self.assertAlmostEqual(bh.calc_effective_bh_resistance_uhf(flow_rate=0.5, temperature=20), 0.20435,
+                               delta=tolerance)
+
+    def test_calc_effective_bh_resistance_ubwt(self):
+        bh = SingleUBorehole(**self.inputs)
+        tolerance = 1e-3
+        bh.update_beta(flow_rate=0.5, temperature=20)
+        self.assertAlmostEqual(bh.calc_effective_bh_resistance_ubwt(flow_rate=0.5, temperature=20), 0.20435,
                                delta=tolerance)

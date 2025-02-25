@@ -38,6 +38,42 @@ class SingleUBorehole(UTube):
         self.resist_bh_direct_coupling = None
         self.resist_bh_total_internal = None
 
+    def update_beta(self, flow_rate: float, temperature: float) -> None:
+        """
+        Updates Beta coefficient.
+
+        Javed, S. & Spitler, J.D. Calculation of Borehole Thermal Resistance. In 'Advances in
+        Ground-Source Heat Pump Systems,' pp. 84. Rees, S.J. ed. Cambridge, MA. Elsevier Ltd. 2016.
+
+        Eq: 3-47
+
+        Javed, S. & Spitler, J.D. 2017. 'Accuracy of Borehole Thermal Resistance Calculation Methods
+        for Grouted Single U-tube Ground Heat Exchangers.' Applied Energy.187:790-806.
+
+        Eq: 14
+
+        :param flow_rate: mass flow rate, kg/s
+        :param temperature: temperature, Celsius
+
+        :return: none
+        """
+
+        self.pipe_resist = self.calc_pipe_resist(flow_rate, temperature)
+        self.beta = 2 * pi * self.grout_conductivity * self.pipe_resist
+
+    def calc_direct_coupling_resistance(self) -> tuple:
+        r_a = self.calc_total_internal_bh_resistance()
+        r_b = self.calc_average_bh_resistance()
+
+        r_12 = (4 * r_a * r_b) / (4 * r_b - r_a)
+
+        # reset if negative
+        if r_12 < 0:
+            r_12 = 70
+
+        self.resist_bh_direct_coupling = r_12
+        return self.resist_bh_direct_coupling, r_b
+
     def calc_average_bh_resistance(self) -> float:
         """
         Calculates the average thermal resistance of the borehole using the first-order multipole method.
@@ -131,38 +167,13 @@ class SingleUBorehole(UTube):
         self.resist_bh_effective = self.resist_bh_ave + resist_short_circuiting
         return self.resist_bh_effective
 
-    def calc_direct_coupling_resistance(self) -> tuple:
-        r_a = self.calc_total_internal_bh_resistance()
-        r_b = self.calc_average_bh_resistance()
-
-        r_12 = (4 * r_a * r_b) / (4 * r_b - r_a)
-
-        # reset if negative
-        if r_12 < 0:
-            r_12 = 70
-
-        self.resist_bh_direct_coupling = r_12
-        return self.resist_bh_direct_coupling, r_b
-
-    def update_beta(self, flow_rate: float, temperature: float) -> None:
+    def calc_effective_bh_resistance_ubwt(self, flow_rate: float, temperature: float) -> float:
         """
-        Updates Beta coefficient.
-
-        Javed, S. & Spitler, J.D. Calculation of Borehole Thermal Resistance. In 'Advances in
-        Ground-Source Heat Pump Systems,' pp. 84. Rees, S.J. ed. Cambridge, MA. Elsevier Ltd. 2016.
-
-        Eq: 3-47
-
-        Javed, S. & Spitler, J.D. 2017. 'Accuracy of Borehole Thermal Resistance Calculation Methods
-        for Grouted Single U-tube Ground Heat Exchangers.' Applied Energy.187:790-806.
-
-        Eq: 14
+        Calculates the effective thermal resistance of the borehole assuming a uniform borehole wall temperature.
 
         :param flow_rate: mass flow rate, kg/s
         :param temperature: temperature, Celsius
 
-        :return: none
+        :return: effective thermal resistance, K/(W/m)
         """
-
-        self.pipe_resist = self.calc_pipe_resist(flow_rate, temperature)
-        self.beta = 2 * pi * self.grout_conductivity * self.pipe_resist
+        return 0
