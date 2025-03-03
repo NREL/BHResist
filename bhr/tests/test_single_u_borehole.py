@@ -31,8 +31,8 @@ class TestSingleUBorehole(TestCase):
 
     def test_calc_internal_and_grout_resistance(self):
         bh = SingleUBorehole(**self.inputs)
-        flow_rate=0.5
-        temperature=20
+        flow_rate = 0.5
+        temperature = 20
         tolerance = 1e-3
         self.assertAlmostEqual(bh.theta_1, 0.33333, delta=tolerance)
         self.assertAlmostEqual(bh.theta_2, 3.0, delta=tolerance)
