@@ -1,36 +1,48 @@
-from math import pi, log
+from math import log, pi
 
 from bhr.fluid import get_fluid
 from bhr.pipe import Pipe
-from bhr.utilities import smoothing_function, coth
+from bhr.utilities import coth, smoothing_function
 
 
 class Coaxial:
-
-    def __init__(self,
-                 borehole_diameter: float,
-                 outer_pipe_outer_diameter: float,
-                 outer_pipe_dimension_ratio: float,
-                 outer_pipe_conductivity: float,
-                 inner_pipe_outer_diameter: float,
-                 inner_pipe_dimension_ratio: float,
-                 inner_pipe_conductivity: float,
-                 length: float,
-                 grout_conductivity: float,
-                 soil_conductivity: float,
-                 fluid_type: str,
-                 fluid_concentration: float):
-
+    def __init__(
+        self,
+        borehole_diameter: float,
+        outer_pipe_outer_diameter: float,
+        outer_pipe_dimension_ratio: float,
+        outer_pipe_conductivity: float,
+        inner_pipe_outer_diameter: float,
+        inner_pipe_dimension_ratio: float,
+        inner_pipe_conductivity: float,
+        length: float,
+        grout_conductivity: float,
+        soil_conductivity: float,
+        fluid_type: str,
+        fluid_concentration: float,
+    ):
         self.borehole_diameter = borehole_diameter
         self.grout_conductivity = grout_conductivity
         self.soil_conductivity = soil_conductivity
         self.fluid = get_fluid(fluid_type, fluid_concentration)
         self.length = length
 
-        self.outer_pipe = Pipe(outer_pipe_outer_diameter, outer_pipe_dimension_ratio, length, outer_pipe_conductivity,
-                               fluid_type, fluid_concentration)
-        self.inner_pipe = Pipe(inner_pipe_outer_diameter, inner_pipe_dimension_ratio, length, inner_pipe_conductivity,
-                               fluid_type, fluid_concentration)
+        self.outer_pipe = Pipe(
+            outer_pipe_outer_diameter,
+            outer_pipe_dimension_ratio,
+            length,
+            outer_pipe_conductivity,
+            fluid_type,
+            fluid_concentration,
+        )
+        self.inner_pipe = Pipe(
+            inner_pipe_outer_diameter,
+            inner_pipe_dimension_ratio,
+            length,
+            inner_pipe_conductivity,
+            fluid_type,
+            fluid_concentration,
+        )
 
         self.annular_hydraulic_diameter = self.outer_pipe.pipe_inner_diameter - self.inner_pipe.pipe_outer_diameter
 
@@ -77,7 +89,7 @@ class Coaxial:
 
         pr = self.fluid.prandtl(temp)
 
-        nu_ii = 0.023 * re ** 0.8 * pr ** 0.35
+        nu_ii = 0.023 * re**0.8 * pr**0.35
         nu_oo = nu_ii
 
         return nu_ii, nu_oo
@@ -110,7 +122,6 @@ class Coaxial:
             nu_ii, nu_oo = self.laminar_nusselt_annulus()
 
         elif low_reynolds <= re < high_reynolds:
-
             # in between
             nu_ii_low, nu_oo_low = self.laminar_nusselt_annulus()
             nu_ii_high, nu_oo_high = self.turbulent_nusselt_annulus(high_reynolds, temp)
@@ -122,10 +133,12 @@ class Coaxial:
             nu_ii, nu_oo = self.turbulent_nusselt_annulus(re, temp)
 
         r_conv_outside_inner_pipe = self.annular_hydraulic_diameter / (
-                nu_ii * self.fluid.k(temp) * self.inner_pipe.pipe_outer_diameter * pi)
+            nu_ii * self.fluid.k(temp) * self.inner_pipe.pipe_outer_diameter * pi
+        )
 
         r_conv_inside_outer_pipe = self.annular_hydraulic_diameter / (
-                nu_oo * self.fluid.k(temp) * self.outer_pipe.pipe_inner_diameter * pi)
+            nu_oo * self.fluid.k(temp) * self.outer_pipe.pipe_inner_diameter * pi
+        )
 
         return r_conv_outside_inner_pipe, r_conv_inside_outer_pipe
 
@@ -150,11 +163,11 @@ class Coaxial:
         r_conv_inside_outer_pipe = self.convective_resist_annulus(flow_rate, temp)[1]
         r_cond_outer_pipe = self.outer_pipe.calc_pipe_cond_resist()
         r_cond_grout = log(self.borehole_diameter / self.outer_pipe.pipe_outer_diameter) / (
-                2 * pi * self.grout_conductivity)
+            2 * pi * self.grout_conductivity
+        )
 
         r_internal_resist = sum([r_conv_inner_pipe, r_cond_inner_pipe, r_conv_outside_inner_pipe])
-        r_borehole_resist = sum([r_conv_inside_outer_pipe,
-                                 r_cond_outer_pipe, r_cond_grout])
+        r_borehole_resist = sum([r_conv_inside_outer_pipe, r_cond_outer_pipe, r_cond_grout])
         local_bh_resist = r_internal_resist + r_borehole_resist
 
         return [local_bh_resist, r_internal_resist, r_borehole_resist]
@@ -173,8 +186,8 @@ class Coaxial:
         """
 
         _, r_a, r_b = self.calc_local_bh_resistance(flow_rate, temp)
-        Rv = self.length / (flow_rate * self.fluid.cp(temp))  # (K/(w/m)) thermal resistance factor
-        effective_bhr_uhf = r_b + 1 / (3 * r_a) * (Rv) ** 2
+        rv = self.length / (flow_rate * self.fluid.cp(temp))  # (K/(w/m)) thermal resistance factor
+        effective_bhr_uhf = r_b + 1 / (3 * r_a) * rv**2
 
         return effective_bhr_uhf
 
@@ -192,8 +205,8 @@ class Coaxial:
         """
 
         _, r_a, r_b = self.calc_local_bh_resistance(flow_rate, temp)
-        Rv = self.length / (flow_rate * self.fluid.cp(temp))  # (K/(w/m)) thermal resistance factor
-        n = Rv / (2 * r_b) * (1 + 4 * r_b / r_a) ** (1 / 2)
+        rv = self.length / (flow_rate * self.fluid.cp(temp))  # (K/(w/m)) thermal resistance factor
+        n = rv / (2 * r_b) * (1 + 4 * r_b / r_a) ** (1 / 2)
         effective_bhr_ubwt = r_b * n * coth(n)
 
         return effective_bhr_ubwt

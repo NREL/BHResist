@@ -5,15 +5,15 @@ from bhr.utilities import inch_to_m, smoothing_function
 
 
 class Pipe:
-
-    def __init__(self,
-                 pipe_outer_diameter: float,
-                 pipe_dimension_ratio: float,
-                 pipe_length: float,
-                 pipe_conductivity: float,
-                 fluid_type: str,
-                 fluid_concentration: float = 0):
-
+    def __init__(
+        self,
+        pipe_outer_diameter: float,
+        pipe_dimension_ratio: float,
+        pipe_length: float,
+        pipe_conductivity: float,
+        fluid_type: str,
+        fluid_concentration: float = 0,
+    ):
         self.fluid = get_fluid(fluid_type, fluid_concentration)
 
         # ratio of outer diameter to wall thickness
@@ -31,8 +31,8 @@ class Pipe:
         self.conductivity = pipe_conductivity
 
         # compute cross-sectional areas
-        self.area_cr_inner = pi / 4 * self.pipe_inner_diameter ** 2
-        self.area_cr_outer = pi / 4 * self.pipe_outer_diameter ** 2
+        self.area_cr_inner = pi / 4 * self.pipe_inner_diameter**2
+        self.area_cr_outer = pi / 4 * self.pipe_outer_diameter**2
         self.area_cr_pipe = self.area_cr_outer - self.area_cr_inner
 
         # compute surface areas
@@ -202,7 +202,7 @@ class Pipe:
         pr = self.fluid.prandtl(temp)
         return (f / 8) * (re - 1000) * pr / (1 + 12.7 * (f / 8) ** 0.5 * (pr ** (2 / 3) - 1))
 
-    def calc_pipe_cond_resist(self):
+    def calc_pipe_cond_resist(self) -> float:
         """
         Calculates the pipe radial conduction thermal resistance, in [K/(W/m)].
 
@@ -214,7 +214,7 @@ class Pipe:
 
         return log(self.pipe_outer_diameter / self.pipe_inner_diameter) / (2 * pi * self.conductivity)
 
-    def calc_pipe_internal_conv_resist(self, m_dot: float, temp: float):
+    def calc_pipe_internal_conv_resist(self, m_dot: float, temp: float) -> float:
         """
         Calculates the pipe internal convection thermal resistance, in [k/(W/m)]
 

@@ -1,4 +1,4 @@
-from math import exp, cosh, sinh
+from math import cosh, exp, sinh
 
 from bhr.enums import BoundaryCondition
 

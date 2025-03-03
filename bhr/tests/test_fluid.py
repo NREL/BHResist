@@ -4,7 +4,6 @@ from bhr.fluid import get_fluid
 
 
 class TestFluid(unittest.TestCase):
-
     def test_init_ethyl_alcohol(self):
         f = get_fluid(fluid_type="ETHYLALCOHOL", fluid_concentration=0.2)
         self.assertAlmostEqual(f.density(20), 968.9, delta=0.1)

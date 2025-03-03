@@ -7,15 +7,15 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-    - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v4.2.2
 
-    - name: Set up Python 3.12
-      uses: actions/setup-python@v5.3.0
-      with:
-        python-version: 3.12
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5.3.0
+        with:
+          python-version: 3.12
 
-    - name: Install Pip Dependencies
-      run: pip install flake8
+      - name: Install Pip Dependencies
+        run: pip install flake8
 
-    - name: Run Flake8
-      run: flake8 bhr
+      - name: Run Flake8
+        run: flake8 bhr
