@@ -38,7 +38,7 @@ class TestBorehole(unittest.TestCase):
             boundary_condition="uniform_borehole_wall_temp"
         )
 
-        self.assertAlmostEqual(bh.calc_bh_resist(temperature=20, flow_rate=0.5), 0.20425, delta=0.0001)
+        self.assertAlmostEqual(bh.calc_bh_resist(temperature=20, flow_rate=0.5), 0.20414, delta=0.0001)
 
     def test_init_single_u_from_dict(self):
         inputs = {
