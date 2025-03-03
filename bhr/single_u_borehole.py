@@ -32,14 +32,7 @@ class SingleUBorehole(UTube):
         self.bh_length = length
 
         # non-static parameters
-        self.beta = None
         self.pipe_resist = None
-        self.resist_bh_ave = None
-        self.resist_bh_grout = None
-        self.resist_bh_effective_uhf = None
-        self.resist_bh_effective_ubt = None
-        self.resist_bh_direct_coupling = None
-        self.resist_bh_total_internal = None
 
     def update_beta(self, flow_rate: float, temperature: float) -> None:
         """
@@ -62,11 +55,13 @@ class SingleUBorehole(UTube):
         """
 
         self.pipe_resist = self.calc_pipe_resist(flow_rate, temperature)
-        self.beta = 2 * pi * self.grout_conductivity * self.pipe_resist
+        beta = 2 * pi * self.grout_conductivity * self.pipe_resist
 
-    def calc_direct_coupling_resistance(self) -> tuple:
-        r_a = self.calc_total_internal_bh_resistance()
-        r_b = self.calc_local_bh_resistance()
+        return beta
+
+    def calc_direct_coupling_resistance(self, flow_rate, temperature) -> tuple:
+        r_a = self.calc_total_internal_bh_resistance(flow_rate, temperature)
+        r_b = self.calc_local_bh_resistance(flow_rate, temperature)
 
         r_12 = (4 * r_a * r_b) / (4 * r_b - r_a)
 
@@ -74,10 +69,10 @@ class SingleUBorehole(UTube):
         if r_12 < 0:
             r_12 = 70
 
-        self.resist_bh_direct_coupling = r_12
-        return self.resist_bh_direct_coupling, r_b
+        resist_bh_direct_coupling = r_12
+        return resist_bh_direct_coupling, r_b
 
-    def calc_local_bh_resistance(self) -> float:
+    def calc_local_bh_resistance(self, flow_rate, temperature) -> float:
         """
         Calculates the average thermal resistance of the borehole using the first-order multipole method.
 
@@ -90,17 +85,18 @@ class SingleUBorehole(UTube):
 
         :return: average thermal resistance, K/(W/m)
         """
+        beta = self.update_beta(flow_rate, temperature)
 
         final_term_1 = log(self.theta_2 / (2 * self.theta_1 * (1 - self.theta_1 ** 4) ** self.sigma))
 
         term_2_num = self.theta_3 ** 2 * (1 - (4 * self.sigma * self.theta_1 ** 4) / (1 - self.theta_1 ** 4)) ** 2
-        term_2_den_pt_1 = (1 + self.beta) / (1 - self.beta)
+        term_2_den_pt_1 = (1 + beta) / (1 - beta)
         term_2_den_pt_2 = self.theta_3 ** 2 * (1 + (16 * self.sigma * self.theta_1 ** 4) / (1 - self.theta_1 ** 4) ** 2)
         term_2_den = term_2_den_pt_1 + term_2_den_pt_2
         final_term_2 = term_2_num / term_2_den
 
-        self.resist_bh_ave = (1 / (4 * pi * self.grout_conductivity)) * (self.beta + final_term_1 - final_term_2)
-        return self.resist_bh_ave
+        resist_bh_ave = (1 / (4 * pi * self.grout_conductivity)) * (beta + final_term_1 - final_term_2)
+        return resist_bh_ave
 
     def calc_total_internal_bh_resistance(self, flow_rate, temperature) -> float:
         """
@@ -113,24 +109,24 @@ class SingleUBorehole(UTube):
 
         :return: total internal thermal resistance, K/(W/m)
         """
-        self.update_beta(flow_rate, temperature)
+        beta = self.update_beta(flow_rate, temperature)
 
         term_1_num = (1 + self.theta_1 ** 2) ** self.sigma
         term_1_den = self.theta_3 * (1 - self.theta_1 ** 2) ** self.sigma
         final_term_1 = log(term_1_num / term_1_den)
 
         term_2_num = self.theta_3 ** 2 * (1 - self.theta_1 ** 4 + 4 * self.sigma * self.theta_1 ** 2) ** 2
-        term_2_den_pt_1 = (1 + self.beta) / (1 - self.beta) * (1 - self.theta_1 ** 4) ** 2
+        term_2_den_pt_1 = (1 + beta) / (1 - beta) * (1 - self.theta_1 ** 4) ** 2
         term_2_den_pt_2 = self.theta_3 ** 2 * (1 - self.theta_1 ** 4) ** 2
         term_2_den_pt_3 = 8 * self.sigma * self.theta_1 ** 2 * self.theta_3 ** 2 * (1 + self.theta_1 ** 4)
         term_2_den = term_2_den_pt_1 - term_2_den_pt_2 + term_2_den_pt_3
         final_term_2 = term_2_num / term_2_den
 
-        self.resist_bh_total_internal = 1 / (pi * self.grout_conductivity) * (self.beta + final_term_1 - final_term_2)
+        resist_bh_total_internal = 1 / (pi * self.grout_conductivity) * (beta + final_term_1 - final_term_2)
 
-        return self.resist_bh_total_internal
+        return resist_bh_total_internal
 
-    def calc_grout_resistance(self) -> float:
+    def calc_grout_resistance(self, flow_rate, temperature) -> float:
         """
         Calculates grout resistance. Use for validation.
 
@@ -142,8 +138,8 @@ class SingleUBorehole(UTube):
         :return: grout resistance, K/(W-m)
         """
 
-        self.resist_bh_grout = self.calc_local_bh_resistance() - self.pipe_resist / 2.0
-        return self.resist_bh_grout
+        resist_bh_grout = self.calc_local_bh_resistance(flow_rate,temperature) - self.pipe_resist / 2.0
+        return resist_bh_grout
 
     def calc_effective_bh_resistance_uhf(self, flow_rate: float, temperature: float) -> float:
         """
@@ -160,16 +156,15 @@ class SingleUBorehole(UTube):
         :return: effective thermal resistance, K/(W/m)
         """
 
-        self.update_beta(flow_rate, temperature)
         r_a = self.calc_total_internal_bh_resistance(flow_rate,temperature)
-        r_b = self.calc_local_bh_resistance()
+        r_b = self.calc_local_bh_resistance(flow_rate, temperature)
 
         pt_1 = 1 / (3 * r_a)
         pt_2 = (self.bh_length / (self.fluid.cp(temperature) * flow_rate)) ** 2
         resist_short_circuiting = pt_1 * pt_2
 
-        self.resist_bh_effective_uhf = r_b + resist_short_circuiting
-        return self.resist_bh_effective_uhf
+        resist_bh_effective_uhf = r_b + resist_short_circuiting
+        return resist_bh_effective_uhf
 
     def calc_effective_bh_resistance_ubwt(self, flow_rate: float, temperature: float) -> float:
         """
@@ -184,12 +179,12 @@ class SingleUBorehole(UTube):
         :return: effective thermal resistance, K/(W/m)
         """
         r_a = self.calc_total_internal_bh_resistance(flow_rate,temperature) #R_a
-        r_b = self.calc_local_bh_resistance() #R_b
+        r_b = self.calc_local_bh_resistance(flow_rate, temperature) #R_b
         r_v = self.bh_length / (flow_rate * self.fluid.cp(temperature))  # (K/(w/m)) thermal resistance factor
 
 
         n = r_v / (r_b * r_a)**(1/2)
 
-        self.resist_bh_effective_ubt = r_b * n * coth(n)
+        resist_bh_effective_ubt = r_b * n * coth(n)
 
-        return self.resist_bh_effective_ubt
+        return resist_bh_effective_ubt
