@@ -110,8 +110,9 @@ class DoubleUTube(UTube):
                     & grout conductivity, dimensionless
         """
 
-        self.pipe_resist = self.calc_pipe_resist(flow_rate, temperature)
-        beta = 2 * pi * self.grout_conductivity * self.pipe_resist
+        pipe_resist = self.calc_pipe_resist(flow_rate, temperature)
+        self.pipe_resist = pipe_resist
+        beta = 2 * pi * self.grout_conductivity * pipe_resist
         b1 = (1 - beta) / (1 + beta)  # dimensionless parameter
 
         return b1
@@ -132,6 +133,9 @@ class DoubleUTube(UTube):
         """
 
         b1 = self.update_b1(flow_rate, temperature)
+
+        if self.pipe_resist is None:
+            raise ValueError("Pipe resistance has not been calculated yet.")
 
         # --Borehole resistance, 0th order [K/(W/m)]--
         rb0 = self.pipe_resist / 4 + 1 / self.eight_pi_kg * (self.b_2 + self.sigma * self.b_3)
@@ -158,6 +162,9 @@ class DoubleUTube(UTube):
         """
 
         b1 = self.update_b1(flow_rate, temperature)
+
+        if self.pipe_resist is None:
+            raise ValueError("Pipe resistance has not been calculated yet.")
 
         if self.pipe_inlet_arrangement == DoubleUPipeInletArrangement.DIAGONAL:
             # 0th order

@@ -64,8 +64,9 @@ class SingleUBorehole(UTube):
         :return: none
         """
 
-        self.pipe_resist = self.calc_pipe_resist(flow_rate, temperature)
-        beta = self.two_pi_kg * self.pipe_resist
+        pipe_resist = self.calc_pipe_resist(flow_rate, temperature)
+        self.pipe_resist = pipe_resist
+        beta = self.two_pi_kg * pipe_resist
 
         return beta
 
@@ -147,6 +148,9 @@ class SingleUBorehole(UTube):
 
         :return: grout resistance, K/(W-m)
         """
+
+        if self.pipe_resist is None:
+            raise ValueError("Pipe resistance has not been calculated yet.")
 
         resist_bh_grout = self.calc_local_bh_resistance(flow_rate, temperature) - self.pipe_resist / 2.0
         return resist_bh_grout

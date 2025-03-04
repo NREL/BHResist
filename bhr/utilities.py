@@ -4,10 +4,11 @@ from bhr.enums import BoundaryCondition
 
 
 def set_boundary_condition_enum(bh_str: str) -> BoundaryCondition:
-    if bh_str.upper() == BoundaryCondition.UNIFORM_HEAT_FLUX.name:
-        return BoundaryCondition.UNIFORM_HEAT_FLUX
-    elif bh_str.upper() == BoundaryCondition.UNIFORM_BOREHOLE_WALL_TEMP.name:
-        return BoundaryCondition.UNIFORM_BOREHOLE_WALL_TEMP
+    boundary_condition_map = {bc.name: bc for bc in BoundaryCondition}
+    if bh_str.upper() in boundary_condition_map:
+        return boundary_condition_map[bh_str.upper()]
+
+    raise ValueError(f"Invalid boundary condition: '{bh_str}'")
 
 
 def inch_to_m(x_inch: float) -> float:
