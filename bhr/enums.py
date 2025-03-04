@@ -10,3 +10,8 @@ class BoreholeType(Enum):
     SINGLE_U_TUBE = auto()
     DOUBLE_U_TUBE = auto()
     COAXIAL = auto()
+
+
+class DoubleUPipeInletArrangement(Enum):
+    ADJACENT = auto()
+    DIAGONAL = auto()

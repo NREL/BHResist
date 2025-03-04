@@ -1,6 +1,7 @@
 from math import log as ln
 from math import pi
 
+from bhr.enums import DoubleUPipeInletArrangement
 from bhr.u_tube import UTube
 from bhr.utilities import coth
 
@@ -27,7 +28,17 @@ class DoubleUTube(UTube):
         self.grout_conductivity = grout_conductivity
         self.borehole_radius = borehole_diameter / 2  # radius of borehole (m)
         self.pipe_radius = pipe_outer_diameter / 2  # pipe outer radius (m)
-        self.pipe_inlet_arrangement = pipe_inlet_arrangement
+
+        if pipe_inlet_arrangement == DoubleUPipeInletArrangement.ADJACENT.name:
+            self.pipe_inlet_arrangement = DoubleUPipeInletArrangement.ADJACENT
+        elif pipe_inlet_arrangement == DoubleUPipeInletArrangement.DIAGONAL.name:
+            self.pipe_inlet_arrangement = DoubleUPipeInletArrangement.DIAGONAL
+        else:
+            msg = "Invalid pipe_inlet_arrangement. Use one of the allowed values: " + \
+                  f"[{'\", \"'.join(map(str, [DoubleUPipeInletArrangement.ADJACENT.name,
+                                              DoubleUPipeInletArrangement.DIAGONAL.name]))}]"
+            raise AssertionError(msg)
+
         self.bh_length = length  # length of borehole (m)
         self.grout_conductivity = grout_conductivity  # W/(m-K)
         self.soil_conductivity = soil_conductivity  # W/(m-K)
@@ -121,6 +132,7 @@ class DoubleUTube(UTube):
 
         :return internal_resist: local internal resistance K/(W/m)
         """
+
         b1 = self.update_b1(flow_rate, temperature)
 
         # static parameters
@@ -133,7 +145,7 @@ class DoubleUTube(UTube):
         two_pi_kg = 2 * pi * self.grout_conductivity
         c_1 = self.pipe_centers_radius / self.pipe_radius
 
-        if self.pipe_inlet_arrangement == "DIAGONAL":
+        if self.pipe_inlet_arrangement == DoubleUPipeInletArrangement.DIAGONAL:
             # 0th order
             c_2 = self.borehole_radius ** 4 + self.pipe_centers_radius ** 4
             c_3 = self.borehole_radius ** 4 - self.pipe_centers_radius ** 4
@@ -148,7 +160,7 @@ class DoubleUTube(UTube):
 
             return internal_resist
 
-        elif self.pipe_inlet_arrangement == "ADJACENT":
+        elif self.pipe_inlet_arrangement == DoubleUPipeInletArrangement.ADJACENT:
             # 0th order
             d_2 = self.borehole_radius ** 2 + self.pipe_centers_radius ** 2
             d_3 = self.borehole_radius ** 2 - self.pipe_centers_radius ** 2
@@ -169,8 +181,8 @@ class DoubleUTube(UTube):
                                       matrix_element_11 * matrix_element_22 + matrix_element_21 ** 2)
 
             return internal_resist
-        else:
-            assert False
+
+        raise AssertionError("Developer error. Invalid pipe inlet arrangement.")
 
     def calc_effective_bh_resistance_uhf(self, flow_rate: float, temperature: float) -> float:
         """
