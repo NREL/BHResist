@@ -44,7 +44,7 @@ class DoubleUTube(UTube):
         else:
             msg = (
                 f"Invalid pipe_inlet_arrangement. Use one of the allowed values: "
-                f'"{", ".join(map(str, DoubleUPipeInletArrangement._member_names_))}"'
+                f"{', '.join(map(str, DoubleUPipeInletArrangement._member_names_))}"
             )
             raise AssertionError(msg)
 
@@ -78,14 +78,14 @@ class DoubleUTube(UTube):
         self.c_1 = self.pipe_centers_radius / self.pipe_radius
         c_2 = self.borehole_radius**4 + self.pipe_centers_radius**4
         c_3 = self.borehole_radius**4 - self.pipe_centers_radius**4
-        self.c_4 = ln(c_2 / c_3)
-        self.c_5 = self.p_c**2 * self.p_b**2
-        self.c_6 = self.p_c**2 * self.p_b**6 + self.p_c**6 * self.p_b**2
+        self.ln_c2_c3 = ln(c_2 / c_3)
+        self.c_4 = self.p_c**2 * self.p_b**2
+        self.c_5 = self.p_c**2 * self.p_b**6 + self.p_c**6 * self.p_b**2
         d_2 = self.borehole_radius**2 + self.pipe_centers_radius**2
         d_3 = self.borehole_radius**2 - self.pipe_centers_radius**2
-        self.d_4 = ln(d_2 / d_3)
-        self.d_5 = 3 * self.p_c**3 * self.p_b**5 + self.p_c**7 * self.p_b
-        self.d_6 = self.p_c * self.p_b**7 + 3 * self.p_c**5 * self.p_b**3
+        self.ln_d2_d3 = ln(d_2 / d_3)
+        self.d_4 = 3 * self.p_c**3 * self.p_b**5 + self.p_c**7 * self.p_b
+        self.d_5 = self.p_c * self.p_b**7 + 3 * self.p_c**5 * self.p_b**3
 
         # non-static parameters
         self.pipe_resist: Union[float, None] = None
@@ -168,22 +168,22 @@ class DoubleUTube(UTube):
 
         if self.pipe_inlet_arrangement == DoubleUPipeInletArrangement.DIAGONAL:
             # 0th order
-            ra0 = 2 * self.pipe_resist + 2 / self.two_pi_kg * (ln(self.c_1) + self.sigma * self.c_4)
+            ra0 = 2 * self.pipe_resist + 2 / self.two_pi_kg * (ln(self.c_1) + self.sigma * self.ln_c2_c3)
 
             # 1st order
-            internal_resist = ra0 - 2 / self.two_pi_kg * (b1 * self.p_pc * (1 + 8 * self.sigma * self.c_5) ** 2) / (
-                1 - b1 * self.p_pc * (3 - 32 * self.sigma * self.c_6)
+            internal_resist = ra0 - 2 / self.two_pi_kg * (b1 * self.p_pc * (1 + 8 * self.sigma * self.c_4) ** 2) / (
+                1 - b1 * self.p_pc * (3 - 32 * self.sigma * self.c_5)
             )
 
             return internal_resist
 
         elif self.pipe_inlet_arrangement == DoubleUPipeInletArrangement.ADJACENT:
             # 0th order
-            ra0 = 2 * self.pipe_resist + 2 / self.two_pi_kg * (ln(2 * self.c_1) + self.sigma * self.d_4)
+            ra0 = 2 * self.pipe_resist + 2 / self.two_pi_kg * (ln(2 * self.c_1) + self.sigma * self.ln_d2_d3)
 
             # 1st order
-            matrix_element_11 = 1 + 16 * b1 * self.sigma * self.p_pc * self.d_5
-            matrix_element_22 = -1 - 16 * b1 * self.sigma * self.p_pc * self.d_6
+            matrix_element_11 = 1 + 16 * b1 * self.sigma * self.p_pc * self.d_4
+            matrix_element_22 = -1 - 16 * b1 * self.sigma * self.p_pc * self.d_5
             matrix_element_21 = b1 * self.p_pc
             vector_1 = 1 - 8 * self.sigma * self.p_c**3 * self.p_b
             vector_2 = 3 + 8 * self.sigma * self.p_c * self.p_b**3
