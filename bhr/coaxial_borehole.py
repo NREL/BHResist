@@ -50,7 +50,7 @@ class Coaxial:
         Laminar Nusselt numbers for annulus flow
 
         Hellström, G. 1991. Ground Heat Storage: Thermal Analyses of Duct Storage Systems.
-        Department of Mathematical Physics, University of Lund, Sweden., pp 67-71
+        Department of Mathematical Physics, University of Lund, Sweden. pp 67-71
 
         :return nu_ii: Laminar Nusselt number for inner surface of annulus pipe
         :return nu_oo: Laminar Nusselt number for outer annulus pipe surface

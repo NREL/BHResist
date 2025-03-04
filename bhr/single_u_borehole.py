@@ -20,7 +20,7 @@ class SingleUBorehole(UTube):
         super().__init__(pipe_outer_diameter, pipe_dimension_ratio, length, shank_space, pipe_conductivity,
                          fluid_type, fluid_concentration)
 
-        # other static parameters
+        # static parameters
         self.borehole_diameter = borehole_diameter
         self.grout_conductivity = grout_conductivity
         self.soil_conductivity = soil_conductivity
@@ -30,11 +30,12 @@ class SingleUBorehole(UTube):
         self.sigma = (self.grout_conductivity - self.soil_conductivity) / (
                 self.grout_conductivity + self.soil_conductivity)
         self.bh_length = length
+        self.two_pi_kg = 2 * pi * self.grout_conductivity
 
         # non-static parameters
         self.pipe_resist = None
 
-    def update_beta(self, flow_rate: float, temperature: float) -> None:
+    def update_beta(self, flow_rate: float, temperature: float) -> float:
         """
         Updates Beta coefficient.
 
@@ -55,7 +56,7 @@ class SingleUBorehole(UTube):
         """
 
         self.pipe_resist = self.calc_pipe_resist(flow_rate, temperature)
-        beta = 2 * pi * self.grout_conductivity * self.pipe_resist
+        beta = self.two_pi_kg * self.pipe_resist
 
         return beta
 
@@ -178,12 +179,11 @@ class SingleUBorehole(UTube):
 
         :return: effective thermal resistance, K/(W/m)
         """
+
         r_a = self.calc_total_internal_bh_resistance(flow_rate, temperature)  # R_a
         r_b = self.calc_local_bh_resistance(flow_rate, temperature)  # R_b
         r_v = self.bh_length / (flow_rate * self.fluid.cp(temperature))  # (K/(w/m)) thermal resistance factor
-
-        n = r_v / (r_b * r_a) ** (1 / 2)
-
+        n = r_v / (r_b * r_a) ** 0.5
         resist_bh_effective_ubt = r_b * n * coth(n)
 
         return resist_bh_effective_ubt

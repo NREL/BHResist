@@ -15,5 +15,5 @@ setup(
     long_description=readme_contents,
     long_description_content_type='text/markdown',
     author='Matt Mitchell',
-    author_email='a@a.com',
-    url='https://github.com/mitchute/BHResist')
+    author_email='mitchute@gmail.com',
+    url='https://github.com/NREL/BHResist')
