@@ -45,7 +45,7 @@ class TestDoubleUBorehole(TestCase):
 
         tolerance = 1e-3
 
-        self.assertAlmostEqual(bh.calc_bh_resist_local(flow_rate=0.5, temperature=20), 7.509e-02, delta=tolerance)
+        self.assertAlmostEqual(bh.calc_bh_resist_local(flow_rate=0.5, temperature=20), 7.509e-2, delta=tolerance)
 
     def test_calc_internal_resist(self):
         bh = DoubleUTube(**self.inputs)
