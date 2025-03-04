@@ -10,8 +10,8 @@ Hellström, G. 1991. "Ground Heat Storage: Thermal Analyses of Duct Storage Syst
 
 Grundmann, R.M. 2016 "Improved design methods for ground heat exchangers." Master’s thesis, Oklahoma State University.
 
-Javed, S. and J.D. Spitler. 2016. "Calculation of borehole thermal resistance." In *Advances in Ground-Source Heat Pump Systems*. Ed. S.J. Rees. Woodhead Publishing. https://doi.org/10.1016/B978-0-08-100311-4.00003-0 
+Javed, S. and J.D. Spitler. 2016. "Calculation of borehole thermal resistance." In _Advances in Ground-Source Heat Pump Systems_. Ed. S.J. Rees. Woodhead Publishing. https://doi.org/10.1016/B978-0-08-100311-4.00003-0
 
-Javed, S., and J.D. Spitler. 2017. "Accuracy of borehole thermal resistance calculation methods for grouted single u-tube ground heat exchangers." *Applied Energy,* 187:790-806. https://doi.org/10.1016/j.apenergy.2016.11.079
+Javed, S., and J.D. Spitler. 2017. "Accuracy of borehole thermal resistance calculation methods for grouted single u-tube ground heat exchangers." _Applied Energy,_ 187:790-806. https://doi.org/10.1016/j.apenergy.2016.11.079
 
-Claesson, J., and S. Javed. 2019. "Explicit multipole formulas and thermal network models for calculating thermal resistances of double U-pipe borehole heat exchangers." *Science and Technology for the Built Environment,* 25(8) pp. 980–992. https://doi.org/10.1080/23744731.2019.1620565
+Claesson, J., and S. Javed. 2019. "Explicit multipole formulas and thermal network models for calculating thermal resistances of double U-pipe borehole heat exchangers." _Science and Technology for the Built Environment,_ 25(8) pp. 980–992. https://doi.org/10.1080/23744731.2019.1620565

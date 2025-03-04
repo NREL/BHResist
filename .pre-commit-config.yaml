@@ -38,7 +38,7 @@ repos:
       - id: mypy
         exclude: ^docs/
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.8
+    rev: v0.9.9
     hooks:
       # Run the linter
       - id: ruff
