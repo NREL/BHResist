@@ -5,7 +5,6 @@ from bhr.double_u_borehole import DoubleUTube
 
 class TestDoubleUBorehole(TestCase):
     def setUp(self):
-
         # from example in Claesson & Javed 2019 paper
         self.inputs = {
             "borehole_diameter": 0.115,  # confirmed
@@ -78,3 +77,8 @@ class TestDoubleUBorehole(TestCase):
                                delta=tolerance)
         self.assertAlmostEqual(bh.calc_effective_bh_resistance_ubwt(flow_rate=0.2077, temperature=20), 0.1062,
                                delta=tolerance)
+
+    def test_invalid_pipe_arrangement(self):
+        self.inputs.update({"pipe_inlet_arrangement": "UNSUPPORTED"})
+        with self.assertRaises(AssertionError):
+            DoubleUTube(**self.inputs)

@@ -35,8 +35,7 @@ class DoubleUTube(UTube):
             self.pipe_inlet_arrangement = DoubleUPipeInletArrangement.DIAGONAL
         else:
             msg = "Invalid pipe_inlet_arrangement. Use one of the allowed values: " + \
-                  f"[{'\", \"'.join(map(str, [DoubleUPipeInletArrangement.ADJACENT.name,
-                                              DoubleUPipeInletArrangement.DIAGONAL.name]))}]"
+                  f"\"{'\", \"'.join(map(str, DoubleUPipeInletArrangement._member_names_))}\""
             raise AssertionError(msg)
 
         self.bh_length = length  # length of borehole (m)
