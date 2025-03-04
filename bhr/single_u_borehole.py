@@ -5,20 +5,28 @@ from bhr.utilities import coth
 
 
 class SingleUBorehole(UTube):
-
-    def __init__(self,
-                 borehole_diameter: float,
-                 pipe_outer_diameter: float,
-                 pipe_dimension_ratio: float,
-                 length: float,
-                 shank_space: float,
-                 pipe_conductivity: float,
-                 grout_conductivity: float,
-                 soil_conductivity: float,
-                 fluid_type: str,
-                 fluid_concentration: float = 0):
-        super().__init__(pipe_outer_diameter, pipe_dimension_ratio, length, shank_space, pipe_conductivity,
-                         fluid_type, fluid_concentration)
+    def __init__(
+        self,
+        borehole_diameter: float,
+        pipe_outer_diameter: float,
+        pipe_dimension_ratio: float,
+        length: float,
+        shank_space: float,
+        pipe_conductivity: float,
+        grout_conductivity: float,
+        soil_conductivity: float,
+        fluid_type: str,
+        fluid_concentration: float = 0,
+    ):
+        super().__init__(
+            pipe_outer_diameter,
+            pipe_dimension_ratio,
+            length,
+            shank_space,
+            pipe_conductivity,
+            fluid_type,
+            fluid_concentration,
+        )
 
         # static parameters
         self.borehole_diameter = borehole_diameter
@@ -28,7 +36,8 @@ class SingleUBorehole(UTube):
         self.theta_2 = self.borehole_diameter / self.pipe_outer_diameter
         self.theta_3 = 1 / (2 * self.theta_1 * self.theta_2)
         self.sigma = (self.grout_conductivity - self.soil_conductivity) / (
-                self.grout_conductivity + self.soil_conductivity)
+            self.grout_conductivity + self.soil_conductivity
+        )
         self.bh_length = length
         self.two_pi_kg = 2 * pi * self.grout_conductivity
 
@@ -55,8 +64,9 @@ class SingleUBorehole(UTube):
         :return: none
         """
 
-        self.pipe_resist = self.calc_pipe_resist(flow_rate, temperature)
-        beta = self.two_pi_kg * self.pipe_resist
+        pipe_resist = self.calc_pipe_resist(flow_rate, temperature)
+        self.pipe_resist = pipe_resist
+        beta = self.two_pi_kg * pipe_resist
 
         return beta
 
@@ -88,11 +98,11 @@ class SingleUBorehole(UTube):
         """
         beta = self.update_beta(flow_rate, temperature)
 
-        final_term_1 = log(self.theta_2 / (2 * self.theta_1 * (1 - self.theta_1 ** 4) ** self.sigma))
+        final_term_1 = log(self.theta_2 / (2 * self.theta_1 * (1 - self.theta_1**4) ** self.sigma))
 
-        term_2_num = self.theta_3 ** 2 * (1 - (4 * self.sigma * self.theta_1 ** 4) / (1 - self.theta_1 ** 4)) ** 2
+        term_2_num = self.theta_3**2 * (1 - (4 * self.sigma * self.theta_1**4) / (1 - self.theta_1**4)) ** 2
         term_2_den_pt_1 = (1 + beta) / (1 - beta)
-        term_2_den_pt_2 = self.theta_3 ** 2 * (1 + (16 * self.sigma * self.theta_1 ** 4) / (1 - self.theta_1 ** 4) ** 2)
+        term_2_den_pt_2 = self.theta_3**2 * (1 + (16 * self.sigma * self.theta_1**4) / (1 - self.theta_1**4) ** 2)
         term_2_den = term_2_den_pt_1 + term_2_den_pt_2
         final_term_2 = term_2_num / term_2_den
 
@@ -112,14 +122,14 @@ class SingleUBorehole(UTube):
         """
         beta = self.update_beta(flow_rate, temperature)
 
-        term_1_num = (1 + self.theta_1 ** 2) ** self.sigma
-        term_1_den = self.theta_3 * (1 - self.theta_1 ** 2) ** self.sigma
+        term_1_num = (1 + self.theta_1**2) ** self.sigma
+        term_1_den = self.theta_3 * (1 - self.theta_1**2) ** self.sigma
         final_term_1 = log(term_1_num / term_1_den)
 
-        term_2_num = self.theta_3 ** 2 * (1 - self.theta_1 ** 4 + 4 * self.sigma * self.theta_1 ** 2) ** 2
-        term_2_den_pt_1 = (1 + beta) / (1 - beta) * (1 - self.theta_1 ** 4) ** 2
-        term_2_den_pt_2 = self.theta_3 ** 2 * (1 - self.theta_1 ** 4) ** 2
-        term_2_den_pt_3 = 8 * self.sigma * self.theta_1 ** 2 * self.theta_3 ** 2 * (1 + self.theta_1 ** 4)
+        term_2_num = self.theta_3**2 * (1 - self.theta_1**4 + 4 * self.sigma * self.theta_1**2) ** 2
+        term_2_den_pt_1 = (1 + beta) / (1 - beta) * (1 - self.theta_1**4) ** 2
+        term_2_den_pt_2 = self.theta_3**2 * (1 - self.theta_1**4) ** 2
+        term_2_den_pt_3 = 8 * self.sigma * self.theta_1**2 * self.theta_3**2 * (1 + self.theta_1**4)
         term_2_den = term_2_den_pt_1 - term_2_den_pt_2 + term_2_den_pt_3
         final_term_2 = term_2_num / term_2_den
 
@@ -138,6 +148,9 @@ class SingleUBorehole(UTube):
 
         :return: grout resistance, K/(W-m)
         """
+
+        if self.pipe_resist is None:
+            raise ValueError("Pipe resistance has not been calculated yet.")
 
         resist_bh_grout = self.calc_local_bh_resistance(flow_rate, temperature) - self.pipe_resist / 2.0
         return resist_bh_grout

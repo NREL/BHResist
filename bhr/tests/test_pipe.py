@@ -5,14 +5,13 @@ from bhr.pipe import Pipe
 
 
 class TestPipe(unittest.TestCase):
-
     def setUp(self):
         self.inputs = {
             "pipe_outer_diameter": 0.0334,
             "pipe_dimension_ratio": 11,
             "pipe_length": 100,
             "pipe_conductivity": 0.4,
-            "fluid_type": "WATER"
+            "fluid_type": "WATER",
         }
 
     def test_init_pipe(self):
@@ -29,9 +28,9 @@ class TestPipe(unittest.TestCase):
         self.assertAlmostEqual(p.thickness, 0.00303, delta=tol)
 
         # areas
-        self.assertAlmostEqual(p.area_cr_outer, 8.761E-4, delta=tol)
-        self.assertAlmostEqual(p.area_cr_inner, 5.628E-4, delta=tol)
-        self.assertAlmostEqual(p.area_cr_pipe, 3.078E-4, delta=tol)
+        self.assertAlmostEqual(p.area_cr_outer, 8.761e-4, delta=tol)
+        self.assertAlmostEqual(p.area_cr_inner, 5.628e-4, delta=tol)
+        self.assertAlmostEqual(p.area_cr_pipe, 3.078e-4, delta=tol)
         self.assertAlmostEqual(p.area_s_outer, 10.4929, delta=tol)
         self.assertAlmostEqual(p.area_s_inner, 8.5851, delta=tol)
 

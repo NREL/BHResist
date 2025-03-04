@@ -16,7 +16,7 @@ class TestDoubleUBorehole(TestCase):
             "pipe_inlet_arrangement": "DIAGONAL",  # correct
             "grout_conductivity": 1.5,  # confirmed
             "soil_conductivity": 3,  # confirmed
-            "fluid_type": "WATER"  # effects come out in Rp
+            "fluid_type": "WATER",  # effects come out in Rp
         }
 
     def test_init(self):
@@ -45,7 +45,7 @@ class TestDoubleUBorehole(TestCase):
 
         tolerance = 1e-3
 
-        self.assertAlmostEqual(bh.calc_bh_resist_local(flow_rate=0.5, temperature=20), 7.509E-02, delta=tolerance)
+        self.assertAlmostEqual(bh.calc_bh_resist_local(flow_rate=0.5, temperature=20), 7.509e-02, delta=tolerance)
 
     def test_calc_internal_resist(self):
         bh = DoubleUTube(**self.inputs)
@@ -61,10 +61,12 @@ class TestDoubleUBorehole(TestCase):
         tolerance = 1e-3
 
         # values match test case data in Table 1
-        self.assertAlmostEqual(bh.calc_effective_bh_resistance_uhf(flow_rate=0.2077, temperature=20), 0.1302,
-                               delta=tolerance)
-        self.assertAlmostEqual(bh.calc_effective_bh_resistance_ubwt(flow_rate=0.2077, temperature=20), 0.1235,
-                               delta=tolerance)
+        self.assertAlmostEqual(
+            bh.calc_effective_bh_resistance_uhf(flow_rate=0.2077, temperature=20), 0.1302, delta=tolerance
+        )
+        self.assertAlmostEqual(
+            bh.calc_effective_bh_resistance_ubwt(flow_rate=0.2077, temperature=20), 0.1235, delta=tolerance
+        )
 
     def test_calc_resistances_adjacent(self):
         self.inputs.update({"pipe_inlet_arrangement": "ADJACENT"})
@@ -73,10 +75,12 @@ class TestDoubleUBorehole(TestCase):
         tolerance = 1e-3
 
         # values match test case data in Table 1
-        self.assertAlmostEqual(bh.calc_effective_bh_resistance_uhf(flow_rate=0.2077, temperature=20), 0.1089,
-                               delta=tolerance)
-        self.assertAlmostEqual(bh.calc_effective_bh_resistance_ubwt(flow_rate=0.2077, temperature=20), 0.1062,
-                               delta=tolerance)
+        self.assertAlmostEqual(
+            bh.calc_effective_bh_resistance_uhf(flow_rate=0.2077, temperature=20), 0.1089, delta=tolerance
+        )
+        self.assertAlmostEqual(
+            bh.calc_effective_bh_resistance_ubwt(flow_rate=0.2077, temperature=20), 0.1062, delta=tolerance
+        )
 
     def test_invalid_pipe_arrangement(self):
         self.inputs.update({"pipe_inlet_arrangement": "UNSUPPORTED"})

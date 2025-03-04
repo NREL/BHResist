@@ -4,7 +4,6 @@ from bhr.u_tube import UTube
 
 
 class TestUTube(TestCase):
-
     def test_init(self):
         inputs = {
             "pipe_outer_diameter": 0.034,
@@ -12,7 +11,7 @@ class TestUTube(TestCase):
             "length": 100,
             "shank_space": 0.03,
             "pipe_conductivity": 0.4,
-            "fluid_type": "WATER"
+            "fluid_type": "WATER",
         }
 
         u_tube = UTube(**inputs)

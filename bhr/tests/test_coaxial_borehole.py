@@ -17,7 +17,7 @@ class TestCoaxialBorehole(TestCase):
             "grout_conductivity": 1.5,
             "soil_conductivity": 3,
             "fluid_type": "WATER",
-            "fluid_concentration": 0
+            "fluid_concentration": 0,
         }
 
     def test_init(self):

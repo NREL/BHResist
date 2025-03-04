@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "BHResist"
+version = "0.1"
+description = "Functionality to compute the thermal resistance of borehole heat exchangers"
+authors = ["Matt Mitchell <mitchute@gmail.com>"]
+readme = "README.md"
+license = "BSD-3-Clause"
+repository = "https://github.com/NREL/BHResist"
+
+packages = [
+    { include = "bhr" }
+]
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.14"
+SecondaryCoolantProps = "^1.3"
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^4"
+pytest = "^8"
+pytest-cov = "^6"
+sphinx = "^7"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -4,7 +4,6 @@ from bhr.single_u_borehole import SingleUBorehole
 
 
 class TestSingleUBorehole(TestCase):
-
     def setUp(self):
         self.inputs = {
             "borehole_diameter": 0.096,
@@ -17,7 +16,7 @@ class TestSingleUBorehole(TestCase):
             "pipe_conductivity": 0.389,
             "grout_conductivity": 0.6,
             "soil_conductivity": 4.0,
-            "fluid_type": "WATER"
+            "fluid_type": "WATER",
         }
 
     def test_init(self):
@@ -42,18 +41,19 @@ class TestSingleUBorehole(TestCase):
         self.inputs.update({"soil_conductivity": 1.0, "grout_conductivity": 3.6})
         bh = SingleUBorehole(**self.inputs)
         bh.update_beta(flow_rate=0.5, temperature=20)
-        self.assertAlmostEqual(bh.calc_total_internal_bh_resistance(flow_rate, temperature), 0.17456,
-                               delta=tolerance)
+        self.assertAlmostEqual(bh.calc_total_internal_bh_resistance(flow_rate, temperature), 0.17456, delta=tolerance)
         self.assertAlmostEqual(bh.calc_grout_resistance(flow_rate, temperature), 0.03373, delta=tolerance)
 
     def test_calc_effective_bh_resistance_uhf(self):
         bh = SingleUBorehole(**self.inputs)
         tolerance = 1e-3
-        self.assertAlmostEqual(bh.calc_effective_bh_resistance_uhf(flow_rate=0.5, temperature=20), 0.20435,
-                               delta=tolerance)
+        self.assertAlmostEqual(
+            bh.calc_effective_bh_resistance_uhf(flow_rate=0.5, temperature=20), 0.20435, delta=tolerance
+        )
 
     def test_calc_effective_bh_resistance_ubwt(self):
         bh = SingleUBorehole(**self.inputs)
         tolerance = 1e-3
-        self.assertAlmostEqual(bh.calc_effective_bh_resistance_ubwt(flow_rate=0.5, temperature=20), 0.20435,
-                               delta=tolerance)
+        self.assertAlmostEqual(
+            bh.calc_effective_bh_resistance_ubwt(flow_rate=0.5, temperature=20), 0.20435, delta=tolerance
+        )
