@@ -54,6 +54,28 @@ class DoubleUTube(UTube):
                 'Shank space is not within bounds. ' +
                 'MAX is 2 / sqrt(2) * (borehole_radius - pipe_outer_radius). MIN is pipe_outer_radius * 2')
 
+        # static parameters - calc_bh_resist_local
+        self.p_pc = self.pipe_radius ** 2 / (4 * self.pipe_centers_radius ** 2)
+        self.p_c = self.pipe_centers_radius ** 2 / (self.borehole_radius ** 8 - self.pipe_centers_radius ** 8) ** 0.25
+        self.p_b = self.borehole_radius ** 2 / (self.borehole_radius ** 8 - self.pipe_centers_radius ** 8) ** 0.25
+        self.eight_pi_kg = 8 * pi * self.grout_conductivity
+        self.b_2 = ln(self.borehole_radius ** 4 / (4 * self.pipe_radius * self.pipe_centers_radius ** 3))
+        self.b_3 = ln(self.borehole_radius ** 8 / (self.borehole_radius ** 8 - self.pipe_centers_radius ** 8))
+
+        # static parameter - calc_internal_resist
+        self.two_pi_kg = 2 * pi * self.grout_conductivity
+        self.c_1 = self.pipe_centers_radius / self.pipe_radius
+        c_2 = self.borehole_radius ** 4 + self.pipe_centers_radius ** 4
+        c_3 = self.borehole_radius ** 4 - self.pipe_centers_radius ** 4
+        self.c_4 = ln(c_2 / c_3)
+        self.c_5 = self.p_c ** 2 * self.p_b ** 2
+        self.c_6 = self.p_c ** 2 * self.p_b ** 6 + self.p_c ** 6 * self.p_b ** 2
+        d_2 = self.borehole_radius ** 2 + self.pipe_centers_radius ** 2
+        d_3 = self.borehole_radius ** 2 - self.pipe_centers_radius ** 2
+        self.d_4 = ln(d_2 / d_3)
+        self.d_5 = 3 * self.p_c ** 3 * self.p_b ** 5 + self.p_c ** 7 * self.p_b
+        self.d_6 = self.p_c * self.p_b ** 7 + 3 * self.p_c ** 5 * self.p_b ** 3
+
         # non-static parameters
         self.pipe_resist = None
 
@@ -100,22 +122,13 @@ class DoubleUTube(UTube):
 
         b1 = self.update_b1(flow_rate, temperature)
 
-        # static parameters
-        p_pc = self.pipe_radius ** 2 / (4 * self.pipe_centers_radius ** 2)  # dimensionless parameter
-        p_c = self.pipe_centers_radius ** 2 / (self.borehole_radius ** 8 - self.pipe_centers_radius ** 8) ** (
-                1 / 4)  # dimensionless parameter
-        p_b = self.borehole_radius ** 2 / (self.borehole_radius ** 8 - self.pipe_centers_radius ** 8) ** (
-                1 / 4)  # dimensionless parameter
-
         # --Borehole resistance, 0th order [K/(W/m)]--
-        Rb0 = self.pipe_resist / 4 + 1 / (8 * pi * self.grout_conductivity) * ((ln(self.borehole_radius ** 4 / (
-                4 * self.pipe_radius * self.pipe_centers_radius ** 3))) + self.sigma * ln(
-            self.borehole_radius ** 8 / (self.borehole_radius ** 8 - self.pipe_centers_radius ** 8)))
+        Rb0 = self.pipe_resist / 4 + 1 / self.eight_pi_kg * (self.b_2 + self.sigma * self.b_3)
 
         # --Borehole resistance, 1st order [K/(W/m)]--
-        borehole_resist_local = Rb0 - 1 / (8 * pi * self.grout_conductivity) * (
-                b1 * p_pc * (3 - 8 * self.sigma * p_c ** 4) ** 2
-        ) / (1 + b1 * p_pc * (5 + 64 * self.sigma * p_c ** 4 * p_b ** 4))
+        borehole_resist_local = Rb0 - 1 / self.eight_pi_kg * (
+                b1 * self.p_pc * (3 - 8 * self.sigma * self.p_c ** 4) ** 2) / (
+                                        1 + b1 * self.p_pc * (5 + 64 * self.sigma * self.p_c ** 4 * self.p_b ** 4))
 
         return borehole_resist_local
 
@@ -135,47 +148,28 @@ class DoubleUTube(UTube):
 
         b1 = self.update_b1(flow_rate, temperature)
 
-        # static parameters
-        p_pc = self.pipe_radius ** 2 / (4 * self.pipe_centers_radius ** 2)  # dimensionless parameter
-        p_c = self.pipe_centers_radius ** 2 / (self.borehole_radius ** 8 - self.pipe_centers_radius ** 8) ** (
-                1 / 4)  # dimensionless parameter
-        p_b = self.borehole_radius ** 2 / (self.borehole_radius ** 8 - self.pipe_centers_radius ** 8) ** (
-                1 / 4)  # dimensionless parameter
-
-        two_pi_kg = 2 * pi * self.grout_conductivity
-        c_1 = self.pipe_centers_radius / self.pipe_radius
-
         if self.pipe_inlet_arrangement == DoubleUPipeInletArrangement.DIAGONAL:
             # 0th order
-            c_2 = self.borehole_radius ** 4 + self.pipe_centers_radius ** 4
-            c_3 = self.borehole_radius ** 4 - self.pipe_centers_radius ** 4
-            Ra0 = 2 * self.pipe_resist + 2 / two_pi_kg * (ln(c_1) + self.sigma * ln(c_2 / c_3))
+            Ra0 = 2 * self.pipe_resist + 2 / self.two_pi_kg * (ln(self.c_1) + self.sigma * self.c_4)
 
             # 1st order
-
-            internal_resist = Ra0 - 2 / two_pi_kg * (
-                    b1 * p_pc * (1 + 8 * self.sigma * p_c ** 2 * p_b ** 2) ** 2
-            ) / (1 - b1 * p_pc * (
-                    3 - 32 * self.sigma * (p_c ** 2 * p_b ** 6 + p_c ** 6 * p_b ** 2)))
+            internal_resist = Ra0 - 2 / self.two_pi_kg * (b1 * self.p_pc * (1 + 8 * self.sigma * self.c_5) ** 2
+                                                          ) / (1 - b1 * self.p_pc * (3 - 32 * self.sigma * self.c_6))
 
             return internal_resist
 
         elif self.pipe_inlet_arrangement == DoubleUPipeInletArrangement.ADJACENT:
             # 0th order
-            d_2 = self.borehole_radius ** 2 + self.pipe_centers_radius ** 2
-            d_3 = self.borehole_radius ** 2 - self.pipe_centers_radius ** 2
-            Ra0 = 2 * self.pipe_resist + 2 / two_pi_kg * (ln(2 * c_1) + self.sigma * ln(d_2 / d_3))
+            Ra0 = 2 * self.pipe_resist + 2 / self.two_pi_kg * (ln(2 * self.c_1) + self.sigma * self.d_4)
 
             # 1st order
-            matrix_element_11 = 1 + 16 * b1 * self.sigma * p_pc * (
-                    3 * p_c ** 3 * p_b ** 5 + p_c ** 7 * p_b)  # matrix variable
-            matrix_element_22 = -1 - 16 * b1 * self.sigma * p_pc * (
-                    p_c * p_b ** 7 + 3 * p_c ** 5 * p_b ** 3)  # matrix variable
-            matrix_element_21 = b1 * p_pc  # matrix variable
-            vector_1 = 1 - 8 * self.sigma * p_c ** 3 * p_b  # vector variable
-            vector_2 = 3 + 8 * self.sigma * p_c * p_b ** 3  # vector variable
+            matrix_element_11 = 1 + 16 * b1 * self.sigma * self.p_pc * self.d_5
+            matrix_element_22 = -1 - 16 * b1 * self.sigma * self.p_pc * self.d_6
+            matrix_element_21 = b1 * self.p_pc
+            vector_1 = 1 - 8 * self.sigma * self.p_c ** 3 * self.p_b
+            vector_2 = 3 + 8 * self.sigma * self.p_c * self.p_b ** 3
 
-            internal_resist = Ra0 + 2 / two_pi_kg * b1 * p_pc / 2 * (
+            internal_resist = Ra0 + 2 / self.two_pi_kg * b1 * self.p_pc / 2 * (
                     vector_2 ** 2 * matrix_element_11 - 2 * vector_1 * vector_2 * matrix_element_21 -
                     vector_1 ** 2 * matrix_element_22) / (
                                       matrix_element_11 * matrix_element_22 + matrix_element_21 ** 2)

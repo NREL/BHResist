@@ -8,16 +8,16 @@ class TestDoubleUBorehole(TestCase):
 
         # from example in Claesson & Javed 2019 paper
         self.inputs = {
-            "borehole_diameter": 0.115, # confirmed
-            "pipe_outer_diameter": 0.032, # confirmed
-            "pipe_dimension_ratio": 18.525, # tuned to set Rp = 0.05
-            "length": 200, # confirmed
-            "shank_space": 0.032, # confirmed, aligns with the 22.63 mm case
-            "pipe_conductivity": 0.389, # reasonable value, but ultimately effects come out in Rp
-            "pipe_inlet_arrangement": "DIAGONAL", # correct
-            "grout_conductivity": 1.5, # confirmed
-            "soil_conductivity": 3, # confirmed
-            "fluid_type": "WATER" # effects come out in Rp
+            "borehole_diameter": 0.115,  # confirmed
+            "pipe_outer_diameter": 0.032,  # confirmed
+            "pipe_dimension_ratio": 18.525,  # tuned to set Rp = 0.05
+            "length": 200,  # confirmed
+            "shank_space": 0.032,  # confirmed, aligns with the 22.63 mm case
+            "pipe_conductivity": 0.389,  # reasonable value, but ultimately effects come out in Rp
+            "pipe_inlet_arrangement": "DIAGONAL",  # correct
+            "grout_conductivity": 1.5,  # confirmed
+            "soil_conductivity": 3,  # confirmed
+            "fluid_type": "WATER"  # effects come out in Rp
         }
 
     def test_init(self):
