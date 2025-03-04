@@ -12,7 +12,7 @@ class TestSingleUBorehole(TestCase):
             # This is not a realistic value,
             # set to make pipe conduction + internal fluid resistance = 0.05 to match tests
             "length": 100,
-            "shank_space": 0.032,
+            "shank_space": 0.016,
             "pipe_conductivity": 0.389,
             "grout_conductivity": 0.6,
             "soil_conductivity": 4.0,

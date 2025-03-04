@@ -28,11 +28,34 @@ class SingleUBorehole(UTube):
             fluid_concentration,
         )
 
+        """
+        Implementation for computing borehole thermal resistance for grouted single u-tube borehole.
+        
+        Relies primarily on the following references:
+        
+        Javed, S. & Spitler, J.D. 2017. 'Accuracy of Borehole Thermal Resistance Calculation Methods
+        for Grouted Single U-tube Ground Heat Exchangers.' Applied Energy.187:790-806.
+        
+        Javed, S. & Spitler, J.D. Calculation of Borehole Thermal Resistance. In 'Advances in
+        Ground-Source Heat Pump Systems,' pp. 84. Rees, S.J. ed. Cambridge, MA. Elsevier Ltd. 2016.
+        
+        :param borehole_diameter: borehole diameter, in m.
+        :param pipe_outer_diameter: outer diameter of the pipe, in m.
+        :param pipe_dimension_ratio: non-dimensional ratio of pipe diameter to pipe thickness.
+        :param length: length of borehole from top to bottom, in m.
+        :param shank_space: radial distance from the borehole center to the center of the pipe, in m.
+        :param pipe_conductivity: pipe thermal conductivity, in W/m-K.
+        :param grout_conductivity: grout thermal conductivity, in W/m-K.
+        :param soil_conductivity: soil thermal conductivity, in W/m-K.
+        :param fluid_type: fluid type. "ETHYLALCOHOL", "ETHYLENEGLYCOL", "METHYLALCOHOL",  "PROPYLENEGLYCOL", or "WATER" 
+        :param fluid_concentration: fractional concentration of antifreeze mixture, from 0-0.6.
+        """
+
         # static parameters
         self.borehole_diameter = borehole_diameter
         self.grout_conductivity = grout_conductivity
         self.soil_conductivity = soil_conductivity
-        self.theta_1 = self.shank_space / self.borehole_diameter
+        self.theta_1 = 2 * self.shank_space / self.borehole_diameter
         self.theta_2 = self.borehole_diameter / self.pipe_outer_diameter
         self.theta_3 = 1 / (2 * self.theta_1 * self.theta_2)
         self.sigma = (self.grout_conductivity - self.soil_conductivity) / (

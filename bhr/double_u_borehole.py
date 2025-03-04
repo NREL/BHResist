@@ -1,5 +1,5 @@
 from math import log as ln
-from math import pi
+from math import sqrt, pi
 from typing import Union
 
 from bhr.enums import DoubleUPipeInletArrangement
@@ -10,15 +10,15 @@ from bhr.utilities import coth
 class DoubleUTube(UTube):
     def __init__(
         self,
-        borehole_diameter: float,  # m
-        pipe_outer_diameter: float,  # m
-        pipe_dimension_ratio: float,  # unitless, ratio of pipe outer diameter / thickness
-        length: float,  # m
-        shank_space: float,  # distance between adjacent pipe centers, assumes symmetrical placement
-        pipe_conductivity: float,  # W/(m-K)
+        borehole_diameter: float,
+        pipe_outer_diameter: float,
+        pipe_dimension_ratio: float,
+        length: float,
+        shank_space: float,
+        pipe_conductivity: float,
         pipe_inlet_arrangement: str,
-        grout_conductivity: float,  # W/(m-K)
-        soil_conductivity: float,  # W/(m-K)
+        grout_conductivity: float,
+        soil_conductivity: float,
         fluid_type: str,
         fluid_concentration: float = 0,
     ):
@@ -31,6 +31,31 @@ class DoubleUTube(UTube):
             fluid_type,
             fluid_concentration,
         )
+
+        """
+        Implementation for computing borehole thermal resistance for grouted double u-tube borehole.
+
+        Relies primarily on the following references:
+
+        Javed, S. & Spitler, J.D. 2017. 'Accuracy of Borehole Thermal Resistance Calculation Methods
+        for Grouted Single U-tube Ground Heat Exchangers.' Applied Energy.187:790-806.
+
+        Claesson, Johan, and Saqib Javed. 2019. “Explicit Multipole Formulas and Thermal Network Models 
+        for Calculating Thermal Resistances of Double U-Pipe Borehole Heat Exchangers.” Science and Technology for
+        the Built Environment 25 (8): 980-92. doi:10.1080/23744731.2019.1620565.
+
+        :param borehole_diameter: borehole diameter, in m.
+        :param pipe_outer_diameter: outer diameter of the pipe, in m.
+        :param pipe_dimension_ratio: non-dimensional ratio of pipe diameter to pipe thickness.
+        :param length: length of borehole from top to bottom, in m.
+        :param shank_space: radial distance from the borehole center to the center of the pipe, in m.
+        :param pipe_conductivity: pipe thermal conductivity, in W/m-K.
+        :param pipe_inlet_arrangement: arrangement of the pipe inlets. "ADJACENT", or "DIAGONAL"
+        :param grout_conductivity: grout thermal conductivity, in W/m-K.
+        :param soil_conductivity: soil thermal conductivity, in W/m-K.
+        :param fluid_type: fluid type. "ETHYLALCOHOL", "ETHYLENEGLYCOL", "METHYLALCOHOL",  "PROPYLENEGLYCOL", or "WATER" 
+        :param fluid_concentration: fractional concentration of antifreeze mixture, from 0-0.6.
+        """
 
         # static parameters
         self.grout_conductivity = grout_conductivity
@@ -53,17 +78,28 @@ class DoubleUTube(UTube):
         self.soil_conductivity = soil_conductivity  # W/(m-K)
 
         # (m) radial distance between centers of symmetrically placed pipes and borehole center (rc)
-        self.pipe_centers_radius = shank_space * (2**0.5 / 2)
+        self.pipe_centers_radius = shank_space
 
+        # thermal conductivity ratio, dimensionless
         self.sigma = (self.grout_conductivity - self.soil_conductivity) / (
             self.grout_conductivity + self.soil_conductivity
-        )  # thermal conductivity ratio, dimensionless
+        )
 
         # Check if shank spacing realistic
-        assert self.pipe_radius * 2 <= shank_space <= 2 / 2**0.5 * (self.borehole_radius - self.pipe_radius), (
-            "Shank space is not within bounds. MAX is 2 / sqrt(2) * (borehole_radius - pipe_outer_radius). "
-            "MIN is pipe_outer_radius * 2"
-        )
+        lower_shank_space_limit = sqrt(pipe_outer_diameter**2 / 2)
+        upper_shank_space_limit = 0.5 * (borehole_diameter - pipe_outer_diameter)
+        if shank_space < lower_shank_space_limit:
+            msg = (
+                "Shank spacing is too small and must be greater than the 2 pipe radii to prevent "
+                + "pipes from overlapping."
+            )
+            raise AssertionError(msg)
+        elif shank_space > upper_shank_space_limit:
+            msg = (
+                "Shank spacing is too large and must be less than the borehole radius minus the pipe radius "
+                + "to prevent pipes from extending beyond the borehole wall."
+            )
+            raise AssertionError(msg)
 
         # static parameters - calc_bh_resist_local
         self.p_pc = self.pipe_radius**2 / (4 * self.pipe_centers_radius**2)

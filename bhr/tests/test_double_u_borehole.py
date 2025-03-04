@@ -11,7 +11,7 @@ class TestDoubleUBorehole(TestCase):
             "pipe_outer_diameter": 0.032,  # confirmed
             "pipe_dimension_ratio": 18.525,  # tuned to set Rp = 0.05
             "length": 200,  # confirmed
-            "shank_space": 0.032,  # confirmed, aligns with the 22.63 mm case
+            "shank_space": 0.02263,  # confirmed
             "pipe_conductivity": 0.389,  # reasonable value, but ultimately effects come out in Rp
             "pipe_inlet_arrangement": "DIAGONAL",  # correct
             "grout_conductivity": 1.5,  # confirmed
@@ -25,12 +25,16 @@ class TestDoubleUBorehole(TestCase):
 
     def test_shank_space_assert(self):
         # checks if code is raising error when shank space is too large
-        self.inputs.update({"shank_space": 0.115})
-        self.assertRaises(AssertionError)  # passes when AssertionError is raised
+        d = self.inputs.copy()
+        with self.assertRaises(AssertionError):
+            d.update({"shank_space": 0.115})
+            DoubleUTube(**d)
 
         # checks if code is raising error when shank space is too small
-        self.inputs.update({"shank_space": 0.031})
-        self.assertRaises(AssertionError)  # passes when AssertionError is raised
+        d = self.inputs.copy()
+        with self.assertRaises(AssertionError):
+            d.update({"shank_space": 0.002})
+            DoubleUTube(**d)
 
     def test_update_beta_b1(self):
         bh = DoubleUTube(**self.inputs)
@@ -42,14 +46,11 @@ class TestDoubleUBorehole(TestCase):
 
     def test_calc_bh_resist_local(self):
         bh = DoubleUTube(**self.inputs)
-
         tolerance = 1e-3
-
         self.assertAlmostEqual(bh.calc_bh_resist_local(flow_rate=0.5, temperature=20), 7.509e-02, delta=tolerance)
 
     def test_calc_internal_resist(self):
         bh = DoubleUTube(**self.inputs)
-
         tolerance = 1e-3
         self.assertAlmostEqual(bh.calc_internal_resist(flow_rate=0.5, temperature=20), 0.1604, delta=tolerance)
 
@@ -57,7 +58,6 @@ class TestDoubleUBorehole(TestCase):
         d = self.inputs.copy()
         d["pipe_dimension_ratio"] = 18.9
         bh = DoubleUTube(**d)
-
         tolerance = 1e-3
 
         # values match test case data in Table 1
@@ -69,9 +69,9 @@ class TestDoubleUBorehole(TestCase):
         )
 
     def test_calc_resistances_adjacent(self):
-        self.inputs.update({"pipe_inlet_arrangement": "ADJACENT"})
-        bh = DoubleUTube(**self.inputs)
-
+        d = self.inputs.copy()
+        d.update({"pipe_inlet_arrangement": "ADJACENT"})
+        bh = DoubleUTube(**d)
         tolerance = 1e-3
 
         # values match test case data in Table 1
@@ -83,6 +83,7 @@ class TestDoubleUBorehole(TestCase):
         )
 
     def test_invalid_pipe_arrangement(self):
-        self.inputs.update({"pipe_inlet_arrangement": "UNSUPPORTED"})
+        d = self.inputs.copy()
+        d.update({"pipe_inlet_arrangement": "UNSUPPORTED"})
         with self.assertRaises(AssertionError):
-            DoubleUTube(**self.inputs)
+            DoubleUTube(**d)
