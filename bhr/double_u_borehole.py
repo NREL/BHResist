@@ -33,7 +33,7 @@ class DoubleUTube(UTube):
         )
 
         """
-        Implementation for computing borehole thermal resistance for grouted double u-tube borehole.
+        Implementation for computing borehole thermal resistance for grouted boreholes with parallel double u-tubes.
 
         Relies primarily on the following references:
 
@@ -58,6 +58,7 @@ class DoubleUTube(UTube):
         """
 
         # static parameters
+        self.borehole_diameter = borehole_diameter
         self.grout_conductivity = grout_conductivity
         self.borehole_radius = borehole_diameter / 2  # radius of borehole (m)
         self.pipe_radius = pipe_outer_diameter / 2  # pipe outer radius (m)
@@ -126,7 +127,7 @@ class DoubleUTube(UTube):
         # non-static parameters
         self.pipe_resist: Union[float, None] = None
 
-    def update_b1(self, flow_rate: float, temperature: float) -> float:
+    def update_b1(self, m_dot_per_u_tube: float, temperature: float) -> float:
         """
         Updates b1 coefficient.
 
@@ -140,20 +141,21 @@ class DoubleUTube(UTube):
 
         Eq: 14
 
-        :param flow_rate: mass flow rate, kg/s
+        :param m_dot_per_u_tube: mass flow rate in each u-tube, kg/s
         :param temperature: temperature, Celsius
+
         :return b1: a ratio of (1-beta)/(1+beta), dependent on pipe resistance
                     & grout conductivity, dimensionless
         """
 
-        pipe_resist = self.calc_pipe_resist(flow_rate, temperature)
+        pipe_resist = self.calc_pipe_resist(m_dot_per_u_tube, temperature)
         self.pipe_resist = pipe_resist
         beta = 2 * pi * self.grout_conductivity * pipe_resist
         b1 = (1 - beta) / (1 + beta)  # dimensionless parameter
 
         return b1
 
-    def calc_bh_resist_local(self, flow_rate: float, temperature: float) -> float:
+    def calc_bh_resist_local(self, m_dot_per_u_tube: float, temperature: float) -> float:
         """
         Calculates tube-to-borehole resistance (aka local borehole resistance).
 
@@ -164,11 +166,13 @@ class DoubleUTube(UTube):
 
         Eq: 13 & 14
 
-        :return borehole_resist_local: local borehole resistance K/(W/m)
+        :param m_dot_per_u_tube: mass flow rate in each u-tube, kg/s
+        :param temperature: temperature, Celsius
 
+        :return borehole_resist_local: local borehole resistance K/(W/m)
         """
 
-        b1 = self.update_b1(flow_rate, temperature)
+        b1 = self.update_b1(m_dot_per_u_tube, temperature)
 
         if self.pipe_resist is None:
             raise ValueError("Pipe resistance has not been calculated yet.")
@@ -183,7 +187,7 @@ class DoubleUTube(UTube):
 
         return borehole_resist_local
 
-    def calc_internal_resist(self, flow_rate: float, temperature: float) -> float:
+    def calc_internal_resist(self, m_dot_per_u_tube: float, temperature: float) -> float:
         """
         Calculates tube-to-tube resistance (aka internal resistance).
 
@@ -194,10 +198,13 @@ class DoubleUTube(UTube):
 
         Eq: 18, 19, 22, 23
 
+        :param m_dot_per_u_tube: mass flow rate in each u-tube, kg/s
+        :param temperature: temperature, Celsius
+
         :return internal_resist: local internal resistance K/(W/m)
         """
 
-        b1 = self.update_b1(flow_rate, temperature)
+        b1 = self.update_b1(m_dot_per_u_tube, temperature)
 
         if self.pipe_resist is None:
             raise ValueError("Pipe resistance has not been calculated yet.")
@@ -234,7 +241,7 @@ class DoubleUTube(UTube):
 
         raise AssertionError("Developer error. Invalid pipe inlet arrangement.")
 
-    def calc_effective_bh_resistance_uhf(self, flow_rate: float, temperature: float) -> float:
+    def calc_effective_bh_resistance_uhf(self, mass_flow_rate: float, temperature: float) -> float:
         """
         Calculates effective borehole resistance for uniform heat flux along the borehole.
 
@@ -245,22 +252,22 @@ class DoubleUTube(UTube):
 
         Eq: 44
 
-        :param flow_rate: mass flow rate, kg/s
+        :param mass_flow_rate: mass flow rate, kg/s
         :param temperature: temperature, Celsius
-        :return effective_bhr_uhf: effective borehole resistance under uniform heat flux boundary conditions
-                                   [K/(W/m)]
+
+        :return effective_bhr_uhf: effective borehole resistance under uniform heat flux boundary conditions [K/(W/m)]
         """
 
-        internal_resist = self.calc_internal_resist(flow_rate, temperature)
-        borehole_resist_local = self.calc_bh_resist_local(flow_rate, temperature)
-
-        rv = self.bh_length / (self.fluid.cp(temperature) * flow_rate)  # (K/(w/m)) thermal resistance factor
+        m_dot_per_u_tube = mass_flow_rate / 2
+        internal_resist = self.calc_internal_resist(m_dot_per_u_tube, temperature)
+        borehole_resist_local = self.calc_bh_resist_local(m_dot_per_u_tube, temperature)
+        rv = self.bh_length / (self.fluid.cp(temperature) * m_dot_per_u_tube)  # (K/(w/m)) thermal resistance factor
 
         effective_bhr_uhf = borehole_resist_local + rv**2 / (6 * internal_resist)
 
         return effective_bhr_uhf
 
-    def calc_effective_bh_resistance_ubwt(self, flow_rate: float, temperature: float) -> float:
+    def calc_effective_bh_resistance_ubwt(self, mass_flow_rate: float, temperature: float) -> float:
         """
         Calculates effective borehole resistance for uniform borehole wall temperature.
 
@@ -271,17 +278,19 @@ class DoubleUTube(UTube):
 
         Eq: 46
 
-        :param flow_rate: mass flow rate, kg/s
+        :param mass_flow_rate: mass flow rate, kg/s
         :param temperature: temperature, Celsius
+
         :return effective_bhr_ubwt: effective borehole resistance for uniform borehole wall temperature
                                     boundary condition [K/(W/m)]
         """
 
-        internal_resist = self.calc_internal_resist(flow_rate, temperature)
-        borehole_resist_local = self.calc_bh_resist_local(flow_rate, temperature)
+        m_dot_per_u_tube = mass_flow_rate / 2
+        internal_resist = self.calc_internal_resist(m_dot_per_u_tube, temperature)
+        borehole_resist_local = self.calc_bh_resist_local(m_dot_per_u_tube, temperature)
 
-        rv = self.bh_length / (flow_rate * self.fluid.cp(temperature))  # (K/(w/m)) thermal resistance factor
-        n = rv / (2 * borehole_resist_local * internal_resist) ** (1 / 2)
+        rv = self.bh_length / (self.fluid.cp(temperature) * m_dot_per_u_tube)  # (K/(w/m)) thermal resistance factor
+        n = rv / (2 * borehole_resist_local * internal_resist) ** 0.5
         effective_bhr_ubwt = borehole_resist_local * n * coth(n)
 
         return effective_bhr_ubwt
