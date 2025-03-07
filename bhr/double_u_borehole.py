@@ -1,5 +1,5 @@
 from math import log as ln
-from math import sqrt, pi
+from math import pi, sqrt
 from typing import Union
 
 from bhr.enums import DoubleUPipeInletArrangement
@@ -40,7 +40,7 @@ class DoubleUTube(UTube):
         Javed, S. & Spitler, J.D. 2017. 'Accuracy of Borehole Thermal Resistance Calculation Methods
         for Grouted Single U-tube Ground Heat Exchangers.' Applied Energy.187:790-806.
 
-        Claesson, Johan, and Saqib Javed. 2019. “Explicit Multipole Formulas and Thermal Network Models 
+        Claesson, Johan, and Saqib Javed. 2019. “Explicit Multipole Formulas and Thermal Network Models
         for Calculating Thermal Resistances of Double U-Pipe Borehole Heat Exchangers.” Science and Technology for
         the Built Environment 25 (8): 980-92. doi:10.1080/23744731.2019.1620565.
 
@@ -53,7 +53,7 @@ class DoubleUTube(UTube):
         :param pipe_inlet_arrangement: arrangement of the pipe inlets. "ADJACENT", or "DIAGONAL"
         :param grout_conductivity: grout thermal conductivity, in W/m-K.
         :param soil_conductivity: soil thermal conductivity, in W/m-K.
-        :param fluid_type: fluid type. "ETHYLALCOHOL", "ETHYLENEGLYCOL", "METHYLALCOHOL",  "PROPYLENEGLYCOL", or "WATER" 
+        :param fluid_type: fluid type. "ETHYLALCOHOL", "ETHYLENEGLYCOL", "METHYLALCOHOL",  "PROPYLENEGLYCOL", or "WATER"
         :param fluid_concentration: fractional concentration of antifreeze mixture, from 0-0.6.
         """
 
@@ -92,13 +92,13 @@ class DoubleUTube(UTube):
         if shank_space < lower_shank_space_limit:
             msg = (
                 "Shank spacing is too small and must be greater than the 2 pipe radii to prevent "
-                + "pipes from overlapping."
+                "pipes from overlapping."
             )
             raise AssertionError(msg)
         elif shank_space > upper_shank_space_limit:
             msg = (
                 "Shank spacing is too large and must be less than the borehole radius minus the pipe radius "
-                + "to prevent pipes from extending beyond the borehole wall."
+                "to prevent pipes from extending beyond the borehole wall."
             )
             raise AssertionError(msg)
 
