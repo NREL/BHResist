@@ -92,13 +92,13 @@ class DoubleUTube(UTube):
         if shank_space < lower_shank_space_limit:
             msg = (
                 "Shank spacing is too small and must be greater than the 2 pipe radii to prevent "
-                + "pipes from overlapping."
+                "pipes from overlapping."
             )
             raise AssertionError(msg)
         elif shank_space > upper_shank_space_limit:
             msg = (
                 "Shank spacing is too large and must be less than the borehole radius minus the pipe radius "
-                + "to prevent pipes from extending beyond the borehole wall."
+                "to prevent pipes from extending beyond the borehole wall."
             )
             raise AssertionError(msg)
 
