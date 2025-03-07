@@ -21,6 +21,23 @@ class Coaxial:
         fluid_type: str,
         fluid_concentration: float,
     ):
+        """
+        Implementation for computing borehole thermal resistance for a grouted coaxial borehole.
+
+        :param borehole_diameter: borehole diameter, in m.
+        :param outer_pipe_outer_diameter: outer diameter of outer pipe, in m.
+        :param outer_pipe_dimension_ratio: non-dimensional ratio of outer pipe diameter to thickness.
+        :param outer_pipe_conductivity: outer pipe thermal conductivity, in W/m-K.
+        :param inner_pipe_outer_diameter: inner diameter of outer pipe, in m.
+        :param inner_pipe_dimension_ratio: non-dimensional ratio of inner pipe diameter to thickness.
+        :param inner_pipe_conductivity: inner pipe thermal conductivity, in W/m-K.
+        :param length: length of borehole from top to bottom, in m.
+        :param grout_conductivity: grout thermal conductivity, in W/m-K.
+        :param soil_conductivity: pipe thermal conductivity, in W/m-K.
+        :param fluid_type: fluid type. "ETHYLALCOHOL", "ETHYLENEGLYCOL", "METHYLALCOHOL",  "PROPYLENEGLYCOL", or "WATER"
+        :param fluid_concentration: fractional concentration of antifreeze mixture, from 0-0.6.
+        """
+
         self.borehole_diameter = borehole_diameter
         self.grout_conductivity = grout_conductivity
         self.soil_conductivity = soil_conductivity
@@ -118,7 +135,7 @@ class Coaxial:
         re = self.re_annulus(flow_rate, temp)
 
         if re < low_reynolds:
-            # use this Nusslet number when the flow is laminar
+            # use this Nusselt number when the flow is laminar
             nu_ii, nu_oo = self.laminar_nusselt_annulus()
 
         elif low_reynolds <= re < high_reynolds:
@@ -129,7 +146,7 @@ class Coaxial:
             nu_oo = smoothing_function(re, low_reynolds, high_reynolds, nu_oo_low, nu_oo_high)
 
         else:
-            # use this Nusslet number when the flow is fully turbulent
+            # use this Nusselt number when the flow is fully turbulent
             nu_ii, nu_oo = self.turbulent_nusselt_annulus(re, temp)
 
         r_conv_outside_inner_pipe = self.annular_hydraulic_diameter / (

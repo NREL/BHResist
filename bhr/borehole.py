@@ -25,6 +25,22 @@ class Borehole:
         fluid_concentration: float = 0,
         boundary_condition: str = "UNIFORM_HEAT_FLUX",
     ):
+        """
+        Constructs a grouted single u-tube borehole.
+
+        :param borehole_diameter: borehole diameter, in m.
+        :param pipe_outer_diameter: outer diameter of the pipe, in m.
+        :param pipe_dimension_ratio: non-dimensional ratio of pipe diameter to pipe thickness.
+        :param length: length of borehole from top to bottom, in m.
+        :param shank_space: radial distance from the borehole center to the center of the pipe, in m.
+        :param pipe_conductivity: pipe thermal conductivity, in W/m-K.
+        :param grout_conductivity: grout thermal conductivity, in W/m-K.
+        :param soil_conductivity: soil thermal conductivity, in W/m-K.
+        :param fluid_type: fluid type. "ETHYLALCOHOL", "ETHYLENEGLYCOL", "METHYLALCOHOL",  "PROPYLENEGLYCOL", or "WATER"
+        :param fluid_concentration: fractional concentration of antifreeze mixture, from 0-0.6.
+        :param boundary_condition: borehole wall boundary condition. "UNIFORM_HEAT_FLUX" or "UNIFORM_BOREHOLE_WALL_TEMP"
+        """
+
         self._bh_type = BoreholeType.SINGLE_U_TUBE
         self._boundary_condition = set_boundary_condition_enum(boundary_condition)
         self._bh = SingleUBorehole(
@@ -55,6 +71,23 @@ class Borehole:
         fluid_concentration: float = 0,
         boundary_condition: str = "UNIFORM_HEAT_FLUX",
     ):
+        """
+        Constructs a grouted double u-tube borehole with u-tubes in parallel.
+
+        :param borehole_diameter: borehole diameter, in m.
+        :param pipe_outer_diameter: outer diameter of the pipe, in m.
+        :param pipe_dimension_ratio: non-dimensional ratio of pipe diameter to pipe thickness.
+        :param length: length of borehole from top to bottom, in m.
+        :param shank_space: radial distance from the borehole center to the center of the pipe, in m.
+        :param pipe_conductivity: pipe thermal conductivity, in W/m-K.
+        :param pipe_inlet_arrangement: arrangement of the pipe inlets. "ADJACENT", or "DIAGONAL"
+        :param grout_conductivity: grout thermal conductivity, in W/m-K.
+        :param soil_conductivity: soil thermal conductivity, in W/m-K.
+        :param fluid_type: fluid type. "ETHYLALCOHOL", "ETHYLENEGLYCOL", "METHYLALCOHOL",  "PROPYLENEGLYCOL", or "WATER"
+        :param fluid_concentration: fractional concentration of antifreeze mixture, from 0-0.6.
+        :param boundary_condition: borehole wall boundary condition. "UNIFORM_HEAT_FLUX" or "UNIFORM_BOREHOLE_WALL_TEMP"
+        """
+
         self._bh_type = BoreholeType.DOUBLE_U_TUBE
         self._boundary_condition = set_boundary_condition_enum(boundary_condition)
         self._bh = DoubleUTube(
@@ -87,6 +120,24 @@ class Borehole:
         fluid_concentration: float,
         boundary_condition: str = "UNIFORM_HEAT_FLUX",
     ):
+        """
+        Constructs a grouted coaxial borehole.
+
+        :param borehole_diameter: borehole diameter, in m.
+        :param outer_pipe_outer_diameter: outer diameter of outer pipe, in m.
+        :param outer_pipe_dimension_ratio: non-dimensional ratio of outer pipe diameter to thickness.
+        :param outer_pipe_conductivity: outer pipe thermal conductivity, in W/m-K.
+        :param inner_pipe_outer_diameter: inner diameter of outer pipe, in m.
+        :param inner_pipe_dimension_ratio: non-dimensional ratio of inner pipe diameter to thickness.
+        :param inner_pipe_conductivity: inner pipe thermal conductivity, in W/m-K.
+        :param length: length of borehole from top to bottom, in m.
+        :param grout_conductivity: grout thermal conductivity, in W/m-K.
+        :param soil_conductivity: pipe thermal conductivity, in W/m-K.
+        :param fluid_type: fluid type. "ETHYLALCOHOL", "ETHYLENEGLYCOL", "METHYLALCOHOL",  "PROPYLENEGLYCOL", or "WATER"
+        :param fluid_concentration: fractional concentration of antifreeze mixture, from 0-0.6.
+        :param boundary_condition: borehole wall boundary condition. "UNIFORM_HEAT_FLUX" or "UNIFORM_BOREHOLE_WALL_TEMP"
+        """
+
         self._bh_type = BoreholeType.COAXIAL
         self._boundary_condition = set_boundary_condition_enum(boundary_condition)
         self._bh = Coaxial(
@@ -105,6 +156,12 @@ class Borehole:
         )
 
     def init_from_dict(self, inputs: dict):
+        """
+        Constructs a borehole from a set of dictionary inputs.
+
+        :param inputs: dict of input data.
+        """
+
         bh_type_str = inputs["borehole_type"].upper()
         if bh_type_str == BoreholeType.SINGLE_U_TUBE.name:
             self._bh_type = BoreholeType.SINGLE_U_TUBE
@@ -196,12 +253,20 @@ class Borehole:
         else:
             raise NotImplementedError(f'bh_type "{self._bh_type.name}" not implemented')
 
-    def calc_bh_resist(self, flow_rate, temperature):
+    def calc_bh_resist(self, mass_flow_rate, temperature):
+        """
+        Computes the effective thermal resistance borehole.
+
+        :param mass_flow_rate: total borehole mass flow rate, in kg/s
+        :param temperature: average fluid temperature, in Celsius
+        :return: effective borehole resistance, in K/W-m
+        """
+
         if self._bh is None:
             raise TypeError("Borehole not initialized")
 
         if self._boundary_condition == BoundaryCondition.UNIFORM_HEAT_FLUX:
-            return self._bh.calc_effective_bh_resistance_uhf(flow_rate, temperature)
+            return self._bh.calc_effective_bh_resistance_uhf(mass_flow_rate, temperature)
 
         if self._boundary_condition == BoundaryCondition.UNIFORM_BOREHOLE_WALL_TEMP:
-            return self._bh.calc_effective_bh_resistance_ubwt(flow_rate, temperature)
+            return self._bh.calc_effective_bh_resistance_ubwt(mass_flow_rate, temperature)
