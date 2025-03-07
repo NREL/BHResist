@@ -30,15 +30,15 @@ class SingleUBorehole(UTube):
 
         """
         Implementation for computing borehole thermal resistance for grouted single u-tube borehole.
-        
+
         Relies primarily on the following references:
-        
+
         Javed, S. & Spitler, J.D. 2017. 'Accuracy of Borehole Thermal Resistance Calculation Methods
         for Grouted Single U-tube Ground Heat Exchangers.' Applied Energy.187:790-806.
-        
+
         Javed, S. & Spitler, J.D. Calculation of Borehole Thermal Resistance. In 'Advances in
         Ground-Source Heat Pump Systems,' pp. 84. Rees, S.J. ed. Cambridge, MA. Elsevier Ltd. 2016.
-        
+
         :param borehole_diameter: borehole diameter, in m.
         :param pipe_outer_diameter: outer diameter of the pipe, in m.
         :param pipe_dimension_ratio: non-dimensional ratio of pipe diameter to pipe thickness.
@@ -47,7 +47,7 @@ class SingleUBorehole(UTube):
         :param pipe_conductivity: pipe thermal conductivity, in W/m-K.
         :param grout_conductivity: grout thermal conductivity, in W/m-K.
         :param soil_conductivity: soil thermal conductivity, in W/m-K.
-        :param fluid_type: fluid type. "ETHYLALCOHOL", "ETHYLENEGLYCOL", "METHYLALCOHOL",  "PROPYLENEGLYCOL", or "WATER" 
+        :param fluid_type: fluid type. "ETHYLALCOHOL", "ETHYLENEGLYCOL", "METHYLALCOHOL",  "PROPYLENEGLYCOL", or "WATER"
         :param fluid_concentration: fractional concentration of antifreeze mixture, from 0-0.6.
         """
 
