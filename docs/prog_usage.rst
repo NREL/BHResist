@@ -26,6 +26,11 @@ Example usage for a single u-tube borehole::
     temp = 20 # celsius
     print(f"{single_bhr.calc_bh_resist(m_flow_borehole, temp):0.5f}")
 
+Note: Shank spacing `s` is reference from the borehole center to the tube center.
+
+.. image:: images/single-u.png
+   :width: 600
+
 Example usage for double u-tube borehole::
 
     from bhr.borehole import Borehole
@@ -50,6 +55,12 @@ Example usage for double u-tube borehole::
     temp = 20 # celsius
     print(f"{double_bhr.calc_bh_resist(m_flow_borehole, temp):0.5f}")
 
+.. image:: images/double-u_adjacent.png
+   :width: 600
+
+.. image:: images/double-u_diagonal.png
+   :width: 600
+
 Example usage for coaxial borehole::
 
     from bhr.borehole import Borehole
@@ -73,6 +84,9 @@ Example usage for coaxial borehole::
     m_flow_borehole = 0.5 # kg/s
     temp = 20 # celsius
     print(f"{coaxial_bhr.calc_bh_resist(m_flow_borehole, temp):0.5f}")
+
+.. image:: images/coaxial.png
+   :width: 600
 
 .. toctree::
    :maxdepth: 2
