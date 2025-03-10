@@ -1,6 +1,6 @@
 # BHResist
 
-A pure python library for computing thermal resistance within single-u, double-u, and coaxial grouted borehole heat exchangers. For single and double u-tube configurations, the methods use the 1st-order closed-form multiplole approximations, which typically produces results with less than 1% error when compared to the 10th-order multipole method. Coaxial borehole methods apply a simple 1D resistance network method.
+A pure python library for computing thermal resistance within single-u, double-u, and coaxial grouted borehole heat exchangers. For single and double u-tube configurations, the methods use the 1st-order closed-form multipole approximations, which typically produces results with less than 1% error when compared to the 10th-order multipole method. Coaxial borehole methods apply a simple 1D resistance network method.
 
 This is intended to be a lightweight library that can be easily imported into any other Python tool, with no bulky dependencies.
 

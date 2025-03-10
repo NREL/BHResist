@@ -255,7 +255,7 @@ class Borehole:
 
     def calc_bh_resist(self, mass_flow_rate, temperature):
         """
-        Computes the effective thermal resistance borehole.
+        Computes the effective borehole thermal resistance.
 
         :param mass_flow_rate: total borehole mass flow rate, in kg/s
         :param temperature: average fluid temperature, in Celsius
