@@ -48,7 +48,7 @@ class DoubleUTube(UTube):
         :param pipe_outer_diameter: outer diameter of the pipe, in m.
         :param pipe_dimension_ratio: non-dimensional ratio of pipe diameter to pipe thickness.
         :param length: length of borehole from top to bottom, in m.
-        :param shank_space: radial distance from the borehole center to the center of the pipe, in m.
+        :param shank_space: radial distance from the borehole center to the pipe center, in m.
         :param pipe_conductivity: pipe thermal conductivity, in W/m-K.
         :param pipe_inlet_arrangement: arrangement of the pipe inlets. "ADJACENT", or "DIAGONAL"
         :param grout_conductivity: grout thermal conductivity, in W/m-K.
