@@ -28,7 +28,7 @@ class Pipe:
         self.pipe_length = pipe_length
 
         # set physical properties
-        self.conductivity = pipe_conductivity
+        self.pipe_conductivity = pipe_conductivity
 
         # compute cross-sectional areas
         self.area_cr_inner = pi / 4 * self.pipe_inner_diameter**2
@@ -212,7 +212,7 @@ class Pipe:
         :return: conduction resistance, K/(W/m)
         """
 
-        return log(self.pipe_outer_diameter / self.pipe_inner_diameter) / (2 * pi * self.conductivity)
+        return log(self.pipe_outer_diameter / self.pipe_inner_diameter) / (2 * pi * self.pipe_conductivity)
 
     def calc_pipe_internal_conv_resist(self, m_dot: float, temp: float) -> float:
         """
