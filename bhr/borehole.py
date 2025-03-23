@@ -4,12 +4,18 @@ from bhr.enums import BoreholeType, BoundaryCondition
 from bhr.single_u_borehole import SingleUBorehole
 from bhr.utilities import set_boundary_condition_enum
 
+AnyBHType = Coaxial | DoubleUTube | SingleUBorehole | None
+
 
 class Borehole:
     def __init__(self):
         self._bh_type = None
         self._boundary_condition = None
-        self._bh = None
+        self._bh: AnyBHType = None
+        self.length = None
+
+    def _set_members(self):
+        self.length = self._bh.length
 
     def init_single_u_borehole(
         self,
@@ -24,7 +30,7 @@ class Borehole:
         fluid_type: str,
         fluid_concentration: float = 0,
         boundary_condition: str = "UNIFORM_HEAT_FLUX",
-    ):
+    ) -> None:
         """
         Constructs a grouted single u-tube borehole.
 
@@ -56,6 +62,8 @@ class Borehole:
             fluid_concentration,
         )
 
+        self._set_members()
+
     def init_double_u_borehole(
         self,
         borehole_diameter: float,
@@ -70,7 +78,7 @@ class Borehole:
         fluid_type: str,
         fluid_concentration: float = 0,
         boundary_condition: str = "UNIFORM_HEAT_FLUX",
-    ):
+    ) -> None:
         """
         Constructs a grouted double u-tube borehole with u-tubes in parallel.
 
@@ -104,6 +112,8 @@ class Borehole:
             fluid_concentration,
         )
 
+        self._set_members()
+
     def init_coaxial_borehole(
         self,
         borehole_diameter: float,
@@ -119,7 +129,7 @@ class Borehole:
         fluid_type: str,
         fluid_concentration: float,
         boundary_condition: str = "UNIFORM_HEAT_FLUX",
-    ):
+    ) -> None:
         """
         Constructs a grouted coaxial borehole.
 
@@ -155,6 +165,8 @@ class Borehole:
             fluid_concentration,
         )
 
+        self._set_members()
+
     def init_from_dict(self, inputs: dict):
         """
         Constructs a borehole from a set of dictionary inputs.
@@ -172,7 +184,7 @@ class Borehole:
         else:
             raise LookupError(f'borehole_type "{bh_type_str}" not supported')
 
-        bc_str = inputs["boundary_condition"].upper()
+        bc_str = inputs.get("boundary_condition", BoundaryCondition.UNIFORM_HEAT_FLUX.name).upper()
         if bc_str == BoundaryCondition.UNIFORM_HEAT_FLUX.name:
             self._boundary_condition = BoundaryCondition.UNIFORM_HEAT_FLUX
         elif bc_str == BoundaryCondition.UNIFORM_BOREHOLE_WALL_TEMP.name:
@@ -193,7 +205,7 @@ class Borehole:
             shank_space_single = inputs["single_u_tube"]["shank_space"]
             pipe_conductivity_single = inputs["single_u_tube"]["pipe_conductivity"]
 
-            self._bh = SingleUBorehole(
+            self.init_single_u_borehole(
                 bh_diameter,
                 pipe_outer_dia_single,
                 dimension_ratio_single,
@@ -213,7 +225,7 @@ class Borehole:
             pipe_conductivity_double = inputs["double_u_tube"]["pipe_conductivity"]
             pipe_inlet_arrangement = inputs["double_u_tube"]["pipe_inlet_arrangement"]
 
-            self._bh = DoubleUTube(
+            self.init_double_u_borehole(
                 bh_diameter,
                 pipe_outer_dia_double,
                 dimension_ratio_double,
@@ -235,7 +247,7 @@ class Borehole:
             inner_pipe_dimension_ratio = inputs["coaxial"]["inner_pipe_dimension_ratio"]
             inner_pipe_conductivity = inputs["coaxial"]["inner_pipe_conductivity"]
 
-            self._bh = Coaxial(
+            self.init_coaxial_borehole(
                 bh_diameter,
                 pipe_outer_dia_coax,
                 outer_pipe_dimension_ratio,
