@@ -14,9 +14,6 @@ class Borehole:
         self._bh: AnyBHType = None
         self.length = None
 
-    def _set_members(self):
-        self.length = self._bh.length
-
     def init_single_u_borehole(
         self,
         borehole_diameter: float,
@@ -61,8 +58,6 @@ class Borehole:
             fluid_type,
             fluid_concentration,
         )
-
-        self._set_members()
 
     def init_double_u_borehole(
         self,
@@ -111,8 +106,6 @@ class Borehole:
             fluid_type,
             fluid_concentration,
         )
-
-        self._set_members()
 
     def init_coaxial_borehole(
         self,
@@ -164,8 +157,6 @@ class Borehole:
             fluid_type,
             fluid_concentration,
         )
-
-        self._set_members()
 
     def init_from_dict(self, inputs: dict):
         """
