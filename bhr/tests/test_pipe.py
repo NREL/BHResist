@@ -19,7 +19,7 @@ class TestPipe(unittest.TestCase):
         tol = 0.0001
 
         # props
-        self.assertAlmostEqual(p.conductivity, 0.4, delta=tol)
+        self.assertAlmostEqual(p.pipe_conductivity, 0.4, delta=tol)
 
         # geometry
         self.assertAlmostEqual(p.pipe_outer_diameter, 0.0334, delta=tol)
