@@ -4,6 +4,9 @@ A pure python library for computing thermal resistance within single-u, double-u
 
 This is intended to be a lightweight library that can be easily imported into any other Python tool, with no bulky dependencies.
 
+
+## Citation
+
 Mitchell, Matt, Adams, Sonja, Lee, Edwin, and Swindler, Alexander. BHResist [SWR-25-57]. Computer Software. https://github.com/NREL/BHResist. USDOE Office of Energy Efficiency and Renewable Energy (EERE), Renewable Power Office. Geothermal Technologies Office. 04 Apr. 2025. Web. doi:10.11578/dc.20250421.3.
 
 ## References
