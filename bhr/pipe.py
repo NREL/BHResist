@@ -176,6 +176,18 @@ class Pipe:
 
         return term_1 * term_2
 
+    def pressure_loss_v_dot(self, v_dot: float, temp: float) -> float:
+        """
+        Pressure loss in a straight pipe
+
+        :param v_dot: volume flow rate, m3/s
+        :param temp: temperature, C
+        :return: pressure loss, Pa
+        """
+
+        m_dot = self.fluid.density(temp) * v_dot
+        return self.pressure_loss(m_dot, temp)
+
     @staticmethod
     def laminar_nusselt():
         """
