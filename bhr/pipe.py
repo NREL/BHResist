@@ -94,6 +94,18 @@ class Pipe:
 
         return 4 * m_dot / (self.fluid.mu(temp) * pi * self.pipe_inner_diameter)
 
+    def vdot_to_re(self, v_dot: float, temp: float) -> float:
+        """
+        Computes Reynolds number based on volume flow rate.
+
+        :param v_dot: volume flow rate, in m^3/s
+        :param temp: temperature, in C
+        :return: Reynolds number, dimensionless
+        """
+
+        m_dot = self.fluid.density(temp) * v_dot
+        return self.mdot_to_re(m_dot, temp)
+
     def mdot_to_velocity(self, m_dot: float, temp: float) -> float:
         """
         Computes velocity based on mass flow rate.
