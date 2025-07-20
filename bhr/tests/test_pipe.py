@@ -92,20 +92,20 @@ class TestPipe(unittest.TestCase):
     def test_calc_conduction_resistance(self):
         p = Pipe(**self.inputs)
         tolerance = 0.00001
-        self.assertAlmostEqual(p.calc_pipe_cond_resist(), 0.0798443, delta=tolerance)
+        self.assertAlmostEqual(p.calc_cond_resist(), 0.0798443, delta=tolerance)
 
     def test_calc_convection_resistance(self):
         p = Pipe(**self.inputs)
         temp = 20
         tol = 0.00001
-        self.assertAlmostEqual(p.calc_pipe_internal_conv_resist(0, temp), 0.13266, delta=tol)
-        self.assertAlmostEqual(p.calc_pipe_internal_conv_resist(0.07, temp), 0.020784, delta=tol)
-        self.assertAlmostEqual(p.calc_pipe_internal_conv_resist(2, temp), 0.00094, delta=tol)
+        self.assertAlmostEqual(p.calc_conv_resist(0, temp), 0.13266, delta=tol)
+        self.assertAlmostEqual(p.calc_conv_resist(0.07, temp), 0.020784, delta=tol)
+        self.assertAlmostEqual(p.calc_conv_resist(2, temp), 0.00094, delta=tol)
 
     def test_calc_resist(self):
         pipe = Pipe(**self.inputs)
         tol = 0.00001
-        self.assertAlmostEqual(pipe.calc_pipe_resist(0.5, 20), 0.082985, delta=tol)
+        self.assertAlmostEqual(pipe.calc_fluid_pipe_resist(0.5, 20), 0.082985, delta=tol)
 
     def test_pressure_loss(self):
         pipe = Pipe(**self.inputs)

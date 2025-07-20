@@ -32,7 +32,7 @@ def smoothing_function(x, x_low_limit, x_high_limit, y_low_limit, y_high_limit) 
     :param x_high_limit: upper limit on x range
     :param y_low_limit: lower limit on y range
     :param y_high_limit: upper limit on y range
-    :return smoothed value between x_low_limit and x_high_limit. returns y_low_limit and y_high_limit
+    :return: smoothed value between x_low_limit and x_high_limit. returns y_low_limit and y_high_limit
     below and above the x_low_limit and x_high_limit, respectively.
     """
 
