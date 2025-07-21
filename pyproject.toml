@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "BHResist"
-version = "0.1"
+version = "0.2.0"
 description = "Functionality to compute the thermal resistance of borehole heat exchangers"
 authors = ["Matt Mitchell <mitchute@gmail.com>"]
 readme = "README.md"
