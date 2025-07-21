@@ -63,16 +63,16 @@ class Coaxial:
 
         self.annular_hydraulic_diameter = self.outer_pipe.pipe_inner_diameter - self.inner_pipe.pipe_outer_diameter
 
-    def re_annulus(self, flow_rate, temp):
+    def re_annulus(self, m_dot, temp):
         """
         Reynolds number for annulus flow
 
-        :param flow_rate: mass flow rate, kg/s
+        :param m_dot: mass flow rate, kg/s
         :param temp: temperature, C
         :return: Reynolds number
         """
 
-        return 4 * flow_rate / (self.fluid.mu(temp) * pi * self.annular_hydraulic_diameter)
+        return 4 * m_dot / (self.fluid.mu(temp) * pi * self.annular_hydraulic_diameter)
 
     def laminar_nusselt_annulus(self):
         """
@@ -81,8 +81,8 @@ class Coaxial:
         Hellström, G. 1991. Ground Heat Storage: Thermal Analyses of Duct Storage Systems.
         Department of Mathematical Physics, University of Lund, Sweden. pp 67-71
 
-        :return nu_ii: Laminar Nusselt number for inner surface of annulus pipe
-        :return nu_oo: Laminar Nusselt number for outer annulus pipe surface
+        :return: nu_ii: Laminar Nusselt number for inner surface of annulus pipe
+        :return: nu_oo: Laminar Nusselt number for outer annulus pipe surface
         """
         nu_ii = 3.66 + 1.2 * (self.inner_pipe.pipe_outer_diameter / self.outer_pipe.pipe_inner_diameter) ** -0.8
         nu_oo = 3.66 + 1.2 * (self.inner_pipe.pipe_outer_diameter / self.outer_pipe.pipe_inner_diameter) ** 0.5
@@ -100,8 +100,8 @@ class Coaxial:
 
         :param re: Reynolds number
         :param temp: temperature, C
-        :return nu_ii: Turbulent Nusselt number for inner surface of annulus pipe
-        :return nu_oo: Turbulent Nusselt number for outer annulus pipe surface
+        :return: nu_ii: Turbulent Nusselt number for inner surface of annulus pipe
+        :return: nu_oo: Turbulent Nusselt number for outer annulus pipe surface
         """
 
         pr = self.fluid.prandtl(temp)
@@ -111,17 +111,17 @@ class Coaxial:
 
         return nu_ii, nu_oo
 
-    def convective_resist_annulus(self, flow_rate, temp):
+    def calc_conv_resist_annulus(self, m_dot, temp):
         """
         Grundmann, Rachel Marie. "Improved design methods for ground heat exchangers."
         Master's thesis, Oklahoma State University, 2016.
 
         Eqns 4.4 - 4.11
 
-        :param flow_rate: mass flow rate, kg/s
+        :param m_dot: mass flow rate, kg/s
         :param temp: temperature, C
-        :return r_conv_outside_inner_pipe: convective resistances along the outer wall of the inner pipe, K/(W/m)
-        :return r_conv_inside_outer_pipe: convective resistance along the inside wall of the outer pipe K/(W/m)
+        :return: r_conv_outside_inner_pipe: convective resistances along the outer wall of the inner pipe, K/(W/m)
+        :return: r_conv_inside_outer_pipe: convective resistance along the inside wall of the outer pipe, K/(W/m)
         """
 
         # limit determined from Hellström, G. 1991. Ground Heat Storage: Thermal Analyses of
@@ -132,7 +132,7 @@ class Coaxial:
         # limit based on Dittus-Boelter equation
         high_reynolds = 10000
 
-        re = self.re_annulus(flow_rate, temp)
+        re = self.re_annulus(m_dot, temp)
 
         if re < low_reynolds:
             # use this Nusselt number when the flow is laminar
@@ -159,26 +159,25 @@ class Coaxial:
 
         return r_conv_outside_inner_pipe, r_conv_inside_outer_pipe
 
-    def calc_local_bh_resistance(self, flow_rate, temp):
+    def calc_local_bh_resistance(self, m_dot, temp):
         """
         Grundmann, Rachel Marie. "Improved design methods for ground heat exchangers."
         Master's thesis, Oklahoma State University, 2016.
 
         Eqns 4.4 and 4.5
 
-        :param flow_rate: mass flow rate, kg/s
+        :param m_dot: mass flow rate, kg/s
         :param temp: temperature, C
-        :return local_bh_resist: total local borehole resistance K /(W/m)
-        :return r_internal_resist: local internal borehole resistance K /(W/m)
-        :return r_borehole_resist: local borehole resistance K /(W/m)
+        :return: local_bh_resist: total local borehole resistance K /(W/m)
+        :return: r_internal_resist: local internal borehole resistance K /(W/m)
+        :return: r_borehole_resist: local borehole resistance K /(W/m)
 
         """
         # resistances progressing from inside to outside
-        r_conv_inner_pipe = self.inner_pipe.calc_pipe_internal_conv_resist(flow_rate, temp)
-        r_cond_inner_pipe = self.inner_pipe.calc_pipe_cond_resist()
-        r_conv_outside_inner_pipe = self.convective_resist_annulus(flow_rate, temp)[0]
-        r_conv_inside_outer_pipe = self.convective_resist_annulus(flow_rate, temp)[1]
-        r_cond_outer_pipe = self.outer_pipe.calc_pipe_cond_resist()
+        r_conv_inner_pipe = self.inner_pipe.calc_conv_resist(m_dot, temp)
+        r_cond_inner_pipe, r_cond_outer_pipe = self.calc_cond_resist()
+        r_conv_outside_inner_pipe = self.calc_conv_resist_annulus(m_dot, temp)[0]
+        r_conv_inside_outer_pipe = self.calc_conv_resist_annulus(m_dot, temp)[1]
         r_cond_grout = log(self.borehole_diameter / self.outer_pipe.pipe_outer_diameter) / (
             2 * pi * self.grout_conductivity
         )
@@ -189,41 +188,71 @@ class Coaxial:
 
         return [local_bh_resist, r_internal_resist, r_borehole_resist]
 
-    def calc_effective_bh_resistance_uhf(self, flow_rate, temp):
+    def calc_effective_bh_resistance_uhf(self, m_dot, temp):
         """
         Grundmann, Rachel Marie. "Improved design methods for ground heat exchangers."
         Master's thesis, Oklahoma State University, 2016.
 
         Eqn 4.33
 
-        :param flow_rate: mass flow rate, kg/s
+        :param m_dot: mass flow rate, kg/s
         :param temp: temperature, C
-        :return effective_bhr_uhf: effective borehole resistance for
-                 uniform heat flux boundary condition  [K/(W/m)]
+        :return: effective_bhr_uhf: effective borehole resistance for
+                 uniform heat flux boundary condition, K/(W/m)
         """
 
-        _, r_a, r_b = self.calc_local_bh_resistance(flow_rate, temp)
-        rv = self.length / (flow_rate * self.fluid.cp(temp))  # (K/(w/m)) thermal resistance factor
+        _, r_a, r_b = self.calc_local_bh_resistance(m_dot, temp)
+        rv = self.length / (m_dot * self.fluid.cp(temp))  # (K/(w/m)) thermal resistance factor
         effective_bhr_uhf = r_b + 1 / (3 * r_a) * rv**2
 
         return effective_bhr_uhf
 
-    def calc_effective_bh_resistance_ubwt(self, flow_rate, temp):
+    def calc_effective_bh_resistance_ubwt(self, m_dot, temp):
         """
         Grundmann, Rachel Marie. "Improved design methods for ground heat exchangers."
         Master's thesis, Oklahoma State University, 2016.
 
         Eqns 4.28 & 4.29
 
-        :param flow_rate: mass flow rate, kg/s
+        :param m_dot: mass flow rate, kg/s
         :param temp: temperature, C
-        :return effective_bhr_ubwt: effective borehole resistance for
-                 uniform borehole wall temperature boundary condition  [K/(W/m)]
+        :return: effective_bhr_ubwt: effective borehole resistance for
+                 uniform borehole wall temperature boundary condition, K/(W/m)
         """
 
-        _, r_a, r_b = self.calc_local_bh_resistance(flow_rate, temp)
-        rv = self.length / (flow_rate * self.fluid.cp(temp))  # (K/(w/m)) thermal resistance factor
+        _, r_a, r_b = self.calc_local_bh_resistance(m_dot, temp)
+        rv = self.length / (m_dot * self.fluid.cp(temp))  # (K/(w/m)) thermal resistance factor
         n = rv / (2 * r_b) * (1 + 4 * r_b / r_a) ** (1 / 2)
         effective_bhr_ubwt = r_b * n * coth(n)
 
         return effective_bhr_ubwt
+
+    def calc_cond_resist(self) -> tuple[float, float]:
+        """
+        Computes the pipe conduction resistance for the inner and outer pipes.
+        :return: pipe conduction resistance, K/(W/m)
+        """
+        return self.inner_pipe.calc_cond_resist(), self.outer_pipe.calc_cond_resist()
+
+    def calc_conv_resist(self, m_dot, temp) -> tuple[float, float]:
+        """
+        Computes the convection resistance for the inner pipe and annular space between inner and outer pipes.
+        :param m_dot: mass flow rate, kg/s
+        :param temp: temperature, C
+        :return: convection resistance, K/(W/m)
+        """
+        return self.inner_pipe.calc_conv_resist(m_dot, temp), sum(self.calc_conv_resist_annulus(m_dot, temp))
+
+    def calc_fluid_pipe_resist(self, m_dot, temp):
+        """
+        Calculates the combined convection resistance of the annular space
+        and the conduction resistance of the outer pipe.
+        :param m_dot: mass flow rate, kg/s
+        :param temp: temperature, C
+        :return: annular convection resistance and outer pipe conduction resistance, K/(W/m)
+        """
+
+        _, r_cond_outer_pipe = self.calc_cond_resist()
+        r_conv_outside_inner_pipe = self.calc_conv_resist_annulus(m_dot, temp)[0]
+        r_conv_inside_outer_pipe = self.calc_conv_resist_annulus(m_dot, temp)[1]
+        return r_cond_outer_pipe + r_conv_outside_inner_pipe + r_conv_inside_outer_pipe

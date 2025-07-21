@@ -72,10 +72,10 @@ class TestDoubleUBorehole(TestCase):
 
         # values match test case data in Table 1
         self.assertAlmostEqual(
-            bh.calc_effective_bh_resistance_uhf(mass_flow_rate=self.m_dot_bh, temperature=20), 0.1302, delta=tolerance
+            bh.calc_effective_bh_resistance_uhf(m_dot=self.m_dot_bh, temp=20), 0.1302, delta=tolerance
         )
         self.assertAlmostEqual(
-            bh.calc_effective_bh_resistance_ubwt(mass_flow_rate=self.m_dot_bh, temperature=20), 0.1235, delta=tolerance
+            bh.calc_effective_bh_resistance_ubwt(m_dot=self.m_dot_bh, temp=20), 0.1235, delta=tolerance
         )
 
     def test_calc_resistances_adjacent(self):
@@ -86,10 +86,10 @@ class TestDoubleUBorehole(TestCase):
 
         # values match test case data in Table 1
         self.assertAlmostEqual(
-            bh.calc_effective_bh_resistance_uhf(mass_flow_rate=self.m_dot_bh, temperature=20), 0.1089, delta=tolerance
+            bh.calc_effective_bh_resistance_uhf(m_dot=self.m_dot_bh, temp=20), 0.1089, delta=tolerance
         )
         self.assertAlmostEqual(
-            bh.calc_effective_bh_resistance_ubwt(mass_flow_rate=self.m_dot_bh, temperature=20), 0.1062, delta=tolerance
+            bh.calc_effective_bh_resistance_ubwt(m_dot=self.m_dot_bh, temp=20), 0.1062, delta=tolerance
         )
 
     def test_invalid_pipe_arrangement(self):

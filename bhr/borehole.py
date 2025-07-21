@@ -1,3 +1,5 @@
+from typing import cast
+
 from bhr.coaxial_borehole import Coaxial
 from bhr.double_u_borehole import DoubleUTube
 from bhr.enums import BoreholeType, BoundaryCondition
@@ -207,6 +209,7 @@ class Borehole:
                 soil_conductivity,
                 fluid_type,
                 fluid_concentration,
+                bc_str,
             )
 
         elif self._bh_type == BoreholeType.DOUBLE_U_TUBE:
@@ -228,6 +231,7 @@ class Borehole:
                 soil_conductivity,
                 fluid_type,
                 fluid_concentration,
+                bc_str,
             )
 
         elif self._bh_type == BoreholeType.COAXIAL:
@@ -251,12 +255,13 @@ class Borehole:
                 soil_conductivity,
                 fluid_type,
                 fluid_concentration,
+                bc_str,
             )
 
         else:
             raise NotImplementedError(f'bh_type "{self._bh_type.name}" not implemented')
 
-    def calc_bh_resist(self, mass_flow_rate, temperature):
+    def calc_bh_resist(self, mass_flow_rate: float, temperature: float) -> float:
         """
         Computes the effective borehole thermal resistance.
 
@@ -273,3 +278,62 @@ class Borehole:
 
         if self._boundary_condition == BoundaryCondition.UNIFORM_BOREHOLE_WALL_TEMP:
             return self._bh.calc_effective_bh_resistance_ubwt(mass_flow_rate, temperature)
+
+        raise NotImplementedError(f'Boundary Condition: "{self._boundary_condition}" implemented.')
+
+    def calc_pipe_cond_resist(self) -> float:
+        """
+        Computes the pipe conduction resistance.
+
+        In the case of coaxial boreholes, the function only returns the conduction resistances for the outer pipe.
+
+        :return: pipe conduction resistance, K/(W/m)
+        """
+
+        match self._bh_type:
+            case BoreholeType.SINGLE_U_TUBE:
+                return cast(SingleUBorehole, self._bh).calc_cond_resist()
+            case BoreholeType.DOUBLE_U_TUBE:
+                return cast(DoubleUTube, self._bh).calc_cond_resist()
+            case BoreholeType.COAXIAL:
+                return cast(Coaxial, self._bh).calc_cond_resist()[1]
+            case _:
+                raise NotImplementedError(f"{self._bh_type} not implemented.")
+
+    def calc_fluid_resist(self, mass_flow_rate: float, temperature: float) -> float:
+        """
+        Computes the fluid convection resistance.
+
+        In the case of coaxial boreholes, the function returns the sum of the convection resistances
+        for the inner pipe and annular region.
+
+        :return: fluid convection, K/(W/m)
+        """
+
+        match self._bh_type:
+            case BoreholeType.SINGLE_U_TUBE:
+                return cast(SingleUBorehole, self._bh).calc_conv_resist(mass_flow_rate, temperature)
+            case BoreholeType.DOUBLE_U_TUBE:
+                return cast(DoubleUTube, self._bh).calc_conv_resist(mass_flow_rate, temperature)
+            case BoreholeType.COAXIAL:
+                return sum(cast(Coaxial, self._bh).calc_conv_resist_annulus(mass_flow_rate, temperature))
+            case _:
+                raise NotImplementedError(f"{self._bh_type} not implemented.")
+
+    def calc_fluid_pipe_resist(self, mass_flow_rate: float, temperature: float) -> float:
+        """
+        Computes the fluid convection + pipe conduction resistance.
+
+        In the case of coaxial boreholes, this returns the convection resistance of the annulus + the conduction
+        resistance of the outer pipe.
+
+        :return: fluid convection + pipe conduction resistance, K/(W/m)
+        """
+
+        if self._bh is None:
+            raise TypeError("Borehole not initialized")
+
+        if self._bh_type is None:
+            raise NotImplementedError(f"{self._bh_type} not implemented.")
+
+        return self._bh.calc_fluid_pipe_resist(mass_flow_rate, temperature)

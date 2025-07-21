@@ -214,7 +214,7 @@ class Pipe:
         pr = self.fluid.prandtl(temp)
         return (f / 8) * (re - 1000) * pr / (1 + 12.7 * (f / 8) ** 0.5 * (pr ** (2 / 3) - 1))
 
-    def calc_pipe_cond_resist(self) -> float:
+    def calc_cond_resist(self) -> float:
         """
         Calculates the pipe radial conduction thermal resistance, in [K/(W/m)].
 
@@ -226,7 +226,7 @@ class Pipe:
 
         return log(self.pipe_outer_diameter / self.pipe_inner_diameter) / (2 * pi * self.pipe_conductivity)
 
-    def calc_pipe_internal_conv_resist(self, m_dot: float, temp: float) -> float:
+    def calc_conv_resist(self, m_dot: float, temp: float) -> float:
         """
         Calculates the pipe internal convection thermal resistance, in [k/(W/m)]
 
@@ -235,7 +235,7 @@ class Pipe:
 
         :param m_dot: mass flow rate, kg/s
         :param temp: temperature, C
-        :return convection resistance, K/(W/m)
+        :return: convection resistance, K/(W/m)
         """
 
         low_reynolds = 2000
@@ -254,9 +254,9 @@ class Pipe:
 
         return 1 / (nu * pi * self.fluid.k(temp))
 
-    def calc_pipe_resist(self, m_dot: float, temp: float):
+    def calc_fluid_pipe_resist(self, m_dot: float, temp: float):
         """
-        Calculates the combined conduction and convection pipe resistance
+        Calculates the combined convection and conduction pipe resistance
 
         Javed, S. and Spitler, J.D. 2017. 'Accuracy of borehole thermal resistance calculation methods
         for grouted single U-tube ground heat exchangers.' Applied Energy. 187: 790-806.
@@ -265,7 +265,7 @@ class Pipe:
 
         :param m_dot: mass flow rate, kg/s
         :param temp: temperature, C
-        :return: combined conduction and convection pipe resistance, K/(W/m)
+        :return: combined convection and conduction pipe resistance, K/(W/m)
         """
 
-        return self.calc_pipe_internal_conv_resist(m_dot, temp) + self.calc_pipe_cond_resist()
+        return self.calc_conv_resist(m_dot, temp) + self.calc_cond_resist()
