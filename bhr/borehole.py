@@ -1,3 +1,5 @@
+from typing import cast
+
 from bhr.coaxial_borehole import Coaxial
 from bhr.double_u_borehole import DoubleUTube
 from bhr.enums import BoreholeType, BoundaryCondition
@@ -289,15 +291,15 @@ class Borehole:
         :return: pipe conduction resistance, K/(W/m)
         """
 
-        if self._bh is None:
-            raise TypeError("Borehole not initialized")
-
-        if (self._bh_type is BoreholeType.SINGLE_U_TUBE) or (self._bh_type is BoreholeType.DOUBLE_U_TUBE):
-            return self._bh.calc_cond_resist()
-        elif self._bh_type is BoreholeType.COAXIAL:
-            return self._bh.calc_cond_resist()[1]
-        else:
-            raise NotImplementedError(f"{self._bh_type} not implemented.")
+        match self._bh_type:
+            case BoreholeType.SINGLE_U_TUBE:
+                return cast(SingleUBorehole, self._bh).calc_cond_resist()
+            case BoreholeType.DOUBLE_U_TUBE:
+                return cast(DoubleUTube, self._bh).calc_cond_resist()
+            case BoreholeType.COAXIAL:
+                return cast(Coaxial, self._bh).calc_cond_resist()[1]
+            case _:
+                raise NotImplementedError(f"{self._bh_type} not implemented.")
 
     def calc_fluid_resist(self, mass_flow_rate: float, temperature: float) -> float:
         """
@@ -309,15 +311,15 @@ class Borehole:
         :return: fluid convection, K/(W/m)
         """
 
-        if self._bh is None:
-            raise TypeError("Borehole not initialized")
-
-        if (self._bh_type is BoreholeType.SINGLE_U_TUBE) or (self._bh_type is BoreholeType.DOUBLE_U_TUBE):
-            return self._bh.calc_conv_resist(mass_flow_rate, temperature)
-        elif self._bh_type is BoreholeType.COAXIAL:
-            return sum(self._bh.calc_conv_resist_annulus(mass_flow_rate, temperature))
-        else:
-            raise NotImplementedError(f"{self._bh_type} not implemented.")
+        match self._bh_type:
+            case BoreholeType.SINGLE_U_TUBE:
+                return cast(SingleUBorehole, self._bh).calc_conv_resist(mass_flow_rate, temperature)
+            case BoreholeType.DOUBLE_U_TUBE:
+                return cast(DoubleUTube, self._bh).calc_conv_resist(mass_flow_rate, temperature)
+            case BoreholeType.COAXIAL:
+                return sum(cast(Coaxial, self._bh).calc_conv_resist_annulus(mass_flow_rate, temperature))
+            case _:
+                raise NotImplementedError(f"{self._bh_type} not implemented.")
 
     def calc_fluid_pipe_resist(self, mass_flow_rate: float, temperature: float) -> float:
         """
