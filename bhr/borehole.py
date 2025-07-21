@@ -285,8 +285,7 @@ class Borehole:
         """
         Computes the pipe conduction resistance.
 
-        In the case of coaxial boreholes, the function returns a tuple of the conduction resistances
-        for the inner and outer pipes.
+        In the case of coaxial boreholes, the function only returns the conduction resistances for the outer pipe.
 
         :return: pipe conduction resistance, K/(W/m)
         """
@@ -305,7 +304,7 @@ class Borehole:
         """
         Computes the fluid convection resistance.
 
-        In the case of coaxial boreholes, the function returns a tuple of the convection resistances
+        In the case of coaxial boreholes, the function returns the sum of the convection resistances
         for the inner pipe and annular region.
 
         :return: fluid convection, K/(W/m)
