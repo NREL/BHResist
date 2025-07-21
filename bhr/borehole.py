@@ -207,6 +207,7 @@ class Borehole:
                 soil_conductivity,
                 fluid_type,
                 fluid_concentration,
+                bc_str,
             )
 
         elif self._bh_type == BoreholeType.DOUBLE_U_TUBE:
@@ -228,6 +229,7 @@ class Borehole:
                 soil_conductivity,
                 fluid_type,
                 fluid_concentration,
+                bc_str,
             )
 
         elif self._bh_type == BoreholeType.COAXIAL:
@@ -251,6 +253,7 @@ class Borehole:
                 soil_conductivity,
                 fluid_type,
                 fluid_concentration,
+                bc_str,
             )
 
         else:
