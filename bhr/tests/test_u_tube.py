@@ -1,17 +1,23 @@
 from unittest import TestCase
 
+from bhr.fluid import get_fluid
 from bhr.u_tube import UTube
 
 
 class TestUTube(TestCase):
     def test_init(self):
+        fluid = get_fluid("water")
+
         inputs = {
             "pipe_outer_diameter": 0.034,
             "pipe_dimension_ratio": 11,
             "length": 100,
             "shank_space": 0.03,
             "pipe_conductivity": 0.4,
-            "fluid_type": "WATER",
+            "fluid_cp": fluid.cp(20),
+            "fluid_mu": fluid.mu(20),
+            "fluid_rho": fluid.rho(20),
+            "fluid_k": fluid.k(20),
         }
 
         u_tube = UTube(**inputs)

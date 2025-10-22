@@ -1,6 +1,5 @@
 from math import log, pi
 
-from bhr.fluid import get_fluid
 from bhr.utilities import inch_to_m, smoothing_function
 
 
@@ -11,10 +10,15 @@ class Pipe:
         pipe_dimension_ratio: float,
         pipe_length: float,
         pipe_conductivity: float,
-        fluid_type: str,
-        fluid_concentration: float = 0,
+        fluid_cp: float = 4182,
+        fluid_mu: float = 0.001,
+        fluid_rho: float = 998,
+        fluid_k: float = 0.598,
     ):
-        self.fluid = get_fluid(fluid_type, fluid_concentration)
+        self.fluid_cp = fluid_cp
+        self.fluid_mu = fluid_mu
+        self.fluid_rho = fluid_rho
+        self.fluid_k = fluid_k
 
         # ratio of outer diameter to wall thickness
         self.dimension_ratio = pipe_dimension_ratio
@@ -72,38 +76,35 @@ class Pipe:
 
         return inch_to_m(self.get_inner_dia(outer_dia, dimension_ratio)), inch_to_m(outer_dia)
 
-    def mdot_to_vdot(self, m_dot: float, temp: float) -> float:
+    def mdot_to_vdot(self, m_dot: float) -> float:
         """
         Computes volumetric flow rate based on mass flow rate.
 
         :param m_dot: mass flow rate, in kg/s
-        :param temp: temperature, in C
         :return: volumetric flow rate, in m3/s
         """
 
-        return m_dot / self.fluid.density(temp)
+        return m_dot / self.fluid_rho
 
-    def mdot_to_re(self, m_dot: float, temp: float) -> float:
+    def mdot_to_re(self, m_dot: float) -> float:
         """
         Computes Reynolds number based on mass flow rate.
 
         :param m_dot: mass flow rate, in kg/s
-        :param temp: temperature, in C
         :return: Reynolds number, dimensionless
         """
 
-        return 4 * m_dot / (self.fluid.mu(temp) * pi * self.pipe_inner_diameter)
+        return 4 * m_dot / (self.fluid_mu * pi * self.pipe_inner_diameter)
 
-    def mdot_to_velocity(self, m_dot: float, temp: float) -> float:
+    def mdot_to_velocity(self, m_dot: float) -> float:
         """
         Computes velocity based on mass flow rate.
 
         :param m_dot: mass flow rate in, kg/s
-        :param temp: temperature, in C
         :return: velocity, in m/s
         """
 
-        return m_dot / (self.area_cr_inner * self.fluid.density(temp))
+        return m_dot / (self.area_cr_inner * self.fluid_rho)
 
     def friction_factor(self, re: float) -> float:
         """
@@ -158,35 +159,33 @@ class Pipe:
 
         return (0.79 * log(re) - 1.64) ** (-2.0)
 
-    def pressure_loss(self, m_dot: float, temp: float) -> float:
+    def pressure_loss(self, m_dot: float) -> float:
         """
         Pressure loss in straight pipe
 
         :param m_dot: mass flow rate, kg/s
-        :param temp: temperature, C
         :return: pressure loss, Pa
         """
 
         if m_dot <= 0:
             return 0
 
-        re = self.mdot_to_re(m_dot, temp)
+        re = self.mdot_to_re(m_dot)
         term_1 = self.friction_factor(re) * self.pipe_length / self.pipe_inner_diameter
-        term_2 = (self.fluid.density(temp) * self.mdot_to_velocity(m_dot, temp) ** 2) / 2
+        term_2 = (self.fluid_rho * self.mdot_to_velocity(m_dot) ** 2) / 2
 
         return term_1 * term_2
 
-    def pressure_loss_v_dot(self, v_dot: float, temp: float) -> float:
+    def pressure_loss_v_dot(self, v_dot: float) -> float:
         """
         Pressure loss in a straight pipe
 
         :param v_dot: volume flow rate, m3/s
-        :param temp: temperature, C
         :return: pressure loss, Pa
         """
 
-        m_dot = self.fluid.density(temp) * v_dot
-        return self.pressure_loss(m_dot, temp)
+        m_dot = self.fluid_rho * v_dot
+        return self.pressure_loss(m_dot)
 
     @staticmethod
     def laminar_nusselt():
@@ -198,7 +197,7 @@ class Pipe:
         """
         return 4.01
 
-    def turbulent_nusselt(self, re: float, temp: float):
+    def turbulent_nusselt(self, re: float):
         """
         Turbulent Nusselt number for smooth pipes
 
@@ -206,12 +205,11 @@ class Pipe:
         International Chemical Engineering 16(1976), pp. 359-368.
 
         :param re: Reynolds number
-        :param temp: temperature, C
         :return: Nusselt number
         """
 
         f = self.friction_factor(re)
-        pr = self.fluid.prandtl(temp)
+        pr = self.fluid_mu * self.fluid_cp / self.fluid_k
         return (f / 8) * (re - 1000) * pr / (1 + 12.7 * (f / 8) ** 0.5 * (pr ** (2 / 3) - 1))
 
     def calc_cond_resist(self) -> float:
@@ -226,7 +224,7 @@ class Pipe:
 
         return log(self.pipe_outer_diameter / self.pipe_inner_diameter) / (2 * pi * self.pipe_conductivity)
 
-    def calc_conv_resist(self, m_dot: float, temp: float) -> float:
+    def calc_conv_resist(self, m_dot: float) -> float:
         """
         Calculates the pipe internal convection thermal resistance, in [k/(W/m)]
 
@@ -234,27 +232,26 @@ class Pipe:
         International Chemical Engineering 16(1976), pp. 359-368.
 
         :param m_dot: mass flow rate, kg/s
-        :param temp: temperature, C
         :return: convection resistance, K/(W/m)
         """
 
         low_reynolds = 2000
         high_reynolds = 4000
 
-        re = self.mdot_to_re(m_dot, temp)
+        re = self.mdot_to_re(m_dot)
 
         if re < low_reynolds:
             nu = self.laminar_nusselt()
         elif low_reynolds <= re < high_reynolds:
             nu_low = self.laminar_nusselt()
-            nu_high = self.turbulent_nusselt(high_reynolds, temp)
+            nu_high = self.turbulent_nusselt(high_reynolds)
             nu = smoothing_function(re, low_reynolds, high_reynolds, nu_low, nu_high)
         else:
-            nu = self.turbulent_nusselt(re, temp)
+            nu = self.turbulent_nusselt(re)
 
-        return 1 / (nu * pi * self.fluid.k(temp))
+        return 1 / (nu * pi * self.fluid_k)
 
-    def calc_fluid_pipe_resist(self, m_dot: float, temp: float):
+    def calc_fluid_pipe_resist(self, m_dot: float):
         """
         Calculates the combined convection and conduction pipe resistance
 
@@ -264,8 +261,7 @@ class Pipe:
         Equation 3
 
         :param m_dot: mass flow rate, kg/s
-        :param temp: temperature, C
         :return: combined convection and conduction pipe resistance, K/(W/m)
         """
 
-        return self.calc_conv_resist(m_dot, temp) + self.calc_cond_resist()
+        return self.calc_conv_resist(m_dot) + self.calc_cond_resist()

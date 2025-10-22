@@ -1,17 +1,22 @@
 import unittest
 from math import log
 
+from bhr.fluid import get_fluid
 from bhr.pipe import Pipe
 
 
 class TestPipe(unittest.TestCase):
     def setUp(self):
+        fluid = get_fluid("water")
         self.inputs = {
             "pipe_outer_diameter": 0.0334,
             "pipe_dimension_ratio": 11,
             "pipe_length": 100,
             "pipe_conductivity": 0.4,
-            "fluid_type": "WATER",
+            "fluid_cp": fluid.cp(20),
+            "fluid_mu": fluid.mu(20),
+            "fluid_rho": fluid.rho(20),
+            "fluid_k": fluid.k(20),
         }
 
     def test_init_pipe(self):
@@ -42,7 +47,7 @@ class TestPipe(unittest.TestCase):
     def test_mdot_to_re(self):
         p = Pipe(**self.inputs)
         tol = 0.1
-        self.assertAlmostEqual(p.mdot_to_re(0.1, 20), 4649.9, delta=tol)
+        self.assertAlmostEqual(p.mdot_to_re(0.1), 4649.9, delta=tol)
 
     def test_calc_friction_factor(self):
         p = Pipe(**self.inputs)
@@ -86,8 +91,8 @@ class TestPipe(unittest.TestCase):
     def test_turbulent_nusselt(self):
         p = Pipe(**self.inputs)
         tol = 0.01
-        self.assertAlmostEqual(p.turbulent_nusselt(3000, 20), 18.39, delta=tol)
-        self.assertAlmostEqual(p.turbulent_nusselt(10000, 20), 79.50, delta=tol)
+        self.assertAlmostEqual(p.turbulent_nusselt(3000), 18.39, delta=tol)
+        self.assertAlmostEqual(p.turbulent_nusselt(10000), 79.50, delta=tol)
 
     def test_calc_conduction_resistance(self):
         p = Pipe(**self.inputs)
@@ -96,18 +101,17 @@ class TestPipe(unittest.TestCase):
 
     def test_calc_convection_resistance(self):
         p = Pipe(**self.inputs)
-        temp = 20
         tol = 0.00001
-        self.assertAlmostEqual(p.calc_conv_resist(0, temp), 0.13266, delta=tol)
-        self.assertAlmostEqual(p.calc_conv_resist(0.07, temp), 0.020784, delta=tol)
-        self.assertAlmostEqual(p.calc_conv_resist(2, temp), 0.00094, delta=tol)
+        self.assertAlmostEqual(p.calc_conv_resist(0), 0.13266, delta=tol)
+        self.assertAlmostEqual(p.calc_conv_resist(0.07), 0.020784, delta=tol)
+        self.assertAlmostEqual(p.calc_conv_resist(2), 0.00094, delta=tol)
 
     def test_calc_resist(self):
         pipe = Pipe(**self.inputs)
         tol = 0.00001
-        self.assertAlmostEqual(pipe.calc_fluid_pipe_resist(0.5, 20), 0.082985, delta=tol)
+        self.assertAlmostEqual(pipe.calc_fluid_pipe_resist(0.5), 0.082985, delta=tol)
 
     def test_pressure_loss(self):
         pipe = Pipe(**self.inputs)
         tol = 1
-        self.assertAlmostEqual(pipe.pressure_loss(0.5, 20), 33533, delta=tol)
+        self.assertAlmostEqual(pipe.pressure_loss(0.5), 33533, delta=tol)

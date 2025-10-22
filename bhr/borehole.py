@@ -26,8 +26,10 @@ class Borehole:
         pipe_conductivity: float,
         grout_conductivity: float,
         soil_conductivity: float,
-        fluid_type: str,
-        fluid_concentration: float = 0,
+        fluid_cp: float = 4182,
+        fluid_mu: float = 0.001,
+        fluid_rho: float = 998,
+        fluid_k: float = 0.598,
         boundary_condition: str = "UNIFORM_HEAT_FLUX",
     ) -> None:
         """
@@ -41,8 +43,6 @@ class Borehole:
         :param pipe_conductivity: pipe thermal conductivity, in W/m-K.
         :param grout_conductivity: grout thermal conductivity, in W/m-K.
         :param soil_conductivity: soil thermal conductivity, in W/m-K.
-        :param fluid_type: fluid type. "ETHYLALCOHOL", "ETHYLENEGLYCOL", "METHYLALCOHOL",  "PROPYLENEGLYCOL", or "WATER"
-        :param fluid_concentration: fractional concentration of antifreeze mixture, from 0-0.6.
         :param boundary_condition: borehole wall boundary condition. "UNIFORM_HEAT_FLUX" or "UNIFORM_BOREHOLE_WALL_TEMP"
         """
 
@@ -57,8 +57,10 @@ class Borehole:
             pipe_conductivity,
             grout_conductivity,
             soil_conductivity,
-            fluid_type,
-            fluid_concentration,
+            fluid_cp,
+            fluid_mu,
+            fluid_rho,
+            fluid_k,
         )
 
     def init_double_u_borehole(
@@ -72,8 +74,10 @@ class Borehole:
         pipe_inlet_arrangement: str,
         grout_conductivity: float,
         soil_conductivity: float,
-        fluid_type: str,
-        fluid_concentration: float = 0,
+        fluid_cp: float = 4182,
+        fluid_mu: float = 0.001,
+        fluid_rho: float = 998,
+        fluid_k: float = 0.598,
         boundary_condition: str = "UNIFORM_HEAT_FLUX",
     ) -> None:
         """
@@ -88,8 +92,6 @@ class Borehole:
         :param pipe_inlet_arrangement: arrangement of the pipe inlets. "ADJACENT", or "DIAGONAL"
         :param grout_conductivity: grout thermal conductivity, in W/m-K.
         :param soil_conductivity: soil thermal conductivity, in W/m-K.
-        :param fluid_type: fluid type. "ETHYLALCOHOL", "ETHYLENEGLYCOL", "METHYLALCOHOL",  "PROPYLENEGLYCOL", or "WATER"
-        :param fluid_concentration: fractional concentration of antifreeze mixture, from 0-0.6.
         :param boundary_condition: borehole wall boundary condition. "UNIFORM_HEAT_FLUX" or "UNIFORM_BOREHOLE_WALL_TEMP"
         """
 
@@ -105,8 +107,10 @@ class Borehole:
             pipe_inlet_arrangement,
             grout_conductivity,
             soil_conductivity,
-            fluid_type,
-            fluid_concentration,
+            fluid_cp,
+            fluid_mu,
+            fluid_rho,
+            fluid_k,
         )
 
     def init_coaxial_borehole(
@@ -121,8 +125,10 @@ class Borehole:
         length: float,
         grout_conductivity: float,
         soil_conductivity: float,
-        fluid_type: str,
-        fluid_concentration: float,
+        fluid_cp: float = 4182,
+        fluid_mu: float = 0.001,
+        fluid_rho: float = 998,
+        fluid_k: float = 0.598,
         boundary_condition: str = "UNIFORM_HEAT_FLUX",
     ) -> None:
         """
@@ -138,8 +144,6 @@ class Borehole:
         :param length: length of borehole from top to bottom, in m.
         :param grout_conductivity: grout thermal conductivity, in W/m-K.
         :param soil_conductivity: pipe thermal conductivity, in W/m-K.
-        :param fluid_type: fluid type. "ETHYLALCOHOL", "ETHYLENEGLYCOL", "METHYLALCOHOL",  "PROPYLENEGLYCOL", or "WATER"
-        :param fluid_concentration: fractional concentration of antifreeze mixture, from 0-0.6.
         :param boundary_condition: borehole wall boundary condition. "UNIFORM_HEAT_FLUX" or "UNIFORM_BOREHOLE_WALL_TEMP"
         """
 
@@ -156,8 +160,10 @@ class Borehole:
             length,
             grout_conductivity,
             soil_conductivity,
-            fluid_type,
-            fluid_concentration,
+            fluid_cp,
+            fluid_mu,
+            fluid_rho,
+            fluid_k,
         )
 
     def init_from_dict(self, inputs: dict):
@@ -189,8 +195,10 @@ class Borehole:
         length = inputs["length"]
         grout_conductivity = inputs["grout_conductivity"]
         soil_conductivity = inputs["soil_conductivity"]
-        fluid_type = inputs["fluid_type"]
-        fluid_concentration = inputs["fluid_concentration"]
+        fluid_cp = inputs["fluid_cp"]
+        fluid_mu = inputs["fluid_mu"]
+        fluid_rho = inputs["fluid_rho"]
+        fluid_k = inputs["fluid_k"]
 
         if self._bh_type == BoreholeType.SINGLE_U_TUBE:
             pipe_outer_dia_single = inputs["single_u_tube"]["pipe_outer_diameter"]
@@ -207,8 +215,10 @@ class Borehole:
                 pipe_conductivity_single,
                 grout_conductivity,
                 soil_conductivity,
-                fluid_type,
-                fluid_concentration,
+                fluid_cp,
+                fluid_mu,
+                fluid_rho,
+                fluid_k,
                 bc_str,
             )
 
@@ -229,8 +239,10 @@ class Borehole:
                 pipe_inlet_arrangement,
                 grout_conductivity,
                 soil_conductivity,
-                fluid_type,
-                fluid_concentration,
+                fluid_cp,
+                fluid_mu,
+                fluid_rho,
+                fluid_k,
                 bc_str,
             )
 
@@ -253,15 +265,17 @@ class Borehole:
                 length,
                 grout_conductivity,
                 soil_conductivity,
-                fluid_type,
-                fluid_concentration,
+                fluid_cp,
+                fluid_mu,
+                fluid_rho,
+                fluid_k,
                 bc_str,
             )
 
         else:
             raise NotImplementedError(f'bh_type "{self._bh_type.name}" not implemented')
 
-    def calc_bh_resist(self, mass_flow_rate: float, temperature: float) -> float:
+    def calc_bh_resist(self, mass_flow_rate: float) -> float:
         """
         Computes the effective borehole thermal resistance.
 
@@ -274,10 +288,10 @@ class Borehole:
             raise TypeError("Borehole not initialized")
 
         if self._boundary_condition == BoundaryCondition.UNIFORM_HEAT_FLUX:
-            return self._bh.calc_effective_bh_resistance_uhf(mass_flow_rate, temperature)
+            return self._bh.calc_effective_bh_resistance_uhf(mass_flow_rate)
 
         if self._boundary_condition == BoundaryCondition.UNIFORM_BOREHOLE_WALL_TEMP:
-            return self._bh.calc_effective_bh_resistance_ubwt(mass_flow_rate, temperature)
+            return self._bh.calc_effective_bh_resistance_ubwt(mass_flow_rate)
 
         raise NotImplementedError(f'Boundary Condition: "{self._boundary_condition}" implemented.')
 
@@ -300,7 +314,7 @@ class Borehole:
             case _:
                 raise NotImplementedError(f"{self._bh_type} not implemented.")
 
-    def calc_fluid_resist(self, mass_flow_rate: float, temperature: float) -> float:
+    def calc_fluid_resist(self, mass_flow_rate: float) -> float:
         """
         Computes the fluid convection resistance.
 
@@ -312,15 +326,15 @@ class Borehole:
 
         match self._bh_type:
             case BoreholeType.SINGLE_U_TUBE:
-                return cast(SingleUBorehole, self._bh).calc_conv_resist(mass_flow_rate, temperature)
+                return cast(SingleUBorehole, self._bh).calc_conv_resist(mass_flow_rate)
             case BoreholeType.DOUBLE_U_TUBE:
-                return cast(DoubleUTube, self._bh).calc_conv_resist(mass_flow_rate, temperature)
+                return cast(DoubleUTube, self._bh).calc_conv_resist(mass_flow_rate)
             case BoreholeType.COAXIAL:
-                return sum(cast(Coaxial, self._bh).calc_conv_resist_annulus(mass_flow_rate, temperature))
+                return sum(cast(Coaxial, self._bh).calc_conv_resist_annulus(mass_flow_rate))
             case _:
                 raise NotImplementedError(f"{self._bh_type} not implemented.")
 
-    def calc_fluid_pipe_resist(self, mass_flow_rate: float, temperature: float) -> float:
+    def calc_fluid_pipe_resist(self, mass_flow_rate: float) -> float:
         """
         Computes the fluid convection + pipe conduction resistance.
 
@@ -336,4 +350,4 @@ class Borehole:
         if self._bh_type is None:
             raise NotImplementedError(f"{self._bh_type} not implemented.")
 
-        return self._bh.calc_fluid_pipe_resist(mass_flow_rate, temperature)
+        return self._bh.calc_fluid_pipe_resist(mass_flow_rate)
