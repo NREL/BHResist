@@ -2,7 +2,7 @@ Borehole
 ========
 
 .. automodule:: bhr.borehole
-    :members:
-    :undoc-members:
-    :show-inheritance:
-    :noindex:
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :noindex:
