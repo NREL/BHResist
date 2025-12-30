@@ -16,7 +16,7 @@ class TestPipe(unittest.TestCase):
 
     def test_init_pipe(self):
         p = Pipe(**self.inputs)
-        tol = 0.0001
+        tol = 1e-4
 
         # props
         self.assertAlmostEqual(p.pipe_conductivity, 0.4, delta=tol)
