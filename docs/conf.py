@@ -7,9 +7,9 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "BH Resist"
-copyright = "2025, Alliance for Sustainable Energy, LLC"
+copyright = "2026, Alliance for Energy Innovation"
 author = "Matt Mitchell"
-release = "0.1"
+release = "0.3"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
