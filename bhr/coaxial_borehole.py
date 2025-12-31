@@ -62,6 +62,7 @@ class Coaxial:
         )
 
         self.annular_hydraulic_diameter = self.outer_pipe.pipe_inner_diameter - self.inner_pipe.pipe_outer_diameter
+        self.annular_wetted_perimeter = pi * (self.outer_pipe.pipe_inner_diameter + self.inner_pipe.pipe_outer_diameter)
 
     def re_annulus(self, m_dot, temp):
         """
@@ -72,7 +73,7 @@ class Coaxial:
         :return: Reynolds number
         """
 
-        return 4 * m_dot / (self.fluid.mu(temp) * pi * self.annular_hydraulic_diameter)
+        return 4 * m_dot / (self.fluid.mu(temp) * self.annular_wetted_perimeter)
 
     def laminar_nusselt_annulus(self):
         """
