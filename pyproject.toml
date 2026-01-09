@@ -1,37 +1,57 @@
-[tool.poetry]
+[build-system]
+requires = ["uv_build>=0.9.22,<0.10.0"]
+build-backend = "uv_build"
+
+[project]
 name = "BHResist"
-version = "0.2.0"
+version = "0.3"
 description = "Functionality to compute the thermal resistance of borehole heat exchangers"
-authors = ["Matt Mitchell <mitchute@gmail.com>"]
 readme = "README.md"
 license = "BSD-3-Clause"
-repository = "https://github.com/NREL/BHResist"
+license-files = ["LICENSE"]
+authors = [{ name = "Matt Mitchell", email = "Matt.Mitchell@nrel.gov" }]
+requires-python = ">=3.10"
+dependencies = [
+    "SecondaryCoolantProps>=1.4",
+]
 
 classifiers = [
     "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Scientific/Engineering",
 ]
 
-packages = [
-    { include = "bhr" }
+[project.urls]
+Repository = "https://github.com/NREL/BHResist"
+Documentation = "https://bhresist.readthedocs.io/"
+Releases = "https://github.com/NREL/BHResist/releases"
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4",
+    "pytest>=9",
+    "pytest-cov>=7",
+]
+docs = [
+    "sphinx>=8",
+    "sphinx-rtd-theme>=3",
 ]
 
-[tool.poetry.dependencies]
-python = ">=3.10, <3.14"
-SecondaryCoolantProps = "^1.3"
+[tool.pytest.ini_options]
+addopts = "--cov=bhr"
 
-[tool.poetry.group.dev.dependencies]
-pre-commit = "^4"
-pytest = "^8"
-pytest-cov = "^6"
-sphinx = "^7"
-sphinx-rtd-theme = "^3.0.2"
+[tool.uv]
+default-groups = ["dev", "docs"]
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.uv.build-backend]
+module-name = "bhr"
+module-root = ""
