@@ -1,6 +1,5 @@
 from math import log as ln
 from math import pi, sqrt
-from typing import Union
 
 from bhr.enums import DoubleUPipeInletArrangement
 from bhr.u_tube import UTube
@@ -125,7 +124,7 @@ class DoubleUTube(UTube):
         self.d_5 = self.p_c * self.p_b**7 + 3 * self.p_c**5 * self.p_b**3
 
         # non-static parameters
-        self.pipe_resist: Union[float, None] = None
+        self.pipe_resist: float | None = None
 
     def update_b1(self, m_dot_per_u_tube: float, temperature: float) -> float:
         """

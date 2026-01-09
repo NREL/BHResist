@@ -41,7 +41,7 @@ class Borehole:
         :param pipe_conductivity: pipe thermal conductivity, in W/m-K.
         :param grout_conductivity: grout thermal conductivity, in W/m-K.
         :param soil_conductivity: soil thermal conductivity, in W/m-K.
-        :param fluid_type: fluid type. "ETHYLALCOHOL", "ETHYLENEGLYCOL", "METHYLALCOHOL",  "PROPYLENEGLYCOL", or "WATER"
+        :param fluid_type: fluid type. "ETHYLALCOHOL", "ETHYLENEGLYCOL", "METHYLALCOHOL", "PROPYLENEGLYCOL", or "WATER"
         :param fluid_concentration: fractional concentration of antifreeze mixture, from 0-0.6.
         :param boundary_condition: borehole wall boundary condition. "UNIFORM_HEAT_FLUX" or "UNIFORM_BOREHOLE_WALL_TEMP"
         """
