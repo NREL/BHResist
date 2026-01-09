@@ -16,7 +16,7 @@ dependencies = [
 ]
 
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "Operating System :: OS Independent",
@@ -55,3 +55,4 @@ default-groups = ["dev", "docs"]
 [tool.uv.build-backend]
 module-name = "bhr"
 module-root = ""
+source-exclude = ["bhr/tests"]
